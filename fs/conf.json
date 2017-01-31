@@ -1,0 +1,16 @@
+{
+	"wifi": 
+	{
+		"sta": 
+		{
+			"enable": true,
+			"ssid": "TP-LINK-Landgraf",
+			"pass": "07031987"
+		},
+
+		"ap": 
+		{
+			"enable": false
+		}
+	}
+}
