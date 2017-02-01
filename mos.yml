@@ -17,3 +17,5 @@ filesystem:
 extra_files:
 build_vars:
   APP_CONF_SCHEMA: src/conf_schema.yaml
+  MGOS_ENABLE_WEB_CONFIG: 1
+  MGOS_ENABLE_FILE_UPLOAD: 1
