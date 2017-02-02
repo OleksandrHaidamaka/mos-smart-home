@@ -1,27 +1,20 @@
 /*
  @autor: Alexandr Haidamaka
- @date:  16.01.2017
+ @ver:   1.0
  */
 
-/******************************
+/*******************************************************************************
  *** INCLUDES
- ******************************/
+ ******************************************************************************/
 #include "common/platform.h"
 #include "fw/src/mgos_app.h"
 #include "fw/src/mgos_gpio.h"
 #include "fw/src/mgos_timers.h"
 #include "fw/src/mgos_wifi.h"
-//#include "fw/src/mgos_sys_config.h"
 
-/******************************
+/*******************************************************************************
  *** COMMON DEFENITIONS
- ******************************/
-#define __DEBUG
-
-#ifndef __DEBUG
-#define  printf()
-#endif
-
+ ******************************************************************************/
 #define  D0         (16)
 #define  D1         (5)
 #define  D2         (4)
@@ -36,17 +29,24 @@
 
 #define  LED_PIN    (D4)
 
-/******************************
+/*******************************************************************************
  *** CUSTOM DEFENITIONS
- ******************************/
+ ******************************************************************************/
 #define NUM_SWITCHES   (2)     // number of switches
 #define DEBOUNCE_TIME  (0.05)  // seconds
 #define MQTT_DELAY     (1000)  // sending timeout
 
-/******************************
+/*******************************************************************************
+ *** MACROSES
+ ******************************************************************************/
+#define led_off()  mgos_gpio_write(LED_PIN, true)
+#define led_on()   mgos_gpio_write(LED_PIN, false)
+
+/*******************************************************************************
  *** TYPEDEF
- ******************************/
-typedef struct {
+ ******************************************************************************/
+typedef struct
+{
 	double elapsed_time;
 	bool s_new;
 	bool s_old;
@@ -57,24 +57,29 @@ typedef struct {
  *** VARIABLES
  ******************************************************************************/
 mgos_timer_id timer_id = NULL;
-const uint8_t switch_pin[NUM_SWITCHES] = { D2, D3 }; // connect appropriate pins
-const uint8_t light_pin[NUM_SWITCHES] = { D5, D6 };  // connect appropriate pins
+const uint8_t switch_pin[NUM_SWITCHES] =
+{ D2, D3 }; // connect appropriate pins
+const uint8_t light_pin[NUM_SWITCHES] =
+{ D5, D6 };  // connect appropriate pins
 switch_state_t switch_state[NUM_SWITCHES];
 //void(*mqtt_handler) (void) = NULL;
 
-/******************************
+/*******************************************************************************
  *** PROTOTYPES
- ******************************/
+ ******************************************************************************/
 static void timer_handler();
 
-static void welcome_str() {
+static void welcome_str()
+{
 	printf("\n\n*** Welcome to mos Hall project ***\n");
 	printf("*** Compile time: %s ********\n\n", __TIME__);
 }
 
-static void init_switchs() {
+static void init_switchs()
+{
 	welcome_str();
-	for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
+	for (uint8_t i = 0; i < NUM_SWITCHES; i++)
+	{
 		switch_state[i].s_new = switch_state[i].s_old = mgos_gpio_read(
 				switch_pin[i]);
 		switch_state[i].update = true;
@@ -83,33 +88,40 @@ static void init_switchs() {
 	}
 }
 
-static void low_level_init() {
+static void low_level_init()
+{
 	mgos_gpio_set_mode(LED_PIN, MGOS_GPIO_MODE_OUTPUT);
-	mgos_gpio_write(LED_PIN, false);
+	led_off();
 
-	for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
+	for (uint8_t i = 0; i < NUM_SWITCHES; i++)
+	{
 		mgos_gpio_set_mode(switch_pin[i], MGOS_GPIO_MODE_INPUT);
 		mgos_gpio_set_pull(switch_pin[i], MGOS_GPIO_PULL_UP);
 		mgos_gpio_set_mode(light_pin[i], MGOS_GPIO_MODE_OUTPUT);
 	}
 
 	init_switchs();
-	timer_id = mgos_set_timer(25, true, timer_handler, NULL);
+	timer_id = mgos_set_timer(50, true, timer_handler, NULL);
 //	mqtt_handler = mqtt_pub_init_state;
 }
 
-static void button_handler() {
-	for (uint8_t i = 0; i < NUM_SWITCHES; i++) {
+static void button_handler()
+{
+	for (uint8_t i = 0; i < NUM_SWITCHES; i++)
+	{
 		uint8_t state = mgos_gpio_read(switch_pin[i]);
 
 		// If the switch changed, due to noise or pressing:
-		if (state != switch_state[i].s_new) {
+		if (state != switch_state[i].s_new)
+		{
 			switch_state[i].s_new = state;
 			switch_state[i].elapsed_time = mg_time() + DEBOUNCE_TIME;
 		}
 
-		if ((mg_time() > switch_state[i].elapsed_time)) {
-			if (state != switch_state[i].s_old) {
+		if ((mg_time() > switch_state[i].elapsed_time))
+		{
+			if (state != switch_state[i].s_old)
+			{
 				switch_state[i].s_old = state;
 				mgos_gpio_write(light_pin[i], switch_state[i].s_old);
 				switch_state[i].update = 1;
@@ -120,17 +132,55 @@ static void button_handler() {
 	}
 }
 
-static void timer_handler() {
+static void blink_driver()
+{
+	static uint32_t time = 0;
+	static uint8_t state = 0;
+	static uint8_t count = 0;
+
+	if (time != 0)
+		time--;
+
+	switch (state)
+	{
+	case 0:
+		if (time == 0)
+		{
+			if (count == 2)
+			{
+				led_off();
+				count = 0;
+				time = 20;
+				break;
+			}
+			led_on();
+			time = 2;
+			state++;
+			count++;
+		}
+		break;
+	case 1:
+		if (time == 0)
+		{
+			led_off();
+			time = 2;
+			state--;
+		}
+		break;
+	}
+}
+
+static void timer_handler()
+{
+	blink_driver();
 	button_handler();
 }
 
-static void long_timer_handler() {
-	mgos_gpio_toggle(LED_PIN);
-}
-
-static void on_wifi_event(enum mgos_wifi_status event, void *data) {
+static void on_wifi_event(enum mgos_wifi_status event, void *data)
+{
 	(void) data;
-	switch (event) {
+	switch (event)
+	{
 	case MGOS_WIFI_IP_ACQUIRED:
 		break;
 	case MGOS_WIFI_CONNECTED:
@@ -140,10 +190,9 @@ static void on_wifi_event(enum mgos_wifi_status event, void *data) {
 	}
 }
 
-enum mgos_app_init_result mgos_app_init(void) {
-
-	mgos_set_timer(250, false, low_level_init, NULL);
-	mgos_set_timer(2500, true, long_timer_handler, NULL);
+enum mgos_app_init_result mgos_app_init(void)
+{
+	low_level_init();
 	mgos_wifi_add_on_change_cb(on_wifi_event, 0);
 
 	return MGOS_APP_INIT_SUCCESS;
