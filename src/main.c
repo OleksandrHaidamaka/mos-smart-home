@@ -11,6 +11,7 @@
 #include "fw/src/mgos_gpio.h"
 #include "fw/src/mgos_timers.h"
 #include "fw/src/mgos_wifi.h"
+#include "fw/src/mgos_mqtt.h"
 
 /*******************************************************************************
  *** COMMON DEFENITIONS
@@ -176,12 +177,27 @@ static void timer_handler()
 	button_handler();
 }
 
-static void on_wifi_event(enum mgos_wifi_status event, void *data)
+static void mqtt_handler(struct mg_connection *c, int ev, void *p)
+{
+	struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
+
+	printf("Mqtt event [%d]: %d", ev, msg->connack_ret_code);
+
+	if (ev == MG_EV_MQTT_CONNACK)
+	{
+		printf("CONNACK: %d", msg->connack_ret_code);
+		(void) c;
+//		sub(c, "%s", get_cfg()->mqtt.sub);
+	}
+}
+
+static void wifi_handler(enum mgos_wifi_status event, void *data)
 {
 	(void) data;
 	switch (event)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
+		mgos_mqtt_set_global_handler(mqtt_handler, NULL);
 		break;
 	case MGOS_WIFI_CONNECTED:
 		break;
@@ -193,7 +209,7 @@ static void on_wifi_event(enum mgos_wifi_status event, void *data)
 enum mgos_app_init_result mgos_app_init(void)
 {
 	low_level_init();
-	mgos_wifi_add_on_change_cb(on_wifi_event, 0);
+	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 
 	return MGOS_APP_INIT_SUCCESS;
 }
