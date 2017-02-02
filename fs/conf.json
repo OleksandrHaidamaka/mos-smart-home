@@ -1,16 +1,38 @@
 {
-	"wifi": 
-	{
-		"sta": 
-		{
-			"enable": true,
-			"ssid": "TP-LINK-Landgraf",
-			"pass": "07031987"
-		},
+    "wifi": 
+    {
+        "ap": 
+        {
+            "enable": false
+        },
 
-		"ap": 
-		{
-			"enable": false
-		}
-	}
+        "sta": 
+        {
+            "enable": true,
+            "ssid": "TP-LINK-Landgraf",
+            "pass": "07031987"
+        }
+    },
+
+    "device": 
+    {
+        "id": "landgraf",
+        "password": "c00794040e08443c8bab85b48e627b5e"
+    },
+
+    "mqtt": 
+    {
+        "server": "io.adafruit.com:1883",
+        "reconnect_timeout_min": 10,
+        "reconnect_timeout_max": 60,
+        "ssl_cert": "",
+        "ssl_key": "",
+        "ssl_ca_cert": "",
+        "clean_session": true,
+        "keep_alive": 60,
+        "will_topic": "",
+        "will_message": "",
+        "pub": "landgraf∕feeds∕hall-light-switch-first",
+        "sub": "landgraf∕feeds∕hall-light-switch-first"
+    }
 }
