@@ -177,31 +177,50 @@ static void timer_handler()
 	button_handler();
 }
 
+void mqtt_subscribe(struct mg_connection *c, char* topic, uint8_t qos)
+{
+	struct mg_mqtt_topic_expression topic_msg =
+	{ topic, qos };
+	mg_mqtt_subscribe(c, &topic_msg, 1, 42);
+	printf("mqtt: subscribed to \"%s\" topic\n", topic);
+}
+
 static void mqtt_handler(struct mg_connection *c, int ev, void *p)
 {
 	struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
 
-	printf("Mqtt event [%d]: %d", ev, msg->connack_ret_code);
+	printf("Mqtt event [%d]: err = %d\n", ev, msg->connack_ret_code);
 
 	if (ev == MG_EV_MQTT_CONNACK)
 	{
-		printf("CONNACK: %d", msg->connack_ret_code);
-		(void) c;
-//		sub(c, "%s", get_cfg()->mqtt.sub);
+		//blink 4
+		if (msg->connack_ret_code == 0)
+		{
+			mqtt_subscribe(c, "hall/light/switch/first", 0);
+			mqtt_subscribe(c, "hall/light/switch/second", 0);
+		}
+	}
+	else if (ev == MG_EV_MQTT_PUBLISH)
+	{
+
 	}
 }
 
 static void wifi_handler(enum mgos_wifi_status event, void *data)
 {
+
 	(void) data;
 	switch (event)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
+		//blink 3
 		mgos_mqtt_set_global_handler(mqtt_handler, NULL);
 		break;
 	case MGOS_WIFI_CONNECTED:
+		//blink 2
 		break;
 	case MGOS_WIFI_DISCONNECTED:
+		//blink 1
 		break;
 	}
 }
