@@ -180,6 +180,8 @@ static void timer_handler()
 
 #define NUM_TOPICS   (2)
 
+const char cmd[] =
+{ '0', '1' };
 const char topic0[] = "hall/light/switch/first";
 const char topic1[] = "hall/light/switch/second";
 
@@ -212,16 +214,21 @@ static int getlen(char* s)
 
 static void topic_parcer(struct mg_mqtt_message* msg)
 {
-	char* topic = malloc(msg->topic.len);
 	char* payload = malloc(msg->payload.len);
 
-	memset(topic, 0, msg->topic.len);
+	(void) cmd;
+
 	memset(payload, 0, msg->payload.len);
 
-	strncpy(topic, msg->topic.p, getlen((char*) msg->topic.p));
-	strncpy(payload, msg->payload.p, getlen((char*) msg->payload.p));
-	printf("mqtt sub: topic: %s; payload: %s\n", topic, payload);
-
+	// find appropriate topic
+	for (int i = 0; i < NUM_TOPICS; i++)
+	{
+		if (memcmp(msg->topic.p, topics[i], strlen(topics[i])) == 0)
+		{
+			memcpy(payload, msg->payload.p, getlen((char*) msg->payload.p));
+			printf("mqtt sub: topic: %s; payload: %s\n", topics[i], payload);
+		}
+	}
 }
 
 static void mqtt_handler(struct mg_connection *c, int ev, void *p)
