@@ -6,6 +6,7 @@
 /*******************************************************************************
  *** INCLUDES
  ******************************************************************************/
+#include <string.h>
 #include "common/platform.h"
 #include "fw/src/mgos_app.h"
 #include "fw/src/mgos_gpio.h"
@@ -177,12 +178,50 @@ static void timer_handler()
 	button_handler();
 }
 
-void mqtt_subscribe(struct mg_connection *c, char* topic, uint8_t qos)
+#define NUM_TOPICS   (2)
+
+const char topic0[] = "hall/light/switch/first";
+const char topic1[] = "hall/light/switch/second";
+
+const char* topics[NUM_TOPICS] =
+{ topic0, topic1 };
+
+void mqtt_subscribe(struct mg_connection *c, const char* topic, uint8_t qos)
 {
 	struct mg_mqtt_topic_expression topic_msg =
 	{ topic, qos };
 	mg_mqtt_subscribe(c, &topic_msg, 1, 42);
 	printf("mqtt: subscribed to \"%s\" topic\n", topic);
+}
+
+static int getlen(char* s)
+{
+	int i;
+
+	for (i = 0; (s[i] != ' ') && (s[i] != '\0'); i++)
+	{
+		if (i > 128)
+		{
+			s[0] = '\0';
+			return 0;
+		}
+	}
+	s[i] = '\0';
+	return i - 1;
+}
+
+static void topic_parcer(struct mg_mqtt_message* msg)
+{
+	char* topic = malloc(msg->topic.len);
+	char* payload = malloc(msg->payload.len);
+
+	memset(topic, 0, msg->topic.len);
+	memset(payload, 0, msg->payload.len);
+
+	strncpy(topic, msg->topic.p, getlen((char*) msg->topic.p));
+	strncpy(payload, msg->payload.p, getlen((char*) msg->payload.p));
+	printf("mqtt sub: topic: %s; payload: %s\n", topic, payload);
+
 }
 
 static void mqtt_handler(struct mg_connection *c, int ev, void *p)
@@ -196,13 +235,13 @@ static void mqtt_handler(struct mg_connection *c, int ev, void *p)
 		//blink 4
 		if (msg->connack_ret_code == 0)
 		{
-			mqtt_subscribe(c, "hall/light/switch/first", 0);
-			mqtt_subscribe(c, "hall/light/switch/second", 0);
+			mqtt_subscribe(c, topics[0], 0);
+			mqtt_subscribe(c, topics[1], 0);
 		}
 	}
 	else if (ev == MG_EV_MQTT_PUBLISH)
 	{
-
+		topic_parcer(msg);
 	}
 }
 
