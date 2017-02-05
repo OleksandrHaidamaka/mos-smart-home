@@ -6,7 +6,6 @@
 /*******************************************************************************
  *** INCLUDES
  ******************************************************************************/
-#include <string.h>
 #include "common/platform.h"
 #include "fw/src/mgos_app.h"
 #include "fw/src/mgos_gpio.h"
@@ -178,55 +177,78 @@ static void timer_handler()
 	button_handler();
 }
 
-#define NUM_TOPICS   (2)
+/*******************************************************************************
+ *** MQTT ENUMS
+ ******************************************************************************/
+typedef enum
+{
+	HOME_HALL = 0, HOME_BEDROOM, NUM_TOPICS
+} topics_e;
 
-const char cmd[] =
-{ '0', '1' };
-const char topic0[] = "hall/light/switch/first";
-const char topic1[] = "hall/light/switch/second";
+typedef enum
+{
+	CHANDELIER_COOL = 0, CHANDELIER_WARM, NUM_HALL_LIGHT
+} json_hall_light_e;
 
-const char* topics[NUM_TOPICS] =
-{ topic0, topic1 };
+const char topic_hall[] = "home/hall";
+const char topic_bedroom[] = "home/bedroom";
+
+const char* topics[] =
+{ topic_hall, topic_bedroom };
 
 void mqtt_subscribe(struct mg_connection *c, const char* topic, uint8_t qos)
 {
 	struct mg_mqtt_topic_expression topic_msg =
 	{ topic, qos };
 	mg_mqtt_subscribe(c, &topic_msg, 1, 42);
-	printf("mqtt: subscribed to \"%s\" topic\n", topic);
+	printf("subscribed to: %s topic\n", topic);
 }
 
-static int getlen(char* s)
+void mqtt_io_light(int num, bool state)
 {
-	int i;
-
-	for (i = 0; (s[i] != ' ') && (s[i] != '\0'); i++)
+	switch (num)
 	{
-		if (i > 128)
-		{
-			s[0] = '\0';
-			return 0;
-		}
+	case CHANDELIER_COOL:
+		mgos_gpio_write(light_pin[0], state);
+		break;
+	case CHANDELIER_WARM:
+		mgos_gpio_write(light_pin[1], state);
+		break;
 	}
-	s[i] = '\0';
-	return i - 1;
 }
 
 static void topic_parcer(struct mg_mqtt_message* msg)
 {
-	char* payload = malloc(msg->payload.len);
-
-	(void) cmd;
-
-	memset(payload, 0, msg->payload.len);
+	struct mg_str *t = &msg->topic;
+	struct mg_str *s = &msg->payload;
 
 	// find appropriate topic
 	for (int i = 0; i < NUM_TOPICS; i++)
 	{
-		if (memcmp(msg->topic.p, topics[i], strlen(topics[i])) == 0)
+		if (memcmp(t->p, topics[i], strlen(topics[i])) == 0)
 		{
-			memcpy(payload, msg->payload.p, getlen((char*) msg->payload.p));
-			printf("mqtt sub: topic: %s; payload: %s\n", topics[i], payload);
+			int json_light;
+			bool json_state;
+
+			switch (i)
+			{
+			case HOME_HALL:
+				printf("topic: %s; ", topics[i]);
+				if (json_scanf(s->p, s->len, "{light: %d, state: %d}",
+						&json_light, &json_state) == 2)
+				{
+					mqtt_io_light(json_light, json_state);
+					printf("got command: %.*s\n", (int) s->len, s->p);
+				}
+				else
+				{
+					printf("got command: unsupported :(\n");
+				}
+				break;
+			case HOME_BEDROOM:
+				break;
+			}
+
 		}
 	}
 }
@@ -235,15 +257,15 @@ static void mqtt_handler(struct mg_connection *c, int ev, void *p)
 {
 	struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
 
-	printf("Mqtt event [%d]: err = %d\n", ev, msg->connack_ret_code);
+	printf("mqtt event [%d]: err = %d\n", ev, msg->connack_ret_code);
 
 	if (ev == MG_EV_MQTT_CONNACK)
 	{
 		//blink 4
 		if (msg->connack_ret_code == 0)
 		{
-			mqtt_subscribe(c, topics[0], 0);
-			mqtt_subscribe(c, topics[1], 0);
+			for (int i = 0; i < NUM_TOPICS; i++)
+				mqtt_subscribe(c, topics[i], 0);
 		}
 	}
 	else if (ev == MG_EV_MQTT_PUBLISH)

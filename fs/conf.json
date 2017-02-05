@@ -32,5 +32,14 @@
         "keep_alive": 60,
         "will_topic": "",
         "will_message": ""
-    }
+    },
+
+  "debug": {
+    "mbedtls_level": 0, 
+    "level": 2, 
+    "stdout_uart": 0, 
+    "stderr_uart": 0, 
+    "enable_prompt": true, 
+    "factory_reset_gpio": -1
+  }, 
 }
