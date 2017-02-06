@@ -18,4 +18,9 @@
 
   # Also, you can override an existing "system" value:
   # ["uart.baud_rate", 9600],
+  
+  ["light", "o", {"title": "custom settings"}],
+  ["light.num", "i", 2, {title: "Integer setting example"}],
+  ["light.pin_0", "s", "D3", {title: "Integer setting example"}],
+  ["light.pin_1", "s", "D4", {title: "Integer setting example"}],
 ]
