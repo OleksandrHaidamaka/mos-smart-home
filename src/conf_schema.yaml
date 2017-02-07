@@ -1,26 +1,29 @@
+#**Pin definitions for NodeMCU**
+#           D0-->16
+#           D1-->5
+#           D2-->4
+#           D3-->0
+#           D4-->2
+#           D5-->14
+#           D6-->12
+#           D7-->13
+#           D8-->15
+#           D9-->3
+#           D10-->1
+#           LED_PIN-->D4
+
 [
-  # Below is a custom firmware configuration example.
-  # Uncomment and modify according to your needs.
-  # These settings get compiled into the C structure, and can be accessed
-  # from the C code this way:
-  #
-  # printf("Hello, %s!\n", get_cfg()->my_firmware.message);
-  #
-  # Settings are cool: can be modified remotely without full firmware upgrade!
-  #
-  # To see all available compiled settings, buid the firmware and open
-  # build/sys_config.c or build/sys_config.h file.
-
-  # ["my_firmware", "o", {"title": "My firmware settings"}],
-  # ["my_firmware.limit1", "i", 123, {title: "Integer setting example"}],
-  # ["my_firmware.allow", "b", true, {title: "Boolean setting example"}],
-  # ["my_firmware.message", "s", "boo!", {"title": "String setting example"}],
-
-  # Also, you can override an existing "system" value:
-  # ["uart.baud_rate", 9600],
+  ["settings", "o", {"title": "Custom settings"}],
   
-  ["light", "o", {"title": "custom settings"}],
-  ["light.num", "i", 2, {title: "Integer setting example"}],
-  ["light.pin_0", "s", "D3", {title: "Integer setting example"}],
-  ["light.pin_1", "s", "D4", {title: "Integer setting example"}],
+  ["settings.light", "o", {"title": "Light settings"}],
+  ["settings.light.num", "i", 2, {"title": "Number of lights"}],
+  ["settings.light.pin_0", "i", 14, {"title": "Pin for light 0"}],
+  ["settings.light.pin_1", "i", 12, {"title": "Pin for light 1"}],  
+  ["settings.light.id_0", "i", 0, {"title": "ID for light 0"}],
+  ["settings.light.id_1", "i", 1, {"title": "ID for light 1"}],
+  
+  ["settings.sw", "o", {"title": "Switch settings"}],
+  ["settings.sw.num", "i", 2, {"title": "Number of switches"}],
+  ["settings.sw.pin_0", "i", 4, {"title": "Pin for switch 0"}],
+  ["settings.sw.pin_1", "i", 0, {"title": "Pin for switch 1"}]
 ]
