@@ -298,10 +298,13 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 	}
 }
 
+#define LIGHT_PIN(n)  get_cfg()->settings.light.pin_ ## n
+
 enum mgos_app_init_result mgos_app_init(void)
 {
 	low_level_init();
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 
+	printf("pin = %d\n", LIGHT_PIN(0));
 	return MGOS_APP_INIT_SUCCESS;
 }
