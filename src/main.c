@@ -31,6 +31,14 @@
 
 #define  LED_PIN    (D4)
 
+#define LIGHT_NUM      get_cfg()->settings.light.num
+#define LIGHT_PIN(n)   get_cfg()->settings.light.pin_ ## n
+#define LIGHT_ID(n)    get_cfg()->settings.light.id_ ## n
+
+#define SWITCH_NUM     get_cfg()->settings.sw.num
+#define SWITCH_PIN(n)  get_cfg()->settings.sw.pin_ ## n
+#define SWITCH_ID(n)   get_cfg()->settings.sw.id_ ## n
+
 /*******************************************************************************
  *** CUSTOM DEFENITIONS
  ******************************************************************************/
@@ -59,6 +67,7 @@ typedef struct
  *** VARIABLES
  ******************************************************************************/
 mgos_timer_id timer_id = NULL;
+
 const uint8_t switch_pin[NUM_SWITCHES] =
 { D2, D3 }; // connect appropriate pins
 const uint8_t light_pin[NUM_SWITCHES] =
@@ -297,8 +306,6 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 		break;
 	}
 }
-
-#define LIGHT_PIN(n)  get_cfg()->settings.light.pin_ ## n
 
 enum mgos_app_init_result mgos_app_init(void)
 {
