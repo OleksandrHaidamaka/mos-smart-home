@@ -31,20 +31,16 @@
 
 #define  LED_PIN    (D4)
 
-#define LIGHT_NUM      get_cfg()->settings.light.num
-#define LIGHT_PIN(n)   get_cfg()->settings.light.pin_ ## n
-#define LIGHT_ID(n)    get_cfg()->settings.light.id_ ## n
-
-#define SWITCH_NUM     get_cfg()->settings.sw.num
-#define SWITCH_PIN(n)  get_cfg()->settings.sw.pin_ ## n
-#define SWITCH_ID(n)   get_cfg()->settings.sw.id_ ## n
+#define  NUM_NODES               get_cfg()->settings.num_nodes
+#define  LIGHT_PIN(n)   ((int *)&get_cfg()->settings.light.pin_0)[n]
+#define  LIGHT_ID(n)    ((int *)&get_cfg()->settings.light.id_0)[n]
+#define  SWITCH_PIN(n)  ((int *)&get_cfg()->settings.sw.pin_0)[n]
 
 /*******************************************************************************
  *** CUSTOM DEFENITIONS
  ******************************************************************************/
-#define NUM_SWITCHES   (2)     // number of switches
-#define DEBOUNCE_TIME  (0.05)  // seconds
-#define MQTT_DELAY     (1000)  // sending timeout
+#define  DEBOUNCE_TIME  (0.05)  // seconds
+#define  MQTT_DELAY     (1000)  // sending timeout
 
 /*******************************************************************************
  *** MACROSES
@@ -67,12 +63,7 @@ typedef struct
  *** VARIABLES
  ******************************************************************************/
 mgos_timer_id timer_id = NULL;
-
-const uint8_t switch_pin[NUM_SWITCHES] =
-{ D2, D3 }; // connect appropriate pins
-const uint8_t light_pin[NUM_SWITCHES] =
-{ D5, D6 };  // connect appropriate pins
-switch_state_t switch_state[NUM_SWITCHES];
+switch_state_t* switch_state = NULL;
 //void(*mqtt_handler) (void) = NULL;
 
 /*******************************************************************************
@@ -93,26 +84,27 @@ static void welcome_str()
 static void init_switchs()
 {
 	welcome_str();
-	for (uint8_t i = 0; i < NUM_SWITCHES; i++)
+	for (uint8_t i = 0; i < NUM_NODES; i++)
 	{
 		switch_state[i].s_new = switch_state[i].s_old = mgos_gpio_read(
-				switch_pin[i]);
+				SWITCH_PIN(i));
 		switch_state[i].update = true;
-		mgos_gpio_write(light_pin[i], switch_state[i].s_old);
+		mgos_gpio_write(LIGHT_PIN(i), switch_state[i].s_old);
 		printf("%s(): switch %d = %d\r\n", __func__, i, switch_state[i].s_old);
 	}
 }
 
 static void low_level_init()
 {
+	switch_state = calloc(NUM_NODES, sizeof(switch_state_t));
 	mgos_gpio_set_mode(LED_PIN, MGOS_GPIO_MODE_OUTPUT);
 	led_off();
 
-	for (uint8_t i = 0; i < NUM_SWITCHES; i++)
+	for (uint8_t i = 0; i < NUM_NODES; i++)
 	{
-		mgos_gpio_set_mode(switch_pin[i], MGOS_GPIO_MODE_INPUT);
-		mgos_gpio_set_pull(switch_pin[i], MGOS_GPIO_PULL_UP);
-		mgos_gpio_set_mode(light_pin[i], MGOS_GPIO_MODE_OUTPUT);
+		mgos_gpio_set_mode(SWITCH_PIN(i), MGOS_GPIO_MODE_INPUT);
+		mgos_gpio_set_pull(SWITCH_PIN(i), MGOS_GPIO_PULL_UP);
+		mgos_gpio_set_mode(SWITCH_PIN(i), MGOS_GPIO_MODE_OUTPUT);
 	}
 
 	init_switchs();
@@ -122,9 +114,9 @@ static void low_level_init()
 
 static void button_handler()
 {
-	for (uint8_t i = 0; i < NUM_SWITCHES; i++)
+	for (uint8_t i = 0; i < NUM_NODES; i++)
 	{
-		uint8_t state = mgos_gpio_read(switch_pin[i]);
+		uint8_t state = mgos_gpio_read(SWITCH_PIN(i));
 
 		// If the switch changed, due to noise or pressing:
 		if (state != switch_state[i].s_new)
@@ -138,7 +130,7 @@ static void button_handler()
 			if (state != switch_state[i].s_old)
 			{
 				switch_state[i].s_old = state;
-				mgos_gpio_write(light_pin[i], switch_state[i].s_old);
+				mgos_gpio_write(LIGHT_PIN(i), switch_state[i].s_old);
 				printf("%s(): switch %d = %d\n", __func__, i,
 						switch_state[i].s_old);
 				mqtt_pub("{light: %d, state: %d}", i, switch_state[i].s_old);
@@ -241,10 +233,10 @@ void mqtt_home_light_io(int num, bool state)
 	switch (num)
 	{
 	case CHANDELIER_COOL:
-		mgos_gpio_write(light_pin[0], state);
+		mgos_gpio_write(LIGHT_PIN(0), state);
 		break;
 	case CHANDELIER_WARM:
-		mgos_gpio_write(light_pin[1], state);
+		mgos_gpio_write(LIGHT_PIN(1), state);
 		break;
 	}
 }
@@ -313,5 +305,6 @@ enum mgos_app_init_result mgos_app_init(void)
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 
 	printf("pin = %d\n", LIGHT_PIN(0));
+	printf("pin = %d\n", LIGHT_PIN(1));
 	return MGOS_APP_INIT_SUCCESS;
 }
