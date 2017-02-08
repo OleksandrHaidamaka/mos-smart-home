@@ -14,16 +14,15 @@
 
 [
   ["settings", "o", {"title": "Custom settings"}],
-  
+  ["settings.num_nodes", "i", 2, {"title": "Number of lights or switches"}],
+
   ["settings.light", "o", {"title": "Light settings"}],
-  ["settings.light.num", "i", 2, {"title": "Number of lights"}],
   ["settings.light.pin_0", "i", 14, {"title": "Pin for light 0"}],
-  ["settings.light.pin_1", "i", 12, {"title": "Pin for light 1"}],  
+  ["settings.light.pin_1", "i", 12, {"title": "Pin for light 1"}],
   ["settings.light.id_0", "i", 0, {"title": "ID for light 0"}],
   ["settings.light.id_1", "i", 1, {"title": "ID for light 1"}],
   
   ["settings.sw", "o", {"title": "Switch settings"}],
-  ["settings.sw.num", "i", 2, {"title": "Number of switches"}],
   ["settings.sw.pin_0", "i", 4, {"title": "Pin for switch 0"}],
   ["settings.sw.pin_1", "i", 0, {"title": "Pin for switch 1"}]
 ]
