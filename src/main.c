@@ -45,8 +45,13 @@
 /*******************************************************************************
  *** MACROSES
  ******************************************************************************/
-#define led_off()  mgos_gpio_write(LED_PIN, true)
-#define led_on()   mgos_gpio_write(LED_PIN, false)
+#define pin_input_up(pin)    { mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_INPUT);  \
+                               mgos_gpio_set_pull(pin, MGOS_GPIO_PULL_UP); }
+#define pin_output(pin)        mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT);
+#define pin_write(pin, state)  mgos_gpio_write(pin, state)
+#define pin_read(pin)          mgos_gpio_read(pin)
+#define led_off()              pin_write(LED_PIN, true)
+#define led_on()               pin_write(LED_PIN, false)
 
 /*******************************************************************************
  *** TYPEDEF
@@ -62,8 +67,7 @@ typedef struct
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-mgos_timer_id timer_id = NULL;
-switch_state_t* switch_state = NULL;
+switch_state_t* switch_state;
 //void(*mqtt_handler) (void) = NULL;
 
 /*******************************************************************************
@@ -73,6 +77,8 @@ const char* topic_request = "home/request";
 const char* topic_response = "home/response";
 
 static void timer_handler();
+static void wifi_handler(enum mgos_wifi_status event, void *data);
+
 void mqtt_pub(const char *cmd, ...);
 
 static void welcome_str()
@@ -83,13 +89,11 @@ static void welcome_str()
 
 static void init_switchs()
 {
-	welcome_str();
-	for (uint8_t i = 0; i < NUM_NODES; i++)
+	for (int i = 0; i < NUM_NODES; i++)
 	{
-		switch_state[i].s_new = switch_state[i].s_old = mgos_gpio_read(
-				SWITCH_PIN(i));
+		switch_state[i].s_new = switch_state[i].s_old = pin_read(SWITCH_PIN(i));
 		switch_state[i].update = true;
-		mgos_gpio_write(LIGHT_PIN(i), switch_state[i].s_old);
+		pin_write(LIGHT_PIN(i), switch_state[i].s_old);
 		printf("%s(): switch %d = %d\r\n", __func__, i, switch_state[i].s_old);
 	}
 }
@@ -97,26 +101,29 @@ static void init_switchs()
 static void low_level_init()
 {
 	switch_state = calloc(NUM_NODES, sizeof(switch_state_t));
-	mgos_gpio_set_mode(LED_PIN, MGOS_GPIO_MODE_OUTPUT);
-	led_off();
 
-	for (uint8_t i = 0; i < NUM_NODES; i++)
+	welcome_str();
+
+	pin_output(LED_PIN);
+	led_off();
+	for (int i = 0; i < NUM_NODES; i++)
 	{
-		mgos_gpio_set_mode(SWITCH_PIN(i), MGOS_GPIO_MODE_INPUT);
-		mgos_gpio_set_pull(SWITCH_PIN(i), MGOS_GPIO_PULL_UP);
-		mgos_gpio_set_mode(SWITCH_PIN(i), MGOS_GPIO_MODE_OUTPUT);
+		pin_input_up(SWITCH_PIN(i));
+		pin_output(LIGHT_PIN(i));
 	}
 
 	init_switchs();
-	timer_id = mgos_set_timer(50, true, timer_handler, NULL);
+	mgos_set_timer(50, true, timer_handler, NULL);
+	mgos_wifi_add_on_change_cb(wifi_handler, 0);
+
 //	mqtt_handler = mqtt_pub_init_state;
 }
 
 static void button_handler()
 {
-	for (uint8_t i = 0; i < NUM_NODES; i++)
+	for (int i = 0; i < NUM_NODES; i++)
 	{
-		uint8_t state = mgos_gpio_read(SWITCH_PIN(i));
+		bool state = pin_read(SWITCH_PIN(i));
 
 		// If the switch changed, due to noise or pressing:
 		if (state != switch_state[i].s_new)
@@ -130,10 +137,11 @@ static void button_handler()
 			if (state != switch_state[i].s_old)
 			{
 				switch_state[i].s_old = state;
-				mgos_gpio_write(LIGHT_PIN(i), switch_state[i].s_old);
+				pin_write(LIGHT_PIN(i), switch_state[i].s_old);
 				printf("%s(): switch %d = %d\n", __func__, i,
 						switch_state[i].s_old);
-				mqtt_pub("{light: %d, state: %d}", i, switch_state[i].s_old);
+				mqtt_pub("{light: %d, state: %d}", LIGHT_ID(i),
+						switch_state[i].s_old);
 				switch_state[i].update = 1;
 			}
 		}
@@ -142,9 +150,9 @@ static void button_handler()
 
 static void blink_driver()
 {
-	static uint32_t time = 0;
-	static uint8_t state = 0;
-	static uint8_t count = 0;
+	static int time = 0;
+	static int state = 0;
+	static int count = 0;
 
 	if (time != 0)
 		time--;
@@ -184,14 +192,6 @@ static void timer_handler()
 	button_handler();
 }
 
-/*******************************************************************************
- *** MQTT ENUMS
- ******************************************************************************/
-typedef enum
-{
-	CHANDELIER_COOL = 0, CHANDELIER_WARM, NUM_LIGHT
-} home_light_id;
-
 void mqtt_sub()
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
@@ -212,7 +212,7 @@ void mqtt_pub(const char *cmd, ...)
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
 	if (c == NULL)
 	{
-		printf("pub: topic <error> msg: error\n");
+		printf("pub: topic: <error> msg: error\n");
 		return;
 	}
 
@@ -225,34 +225,34 @@ void mqtt_pub(const char *cmd, ...)
 	n = json_vprintf(&jmo, cmd, ap);
 	va_end(ap);
 	mg_mqtt_publish(c, topic_response, message_id++, MG_MQTT_QOS(0), msg, n);
-	printf("pub: topic <%s> msg: %s\n", topic_response, msg);
+	printf("pub: topic: <%s> msg: %s\n", topic_response, msg);
 }
 
-void mqtt_home_light_io(int num, bool state)
+void mqtt_light_id(int id, bool state)
 {
-	switch (num)
+	for (int i = 0; i < NUM_NODES; i++)
 	{
-	case CHANDELIER_COOL:
-		mgos_gpio_write(LIGHT_PIN(0), state);
-		break;
-	case CHANDELIER_WARM:
-		mgos_gpio_write(LIGHT_PIN(1), state);
-		break;
+		if (id == LIGHT_ID(i))
+		{
+			pin_write(LIGHT_PIN(i), state);
+			printf("id = %d; status: accepted\n", id);
+			return;
+		}
 	}
+	printf("id = %d; status: ignored\n", id);
 }
 
 static void mqtt_cmd_parcer(struct mg_mqtt_message* msg)
 {
 	struct mg_str *s = &msg->payload;
 
-	int id;
-	int param;
+	int id, state;
 
 	printf("sub: topic: <%s> ", topic_request);
-	if (json_scanf(s->p, s->len, "{light: %d, state: %d}", &id, &param) == 2)
+	if (json_scanf(s->p, s->len, "{light: %d, state: %d}", &id, &state) == 2)
 	{
-		mqtt_home_light_io(id, (bool) param);
 		printf("msg: %.*s\n", (int) s->len, s->p);
+		mqtt_light_id(id, (bool) state);
 	}
 	else
 	{
@@ -265,36 +265,33 @@ static void mqtt_handler(struct mg_connection *c, int ev, void *p)
 	(void) c;
 	struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
 
-	printf("mqtt event [%d]: err = %d\n", ev, msg->connack_ret_code);
-
-	if (ev == MG_EV_MQTT_CONNACK)
+	switch (ev)
 	{
-		//blink 4
+	case MG_EV_MQTT_CONNACK:
 		if (msg->connack_ret_code == 0)
 		{
+			//blink 3
 			mqtt_sub();
 		}
-	}
-	else if (ev == MG_EV_MQTT_PUBLISH)
-	{
+		break;
+	case MG_EV_MQTT_PUBLISH:
 		mqtt_cmd_parcer(msg);
+		break;
 	}
 }
 
 static void wifi_handler(enum mgos_wifi_status event, void *data)
 {
 	(void) data;
-	switch (event)
+	switch ((int) event)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
-		//blink 3
-		mgos_mqtt_set_global_handler(mqtt_handler, NULL);
-		break;
-	case MGOS_WIFI_CONNECTED:
 		//blink 2
+		mgos_mqtt_set_global_handler(mqtt_handler, NULL);
 		break;
 	case MGOS_WIFI_DISCONNECTED:
 		//blink 1
+		mgos_mqtt_set_global_handler(NULL, NULL);
 		break;
 	}
 }
@@ -302,9 +299,5 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 enum mgos_app_init_result mgos_app_init(void)
 {
 	low_level_init();
-	mgos_wifi_add_on_change_cb(wifi_handler, 0);
-
-	printf("pin = %d\n", LIGHT_PIN(0));
-	printf("pin = %d\n", LIGHT_PIN(1));
-	return MGOS_APP_INIT_SUCCESS;
+	return 0;
 }
