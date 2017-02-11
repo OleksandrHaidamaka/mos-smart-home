@@ -1,4 +1,20 @@
-#**Pin definitions for NodeMCU**
+[
+### WIFI settings ##############################################################
+  ["wifi.ap.enable", false],
+  ["wifi.sta.enable", true],
+  ["wifi.sta.ssid", "TP-LINK-Landgraf"],
+  ["wifi.sta.pass", "07031987"],
+################################################################################
+
+### MQTT settings ##############################################################
+  ["device.id", "landgraf"],
+  ["device.password", ""],
+  ["mqtt.server", "broker.mqttdashboard.com:1883"],
+  ["mqtt.pub", "s", "home/response", {title: "Publish topic"}],
+  ["mqtt.sub", "s", "home/request", {title: "Subscribe topic"}],
+################################################################################
+
+### Pin definitions for NodeMCU ################################################
 #           D0-->16
 #           D1-->5
 #           D2-->4
@@ -11,18 +27,20 @@
 #           D9-->3
 #           D10-->1
 #           LED_PIN-->D4
+################################################################################
 
-[
+### Settings section ###########################################################
   ["settings", "o", {"title": "Custom settings"}],
   ["settings.num_nodes", "i", 2, {"title": "Number of lights or switches"}],
-
+### Light settings #############################################################
   ["settings.light", "o", {"title": "Light settings"}],
   ["settings.light.pin_0", "i", 14, {"title": "Pin for light 0"}],
   ["settings.light.pin_1", "i", 12, {"title": "Pin for light 1"}],
   ["settings.light.id_0", "i", 0, {"title": "ID for light 0"}],
   ["settings.light.id_1", "i", 1, {"title": "ID for light 1"}],
-  
+### Switch settings ############################################################
   ["settings.sw", "o", {"title": "Switch settings"}],
   ["settings.sw.pin_0", "i", 4, {"title": "Pin for switch 0"}],
-  ["settings.sw.pin_1", "i", 0, {"title": "Pin for switch 1"}]
+  ["settings.sw.pin_1", "i", 0, {"title": "Pin for switch 1"}],
+################################################################################
 ]
