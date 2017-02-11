@@ -10,8 +10,8 @@
   ["device.id", "landgraf"],
   ["device.password", ""],
   ["mqtt.server", "broker.mqttdashboard.com:1883"],
-  ["mqtt.pub", "s", "home/response", {title: "Publish topic"}],
-  ["mqtt.sub", "s", "home/request", {title: "Subscribe topic"}],
+  ["mqtt.pub", "s", "home/pub", {title: "Publish topic"}],
+  ["mqtt.sub", "s", "home/sub", {title: "Subscribe topic"}],
 ################################################################################
 
 ### Pin definitions for NodeMCU ################################################
