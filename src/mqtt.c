@@ -10,6 +10,11 @@
 #include "main.h"
 
 /*******************************************************************************
+ *** DEFENITIONS
+ ******************************************************************************/
+#define  MQTT_SEND_TIMEOUT   (1000/SYS_TICK)  // time [ms]
+
+/*******************************************************************************
  *** MACROSES
  ******************************************************************************/
 #define  PUB_TOPIC()    get_cfg()->mqtt.pub
@@ -18,7 +23,8 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-//void (*mqtt_handler)(void) = NULL;
+void (*mqtt_callback)(void) = NULL;
+
 //------------------------------------------------------------------------------
 static void mqtt_sub()
 {
@@ -39,7 +45,7 @@ static void mqtt_sub()
 void mqtt_pub(const char *cmd, ...)
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
-	if (c == NULL)
+	if (c == NULL || PUB_TOPIC() == NULL)
 	{
 		printf("pub: topic: <error> msg: error\n");
 		return;
@@ -58,7 +64,7 @@ void mqtt_pub(const char *cmd, ...)
 }
 
 //------------------------------------------------------------------------------
-void mqtt_light_id(int id, bool state)
+static void mqtt_light_id(int id, bool state)
 {
 	for (int i = 0; i < NUM_NODES; i++)
 	{
@@ -103,11 +109,38 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p)
 		if (msg->connack_ret_code == 0)
 		{
 			//blink 3
-			mqtt_sub();
+			if (PUB_TOPIC() != NULL && SUB_TOPIC() != NULL)
+			{
+				mqtt_sub();
+				mqtt_callback = mqtt_manager;
+			}
+			else
+				printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
 		}
 		break;
 	case MG_EV_MQTT_PUBLISH:
 		mqtt_cmd_parcer(msg);
 		break;
+	}
+}
+
+//------------------------------------------------------------------------------
+void mqtt_manager()
+{
+	static int time = 0;
+
+	if (time++ < MQTT_SEND_TIMEOUT)
+		return;
+	time = 0;
+
+	for (int i = 0; i < NUM_NODES; i++)
+	{
+		if (switch_state[i].update == true)
+		{
+			switch_state[i].update = false;
+			mqtt_pub("{light_id: %d, state: %d}", LIGHT_ID(i),
+					switch_state[i].s_old);
+			return;
+		}
 	}
 }

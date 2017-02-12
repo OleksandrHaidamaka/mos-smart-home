@@ -29,6 +29,7 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 	case MGOS_WIFI_DISCONNECTED:
 		//blink 1
 		mgos_mqtt_set_global_handler(NULL, NULL);
+		mqtt_callback = NULL;
 		break;
 	}
 }
@@ -38,6 +39,8 @@ static void sys_tick()
 {
 	led_driver();
 	switch_driver();
+	if (mqtt_callback != NULL)
+		mqtt_callback();
 }
 
 //------------------------------------------------------------------------------
