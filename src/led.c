@@ -56,7 +56,7 @@ void led_driver()
 	case 0:
 		if (time == 0)
 		{
-			if (count == gl_blink_mode)
+			if (count >= gl_blink_mode)
 			{
 				led_off();
 				count = 0;
