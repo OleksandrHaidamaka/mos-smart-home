@@ -108,7 +108,7 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p)
 	case MG_EV_MQTT_CONNACK:
 		if (msg->connack_ret_code == 0)
 		{
-			//blink 3
+			blink_mode(3);
 			if (PUB_TOPIC() != NULL && SUB_TOPIC() != NULL)
 			{
 				mqtt_sub();
