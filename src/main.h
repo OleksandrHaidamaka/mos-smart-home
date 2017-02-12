@@ -18,6 +18,9 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
+#define  SYS_TICK   (50) //time [ms]
+
+//  Node MCU pin-out
 #define  D0         (16)
 #define  D1         (5)
 #define  D2         (4)
@@ -34,8 +37,6 @@
 #define  LIGHT_PIN(n)   ((int *)&get_cfg()->settings.light.pin_0)[n]
 #define  LIGHT_ID(n)    ((int *)&get_cfg()->settings.light.id_0)[n]
 #define  SWITCH_PIN(n)  ((int *)&get_cfg()->settings.sw.pin_0)[n]
-
-#define  SYS_TICK   (50) //time [ms]
 
 /*******************************************************************************
  *** MACROSES

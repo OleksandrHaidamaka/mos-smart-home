@@ -29,11 +29,6 @@ void (*mqtt_callback)(void) = NULL;
 static void mqtt_sub()
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
-	if (c == NULL)
-	{
-		printf("sub: topic: <error>\n");
-		return;
-	}
 
 	struct mg_mqtt_topic_expression topic_exp =
 	{ SUB_TOPIC(), 0 };
@@ -45,11 +40,6 @@ static void mqtt_sub()
 void mqtt_pub(const char *cmd, ...)
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
-	if (c == NULL || PUB_TOPIC() == NULL)
-	{
-		printf("pub: topic: <error> msg: error\n");
-		return;
-	}
 
 	char msg[128];
 	static uint16_t message_id;
@@ -98,33 +88,6 @@ static void mqtt_cmd_parcer(struct mg_mqtt_message* msg)
 }
 
 //------------------------------------------------------------------------------
-void mqtt_handler(struct mg_connection *c, int ev, void *p)
-{
-	(void) c;
-	struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
-
-	switch (ev)
-	{
-	case MG_EV_MQTT_CONNACK:
-		if (msg->connack_ret_code == 0)
-		{
-			blink_mode(3);
-			if (PUB_TOPIC() != NULL && SUB_TOPIC() != NULL)
-			{
-				mqtt_sub();
-				mqtt_callback = mqtt_manager;
-			}
-			else
-				printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
-		}
-		break;
-	case MG_EV_MQTT_PUBLISH:
-		mqtt_cmd_parcer(msg);
-		break;
-	}
-}
-
-//------------------------------------------------------------------------------
 void mqtt_manager()
 {
 	static int time = 0;
@@ -132,6 +95,15 @@ void mqtt_manager()
 	if (time++ < MQTT_SEND_TIMEOUT)
 		return;
 	time = 0;
+
+	struct mg_connection *c = mgos_mqtt_get_global_conn();
+
+	if (c == NULL)
+	{
+		mqtt_callback = NULL;
+		blink_mode(2);
+		return;
+	}
 
 	for (int i = 0; i < NUM_NODES; i++)
 	{
@@ -142,5 +114,32 @@ void mqtt_manager()
 					switch_state[i].s_old);
 			return;
 		}
+	}
+}
+
+//------------------------------------------------------------------------------
+void mqtt_handler(struct mg_connection *c, int ev, void *p)
+{
+	(void) c;
+	struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
+
+	switch (ev)
+	{
+	case MG_EV_MQTT_CONNACK:
+		if (msg->connack_ret_code == 0)
+		{
+			if (PUB_TOPIC() != NULL && SUB_TOPIC() != NULL)
+			{
+				mqtt_sub();
+				mqtt_callback = mqtt_manager;
+				blink_mode(3);
+			}
+			else
+				printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
+		}
+		break;
+	case MG_EV_MQTT_PUBLISH:
+		mqtt_cmd_parcer(msg);
+		break;
 	}
 }
