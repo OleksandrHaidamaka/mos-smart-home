@@ -71,8 +71,6 @@ void switch_driver()
 				pin_write(LIGHT_PIN(i), switch_state[i].s_old);
 				printf("%s(): switch %d = %d\n", __func__, i,
 						switch_state[i].s_old);
-				mqtt_pub("{light_id: %d, state: %d}", LIGHT_ID(i),
-						switch_state[i].s_old);
 				switch_state[i].update = 1;
 			}
 		}

@@ -2,14 +2,14 @@
 #define __MQTT_H__
 
 /*******************************************************************************
- *** DEFENITIONS
+ *** EXTERN VARIABLES
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT   (1000)  // time[ms]
+void (*mqtt_callback)(void);
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
 void mqtt_handler(struct mg_connection *c, int ev, void *p);
-void mqtt_pub(const char *cmd, ...);
+void mqtt_manager();
 
 #endif  //__MQTT_H__
