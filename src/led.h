@@ -6,11 +6,12 @@
  ******************************************************************************/
 enum bl_mode
 {
-	BL_WIFI_DISCONNECTED = 0,
+	BL_WIFI_DISCONNECTED,
 	BL_WIFI_IP_ACQUIRED,
 	BL_MQTT_CONNECTED,
-	BL_MQTT_PUB,
-	BL_MQTT_SUB
+	BL_MQTT_SUB_MSG_ERR,
+	BL_MQTT_SUB_MSG_OK,
+	BL_MQTT_PUB_MSG
 };
 
 /*******************************************************************************
