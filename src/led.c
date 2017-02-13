@@ -13,6 +13,10 @@
  *** DEFENITIONS
  ******************************************************************************/
 #define LED_PIN            (D4)
+
+/*******************************************************************************
+ *** MACROSES
+ ******************************************************************************/
 #define led_off()          pin_write(LED_PIN, true)
 #define led_on()           pin_write(LED_PIN, false)
 
@@ -72,7 +76,7 @@ void led_driver()
 	static int time = 0;
 	static int state = 0;
 	static int count = 0;
-	static bool go_to_current_mode = false;
+	static bool go_to_bl_mode_current = false;
 
 	if (time != 0)
 		time--;
@@ -90,13 +94,13 @@ void led_driver()
 
 				mode = bl_mode_new;
 
-				if (go_to_current_mode == true)
+				if (go_to_bl_mode_current == true)
 				{
-					go_to_current_mode = false;
+					go_to_bl_mode_current = false;
 					mode = bl_mode_new = bl_mode_current;
 				}
 				if (main_blink_mode[mode].repeat == false)
-					go_to_current_mode = true;
+					go_to_bl_mode_current = true;
 
 				break;
 			}
