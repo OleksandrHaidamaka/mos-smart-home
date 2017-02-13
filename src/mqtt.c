@@ -51,6 +51,7 @@ void mqtt_pub(const char *cmd, ...)
 	va_end(ap);
 	mg_mqtt_publish(c, PUB_TOPIC(), message_id++, MG_MQTT_QOS(0), msg, n);
 	printf("pub: topic: <%s> msg: %s\n", PUB_TOPIC(), msg);
+	blink_mode(BL_MQTT_PUB);
 }
 
 //------------------------------------------------------------------------------
@@ -101,7 +102,7 @@ void mqtt_manager()
 	if (c == NULL)
 	{
 		mqtt_callback = NULL;
-		blink_mode(2);
+		blink_mode(BL_WIFI_IP_ACQUIRED);
 		return;
 	}
 
@@ -132,7 +133,7 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p)
 			{
 				mqtt_sub();
 				mqtt_callback = mqtt_manager;
-				blink_mode(3);
+				blink_mode(BL_MQTT_CONNECTED);
 			}
 			else
 				printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
@@ -140,6 +141,7 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p)
 		break;
 	case MG_EV_MQTT_PUBLISH:
 		mqtt_cmd_parcer(msg);
+		blink_mode(BL_MQTT_SUB);
 		break;
 	}
 }
