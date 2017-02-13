@@ -51,7 +51,7 @@ void mqtt_pub(const char *cmd, ...)
 	va_end(ap);
 	mg_mqtt_publish(c, PUB_TOPIC(), message_id++, MG_MQTT_QOS(0), msg, n);
 	printf("pub: topic: <%s> msg: %s\n", PUB_TOPIC(), msg);
-	blink_mode(BL_MQTT_PUB);
+	blink_mode(BL_MQTT_PUB_MSG);
 }
 
 //------------------------------------------------------------------------------
@@ -81,10 +81,12 @@ static void mqtt_cmd_parcer(struct mg_mqtt_message* msg)
 	{
 		printf("msg: %.*s\n", (int) s->len, s->p);
 		mqtt_light_id(id, (bool) state);
+		blink_mode(BL_MQTT_SUB_MSG_OK);
 	}
 	else
 	{
 		printf("msg: <unsupported>\n");
+		blink_mode(BL_MQTT_SUB_MSG_ERR);
 	}
 }
 
@@ -141,7 +143,6 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p)
 		break;
 	case MG_EV_MQTT_PUBLISH:
 		mqtt_cmd_parcer(msg);
-		blink_mode(BL_MQTT_SUB);
 		break;
 	}
 }

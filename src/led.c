@@ -36,13 +36,13 @@ struct blink_mode_t main_blink_mode[] =
 		{ 250 / SYS_TICK, 1000 / SYS_TICK, 1, true }, // BL_WIFI_DISCONNECTED
 		{ 250 / SYS_TICK, 1000 / SYS_TICK, 2, true }, // BL_WIFI_IP_ACQUIRED
 		{ 250 / SYS_TICK, 1000 / SYS_TICK, 3, true }, // BL_MQTT_CONNECTED
-		{ 50 / SYS_TICK, 1000 / SYS_TICK, 3, false }, // BL_MQTT_PUB
-		{ 50 / SYS_TICK, 1000 / SYS_TICK, 6, false }  // BL_MQTT_SUB
+		{ 50 / SYS_TICK, 1000 / SYS_TICK, 1, false }, // BL_MQTT_SUB_MSG_ERR
+		{ 50 / SYS_TICK, 1000 / SYS_TICK, 2, false }, // BL_MQTT_SUB_MSG_OK
+		{ 50 / SYS_TICK, 1000 / SYS_TICK, 2, false }  // BL_MQTT_PUB_MSG
 };
 
 enum bl_mode bl_mode_current = BL_WIFI_DISCONNECTED;
 enum bl_mode bl_mode_new = BL_WIFI_DISCONNECTED;
-bool bl_mode_changed = false;
 
 //------------------------------------------------------------------------------
 static void led_periph()
@@ -59,12 +59,10 @@ void led_init()
 
 void blink_mode(enum bl_mode mode)
 {
-	bl_mode_changed = true;
+	bl_mode_new = mode;
 
 	if (main_blink_mode[mode].repeat == true)
-		bl_mode_current = bl_mode_new = mode;
-	else
-		bl_mode_new = mode;
+		bl_mode_current = mode;
 }
 
 //------------------------------------------------------------------------------
@@ -90,21 +88,16 @@ void led_driver()
 				count = 0;
 				time = main_blink_mode[mode].time_long;
 
-				if (bl_mode_changed == true)
+				mode = bl_mode_new;
+
+				if (go_to_current_mode == true)
 				{
-					bl_mode_changed = false;
-
-					if (go_to_current_mode == true)
-					{
-						go_to_current_mode = false;
-						mode = bl_mode_current;
-					}
-					else
-						mode = bl_mode_new;
-
-					if (main_blink_mode[mode].repeat == false)
-						go_to_current_mode = true;
+					go_to_current_mode = false;
+					mode = bl_mode_new = bl_mode_current;
 				}
+				if (main_blink_mode[mode].repeat == false)
+					go_to_current_mode = true;
+
 				break;
 			}
 			led_on();
