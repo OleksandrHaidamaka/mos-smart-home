@@ -24,11 +24,11 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
 		mgos_mqtt_set_global_handler(mqtt_handler, NULL);
-		blink_mode(2);
+		blink_mode(BL_WIFI_IP_ACQUIRED);
 		break;
 	case MGOS_WIFI_DISCONNECTED:
 		mgos_mqtt_set_global_handler(NULL, NULL);
-		blink_mode(1);
+		blink_mode(BL_WIFI_DISCONNECTED);
 		break;
 	}
 }
