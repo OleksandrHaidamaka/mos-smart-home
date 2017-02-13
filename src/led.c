@@ -70,11 +70,11 @@ void blink_mode(enum bl_mode mode)
 //------------------------------------------------------------------------------
 void led_driver()
 {
+	static enum bl_mode mode = BL_WIFI_DISCONNECTED;
 	static int time = 0;
 	static int state = 0;
 	static int count = 0;
 	static bool go_to_current_mode = false;
-	enum bl_mode mode = BL_WIFI_DISCONNECTED;
 
 	if (time != 0)
 		time--;
