@@ -12,7 +12,7 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT   (500/SYS_TICK)  // time [ms]
+#define  MQTT_SEND_TIMEOUT   (250/SYS_TICK)  // time [ms]
 
 /*******************************************************************************
  *** MACROSES
@@ -70,6 +70,16 @@ static void mqtt_light_id(int id, bool state)
 }
 
 //------------------------------------------------------------------------------
+static void mqtt_update_gui()
+{
+	for (int i = 0; i < NUM_NODES; i++)
+	{
+		mqtt_pub("{light_id: %d, state: %d}", LIGHT_ID(i),
+				pin_read(LIGHT_PIN(i)));
+	}
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_cmd_parcer(struct mg_mqtt_message* msg)
 {
 	struct mg_str *s = &msg->payload;
@@ -83,12 +93,10 @@ static void mqtt_cmd_parcer(struct mg_mqtt_message* msg)
 		mqtt_light_id(id, (bool) state);
 		blink_mode(BL_MQTT_SUB_MSG_OK);
 	}
-
 	else if (strncmp(s->p, "update_gui", s->len) == 0)
 	{
 		printf("msg: %.*s\n", (int) s->len, s->p);
-		for (int i = 0; i < NUM_NODES; i++)
-			switch_state[i].update = true;
+		mqtt_update_gui();
 		blink_mode(BL_MQTT_SUB_MSG_OK);
 	}
 	else
