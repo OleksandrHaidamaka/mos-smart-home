@@ -9,7 +9,7 @@
 ### MQTT settings ##############################################################
   ["device.id", "landgraf"],
   ["device.password", ""],
-  ["mqtt.server", "broker.mqttdashboard.com:1883"],
+  ["mqtt.server", "192.168.0.102:1883"],
   ["mqtt.pub", "s", "home/pub", {title: "Publish topic"}],
   ["mqtt.sub", "s", "home/sub", {title: "Subscribe topic"}],
 ################################################################################
