@@ -81,6 +81,12 @@ void led_driver()
 	if (time != 0)
 		time--;
 
+	if (mode != bl_mode_new)
+	{
+		state = 0;
+		goto mode_update;
+	}
+
 	switch (state)
 	{
 	case 0:
@@ -88,6 +94,7 @@ void led_driver()
 		{
 			if (count >= main_blink_mode[mode].times)
 			{
+				mode_update:
 				led_off();
 				count = 0;
 				time = main_blink_mode[mode].time_long;

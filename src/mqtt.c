@@ -12,13 +12,18 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT   (250/SYS_TICK)  // time [ms]
+#define  MQTT_SEND_TIMEOUT   (100/SYS_TICK)  // time [ms]
 
 /*******************************************************************************
  *** MACROSES
  ******************************************************************************/
 #define  PUB_TOPIC()    get_cfg()->mqtt.pub
 #define  SUB_TOPIC()    get_cfg()->mqtt.sub
+#define  MQTT_ACK()     get_cfg()->mqtt.ack
+
+/*******************************************************************************
+ *** TYPEDEFS
+ ******************************************************************************/
 
 /*******************************************************************************
  *** VARIABLES
@@ -62,15 +67,13 @@ static void mqtt_light_id(int id, bool state)
 		if (id == LIGHT_ID(i))
 		{
 			pin_write(LIGHT_PIN(i), state);
-			printf("id = %d; status: accepted\n", id);
 			return;
 		}
 	}
-	printf("id = %d; status: ignored\n", id);
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_update_gui()
+static void mqtt_update()
 {
 	for (int i = 0; i < NUM_NODES; i++)
 	{
@@ -80,28 +83,36 @@ static void mqtt_update_gui()
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_cmd_parcer(struct mg_mqtt_message* msg)
+static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 {
 	struct mg_str *s = &msg->payload;
-
 	int id, state;
+	bool err = false;
 
-	printf("sub: topic: <%s> ", SUB_TOPIC());
+	printf("sub: topic: <%s> msg: %.*s\n", SUB_TOPIC(), (int) s->len, s->p);
+
+	/* parsing commands */
 	if (json_scanf(s->p, s->len, "{light_id: %d, state: %d}", &id, &state) == 2)
 	{
-		printf("msg: %.*s\n", (int) s->len, s->p);
 		mqtt_light_id(id, (bool) state);
-		blink_mode(BL_MQTT_SUB_MSG_OK);
 	}
-	else if (strncmp(s->p, "update_gui", s->len) == 0)
+	else if (strncmp(s->p, "update", s->len) == 0)
 	{
-		printf("msg: %.*s\n", (int) s->len, s->p);
-		mqtt_update_gui();
-		blink_mode(BL_MQTT_SUB_MSG_OK);
+		mqtt_update();
 	}
 	else
 	{
-		printf("msg: <unsupported>\n");
+		err = true;
+	}
+
+	if (err == false)
+	{
+		blink_mode(BL_MQTT_SUB_MSG_OK);
+		if (MQTT_ACK() == true)
+			mqtt_pub("%.*s\n", (int) s->len, s->p);
+	}
+	else
+	{
 		blink_mode(BL_MQTT_SUB_MSG_ERR);
 	}
 }
@@ -158,7 +169,7 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p)
 		}
 		break;
 	case MG_EV_MQTT_PUBLISH:
-		mqtt_cmd_parcer(msg);
+		mqtt_parcer_msg(msg);
 		break;
 	}
 }
