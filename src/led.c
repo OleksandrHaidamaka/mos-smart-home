@@ -37,12 +37,12 @@ struct blink_mode_t
 struct blink_mode_t main_blink_mode[] =
 {
 //       time short, time long, number of short blinks, repeat flag
-		{ 250 / SYS_TICK, 1000 / SYS_TICK, 1, true }, // BL_WIFI_DISCONNECTED
-		{ 250 / SYS_TICK, 1000 / SYS_TICK, 2, true }, // BL_WIFI_IP_ACQUIRED
-		{ 250 / SYS_TICK, 1000 / SYS_TICK, 3, true }, // BL_MQTT_CONNECTED
-		{ 50 / SYS_TICK, 1000 / SYS_TICK, 1, false }, // BL_MQTT_SUB_MSG_ERR
-		{ 50 / SYS_TICK, 1000 / SYS_TICK, 2, false }, // BL_MQTT_SUB_MSG_OK
-		{ 50 / SYS_TICK, 1000 / SYS_TICK, 2, false }  // BL_MQTT_PUB_MSG
+		{ 250 / SYS_TICK, 500 / SYS_TICK, 1, true }, // BL_WIFI_DISCONNECTED
+		{ 250 / SYS_TICK, 500 / SYS_TICK, 2, true }, // BL_WIFI_IP_ACQUIRED
+		{ 250 / SYS_TICK, 500 / SYS_TICK, 3, true }, // BL_MQTT_CONNECTED
+		{ 50 / SYS_TICK, 100 / SYS_TICK, 1, false }, // BL_MQTT_SUB_MSG_ERR
+		{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }, // BL_MQTT_SUB_MSG
+		{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }  // BL_MQTT_PUB_MSG
 };
 
 enum bl_mode bl_mode_current = BL_WIFI_DISCONNECTED;
@@ -84,7 +84,7 @@ void led_driver()
 	if (mode != bl_mode_new)
 	{
 		state = 0;
-		goto mode_update;
+		goto led_mode_update;
 	}
 
 	switch (state)
@@ -94,7 +94,7 @@ void led_driver()
 		{
 			if (count >= main_blink_mode[mode].times)
 			{
-				mode_update:
+				led_mode_update:
 				led_off();
 				count = 0;
 				time = main_blink_mode[mode].time_long;
