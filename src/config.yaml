@@ -9,9 +9,9 @@
 ### MQTT settings ##############################################################
   ["device.id", "landgraf"],
   ["device.password", ""],
-  ["mqtt.server", "192.168.0.101:1883"],
-  ["mqtt.pub", "s", "from_IoT", {title: "Publish topic"}],
-  ["mqtt.sub", "s", "to_IoT", {title: "Subscribe topic"}],
+  ["mqtt.server", "192.168.1.160:1883"],
+  ["mqtt.pub", "s", "fromIoT", {title: "Publish topic"}],
+  ["mqtt.sub", "s", "toIoT", {title: "Subscribe topic"}],
   ["mqtt.ack", "b", false, {"title": "Acknowledge on mqtt request"}],  
 ################################################################################
 
