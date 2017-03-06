@@ -60,6 +60,18 @@ void mqtt_pub(const char *cmd, ...)
 }
 
 //------------------------------------------------------------------------------
+static char* bool_to_str_state(bool state)
+{
+	return (state == true ? "ON" : "OFF");
+}
+
+//------------------------------------------------------------------------------
+static bool str_to_bool_state(char* state)
+{
+	return (strcmp(state, "ON") ? false : true);
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_light_id(int id, bool state)
 {
 	for (int i = 0; i < NUM_NODES; i++)
@@ -77,8 +89,8 @@ static void mqtt_update()
 {
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		mqtt_pub("{light_id: %d, state: %d}", LIGHT_ID(i),
-				pin_read(LIGHT_PIN(i)));
+		mqtt_pub("{light_id: %d, state: %Q}", LIGHT_ID(i),
+				bool_to_str_state(pin_read(LIGHT_PIN(i))));
 	}
 }
 
@@ -86,15 +98,16 @@ static void mqtt_update()
 static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 {
 	struct mg_str *s = &msg->payload;
-	int id, state;
+	int id;
 	bool err = false;
+	char* state;
 
 	printf("sub: topic: <%s> msg: %.*s\n", SUB_TOPIC(), (int) s->len, s->p);
 
 	/* parsing commands */
-	if (json_scanf(s->p, s->len, "{light_id: %d, state: %d}", &id, &state) == 2)
+	if (json_scanf(s->p, s->len, "{light_id: %d, state: %Q}", &id, &state) == 1)
 	{
-		mqtt_light_id(id, (bool) state);
+		mqtt_light_id(id, str_to_bool_state(state));
 	}
 	else if (strncmp(s->p, "update", s->len) == 0)
 	{
@@ -140,8 +153,8 @@ void mqtt_manager()
 		if (switch_state[i].update == true)
 		{
 			switch_state[i].update = false;
-			mqtt_pub("{light_id: %d, state: %d}", LIGHT_ID(i),
-					switch_state[i].s_old);
+			mqtt_pub("{light_id: %d, state: %Q}", LIGHT_ID(i),
+					bool_to_str_state(switch_state[i].s_old));
 			return;
 		}
 	}
