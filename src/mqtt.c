@@ -12,7 +12,7 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT   (100/SYS_TICK)  // time [ms]
+#define  MQTT_SEND_TIMEOUT   (250/SYS_TICK)  // time [ms]
 
 /*******************************************************************************
  *** MACROSES
@@ -100,12 +100,12 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	struct mg_str *s = &msg->payload;
 	int id;
 	bool err = false;
-	char* state;
+	char state[16];
 
 	printf("sub: topic: <%s> msg: %.*s\n", SUB_TOPIC(), (int) s->len, s->p);
 
 	/* parsing commands */
-	if (json_scanf(s->p, s->len, "{light_id: %d, state: %Q}", &id, &state) == 1)
+	if (json_scanf(s->p, s->len, "{light_id: %d, state: %Q}", &id, state) == 2)
 	{
 		mqtt_light_id(id, str_to_bool_state(state));
 	}
