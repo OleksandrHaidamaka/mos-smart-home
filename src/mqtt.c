@@ -161,9 +161,10 @@ void mqtt_manager()
 }
 
 //------------------------------------------------------------------------------
-void mqtt_handler(struct mg_connection *c, int ev, void *p)
+void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data)
 {
 	(void) c;
+	(void) user_data;
 	struct mg_mqtt_message *msg = (struct mg_mqtt_message *) p;
 
 	switch (ev)

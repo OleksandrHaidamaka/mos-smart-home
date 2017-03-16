@@ -9,6 +9,6 @@ void (*mqtt_callback)(void);
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void mqtt_handler(struct mg_connection *c, int ev, void *p);
+void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data);
 
 #endif  //__MQTT_H__
