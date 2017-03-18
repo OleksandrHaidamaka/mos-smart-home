@@ -37,7 +37,6 @@
 
 #define  NUM_NODES               get_cfg()->settings.num_nodes
 #define  LIGHT_PIN(n)   ((int *)&get_cfg()->settings.light.pin_0)[n]
-#define  LIGHT_ID(n)    ((int *)&get_cfg()->settings.light.id_0)[n]
 #define  SWITCH_PIN(n)  ((int *)&get_cfg()->settings.sw.pin_0)[n]
 
 /*******************************************************************************
