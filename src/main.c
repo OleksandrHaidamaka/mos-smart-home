@@ -40,6 +40,11 @@ static void sys_tick()
 		mqtt_callback();
 }
 
+static void sys_tick_start()
+{
+	mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
+}
+
 //------------------------------------------------------------------------------
 static void __low_level_init()
 {
@@ -47,7 +52,7 @@ static void __low_level_init()
 	switch_init();
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
-	mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
+	mgos_set_timer(10000, false, sys_tick_start, NULL);
 }
 
 //------------------------------------------------------------------------------

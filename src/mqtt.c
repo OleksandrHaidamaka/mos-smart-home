@@ -76,7 +76,7 @@ static void mqtt_light_id(int id, bool state)
 {
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		if (id == LIGHT_ID(i))
+		if (id == i)
 		{
 			pin_write(LIGHT_PIN(i), state);
 			return;
@@ -89,7 +89,7 @@ static void mqtt_update()
 {
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		mqtt_pub("{light_id: %d, state: %Q}", LIGHT_ID(i),
+		mqtt_pub("{light_id: %d, state: %Q}", i,
 				bool_to_str_state(pin_read(LIGHT_PIN(i))));
 	}
 }
@@ -153,7 +153,7 @@ void mqtt_manager()
 		if (switch_state[i].update == true)
 		{
 			switch_state[i].update = false;
-			mqtt_pub("{light_id: %d, state: %Q}", LIGHT_ID(i),
+			mqtt_pub("{light_id: %d, state: %Q}", i,
 					bool_to_str_state(switch_state[i].s_old));
 			return;
 		}
