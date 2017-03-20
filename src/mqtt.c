@@ -76,7 +76,7 @@ static void mqtt_light(int i, bool state)
 {
 	if (i < NUM_NODES)
 	{
-		light_on_off(LIGHT_PIN(i), state);
+		pin_write(LIGHT_PIN(i), !state);
 	}
 }
 
@@ -150,7 +150,7 @@ void mqtt_manager()
 		{
 			switch_state[i].update = false;
 			mqtt_pub("{light: %d, state: %Q}", i,
-					bool_to_str_state(switch_state[i].s_old));
+					bool_to_str_state(!switch_state[i].s_old));
 			return;
 		}
 	}

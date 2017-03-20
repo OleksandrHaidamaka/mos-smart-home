@@ -49,7 +49,7 @@ void switch_init()
 	{
 		switch_state[i].s_new = switch_state[i].s_old = pin_read(SWITCH_PIN(i));
 		switch_state[i].update = true;
-		light_on_off(LIGHT_PIN(i), switch_state[i].s_old);
+		pin_write(LIGHT_PIN(i), switch_state[i].s_old);
 		printf("%s(): switch %d = %d\r\n", __func__, i, switch_state[i].s_old);
 	}
 }
@@ -73,7 +73,7 @@ void switch_driver()
 			if (state != switch_state[i].s_old)
 			{
 				switch_state[i].s_old = state;
-				light_on_off(LIGHT_PIN(i), switch_state[i].s_old);
+				pin_write(LIGHT_PIN(i), switch_state[i].s_old);
 				printf("%s(): switch %d = %d\n", __func__, i,
 						switch_state[i].s_old);
 				switch_state[i].update = 1;

@@ -48,6 +48,4 @@
 #define pin_write(pin, state)  mgos_gpio_write(pin, state)
 #define pin_read(pin)          mgos_gpio_read(pin)
 
-#define light_on_off(pin, state)  pin_write(pin, state)
-
 #endif  //__MAIN_H__
