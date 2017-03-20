@@ -58,7 +58,7 @@ static void led_periph()
 void led_init()
 {
 	led_periph();
-	led_off();
+	led_on();
 }
 
 void blink_mode(enum bl_mode mode)

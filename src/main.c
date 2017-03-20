@@ -51,7 +51,7 @@ static void __low_level_init()
 	led_init();
 	switch_init();
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
-	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
+	mgos_mqtt_add_global_handler(mqtt_handler, NULL, NULL);
 	mgos_set_timer(10000, false, sys_tick_start, NULL);
 }
 
