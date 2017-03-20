@@ -86,7 +86,7 @@ static void mqtt_update()
 	for (int i = 0; i < NUM_NODES; i++)
 	{
 		mqtt_pub("{light: %d, state: %Q}", i,
-				bool_to_str_state(pin_read(LIGHT_PIN(i))));
+				bool_to_str_state(!pin_read(LIGHT_PIN(i))));
 	}
 }
 
