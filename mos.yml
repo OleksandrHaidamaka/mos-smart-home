@@ -1,7 +1,7 @@
 arch: esp8266
 version: 1.0
 mongoose_os_version: master
-skeleton_version: 2016-11-24T00:00:00Z
+skeleton_version: 2016-11-24
 sources:
 - src
 filesystem:

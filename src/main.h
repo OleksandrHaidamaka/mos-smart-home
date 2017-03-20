@@ -36,8 +36,8 @@
 #define  D10        (1)
 
 #define  NUM_NODES               get_cfg()->settings.num_nodes
-#define  LIGHT_PIN(n)   ((int *)&get_cfg()->settings.light.pin_0)[n]
-#define  SWITCH_PIN(n)  ((int *)&get_cfg()->settings.sw.pin_0)[n]
+#define  LIGHT_PIN(n)   ((int *)&get_cfg()->settings.light.pin0)[n]
+#define  SWITCH_PIN(n)  ((int *)&get_cfg()->settings.sw.pin0)[n]
 
 /*******************************************************************************
  *** MACROSES
@@ -47,5 +47,7 @@
 #define pin_output(pin)        mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT);
 #define pin_write(pin, state)  mgos_gpio_write(pin, state)
 #define pin_read(pin)          mgos_gpio_read(pin)
+
+#define light_on_off(pin, state)  pin_write(pin, state)
 
 #endif  //__MAIN_H__

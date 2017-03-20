@@ -9,9 +9,9 @@
 ### MQTT settings ##############################################################
   ["device.id", "landgraf"],
   ["device.password", ""],
-  ["mqtt.server", "192.168.0.101:1883"],
-  ["mqtt.pub", "s", "fromIoT/esp_id0", {title: "Publish topic"}],
-  ["mqtt.sub", "s", "toIoT/esp_id0", {title: "Subscribe topic"}],
+  ["mqtt.server", "192.168.0.100:1883"],
+  ["mqtt.pub", "s", "fromIoT/esp0", {title: "Publish topic"}],
+  ["mqtt.sub", "s", "toIoT/esp0", {title: "Subscribe topic"}],
   ["mqtt.ack", "b", false, {"title": "Acknowledge on mqtt request"}],
 ################################################################################
 
@@ -35,11 +35,11 @@
   ["settings.num_nodes", "i", 2, {"title": "Number of lights or switches"}],
 ### Light settings #############################################################
   ["settings.light", "o", {"title": "Light settings"}],
-  ["settings.light.pin_0", "i", 14, {"title": "Pin for light 0"}],
-  ["settings.light.pin_1", "i", 12, {"title": "Pin for light 1"}],
+  ["settings.light.pin0", "i", 14, {"title": "Pin for light 0"}],
+  ["settings.light.pin1", "i", 12, {"title": "Pin for light 1"}],
 ### Switch settings ############################################################
   ["settings.sw", "o", {"title": "Switch settings"}],
-  ["settings.sw.pin_0", "i", 4, {"title": "Pin for switch 0"}],
-  ["settings.sw.pin_1", "i", 0, {"title": "Pin for switch 1"}],
+  ["settings.sw.pin0", "i", 4, {"title": "Pin for switch 0"}],
+  ["settings.sw.pin1", "i", 0, {"title": "Pin for switch 1"}],
 ################################################################################
 ]
