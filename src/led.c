@@ -31,6 +31,8 @@ struct blink_mode_t
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
+int gl_led_pwm = 100;
+
 struct blink_mode_t main_blink_mode[] =
 {
 //       time short, time long, number of short blinks, repeat flag
@@ -46,16 +48,17 @@ enum bl_mode bl_mode_current = BL_WIFI_DISCONNECTED;
 enum bl_mode bl_mode_new = BL_WIFI_DISCONNECTED;
 
 //------------------------------------------------------------------------------
-static void led_periph()
+void led_pwm(int dim)  // range (0 - 100)  0 - off 100 - maximum
 {
-	pin_output(LED_PIN);
+	dim *= 100;
+	dim = 10000 - dim;
+	mgos_pwm_set(LED_PIN, 10000, dim);
 }
 
 //------------------------------------------------------------------------------
 void led_init()
 {
-	led_periph();
-	led_on();
+	led_pwm(gl_led_pwm);
 }
 
 void blink_mode(enum bl_mode mode)
@@ -92,7 +95,7 @@ void led_driver()
 			if (count >= main_blink_mode[mode].times)
 			{
 				led_mode_update:
-				led_off();
+				led_pwm(0);
 				count = 0;
 				time = main_blink_mode[mode].time_long;
 
@@ -108,7 +111,7 @@ void led_driver()
 
 				break;
 			}
-			led_on();
+			led_pwm(gl_led_pwm);
 			time = main_blink_mode[mode].time_short;
 			state++;
 			count++;
@@ -117,7 +120,7 @@ void led_driver()
 	case 1:
 		if (time == 0)
 		{
-			led_off();
+			led_pwm(0);
 			time = main_blink_mode[mode].time_short;
 			state--;
 		}

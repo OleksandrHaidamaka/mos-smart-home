@@ -13,6 +13,7 @@
 #include "fw/src/mgos_timers.h"
 #include "fw/src/mgos_mqtt.h"
 #include "fw/src/mgos_wifi.h"
+#include "fw/src/mgos_pwm.h"
 #include "led.h"
 #include "switch.h"
 #include "mqtt.h"
