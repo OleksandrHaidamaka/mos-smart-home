@@ -47,7 +47,7 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 		{
 			mgos_clear_timer(timer_id);
 			timer_id = 0;
-			led_on();
+			led_pwm(gl_led_pwm);
 		}
 		break;
 	case MGOS_WIFI_DISCONNECTED:
