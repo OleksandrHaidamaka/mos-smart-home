@@ -48,4 +48,9 @@
 #define pin_write(pin, state)  mgos_gpio_write(pin, state)
 #define pin_read(pin)          mgos_gpio_read(pin)
 
+/*******************************************************************************
+ *** EXTERN VARIABLES
+ ******************************************************************************/
+extern bool wifi_ip_acquired;
+
 #endif  //__MAIN_H__

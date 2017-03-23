@@ -9,11 +9,25 @@
  ******************************************************************************/
 #include "main.h"
 
+/*******************************************************************************
+ *** VARIABLES
+ ******************************************************************************/
+mgos_timer_id timer_id;
+bool wifi_ip_acquired;
+
 //------------------------------------------------------------------------------
 static void welcome_str()
 {
 	printf("\n\n*** Welcome to <mos-hall> project ***\n");
 	printf("*** Compile time: %s **********\n\n", __TIME__);
+}
+
+//------------------------------------------------------------------------------
+static void sys_tick()
+{
+	led_driver();
+	switch_driver();
+	mqtt_driver();
 }
 
 //------------------------------------------------------------------------------
@@ -23,26 +37,26 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 	switch ((int) event)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
-		blink_mode(BL_WIFI_IP_ACQUIRED);
+		wifi_ip_acquired = true;
+		if (timer_id == 0)
+			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
+		break;
+	case MGOS_WIFI_CONNECTED:
+		wifi_ip_acquired = false;
+		if (timer_id)
+		{
+			mgos_clear_timer(timer_id);
+			timer_id = 0;
+			led_on();
+		}
 		break;
 	case MGOS_WIFI_DISCONNECTED:
+		wifi_ip_acquired = false;
+		if (timer_id == 0)
+			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		blink_mode(BL_WIFI_DISCONNECTED);
 		break;
 	}
-}
-
-//------------------------------------------------------------------------------
-static void sys_tick()
-{
-	led_driver();
-	switch_driver();
-	if (mqtt_callback != NULL)
-		mqtt_callback();
-}
-
-static void sys_tick_start()
-{
-	mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 }
 
 //------------------------------------------------------------------------------
@@ -50,9 +64,9 @@ static void __low_level_init()
 {
 	led_init();
 	switch_init();
+	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
-	mgos_set_timer(10000, false, sys_tick_start, NULL);
 }
 
 //------------------------------------------------------------------------------
