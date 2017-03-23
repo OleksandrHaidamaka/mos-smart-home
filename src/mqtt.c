@@ -28,7 +28,6 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-void (*mqtt_callback)(void) = NULL;
 
 //------------------------------------------------------------------------------
 static void mqtt_sub()
@@ -127,22 +126,22 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 }
 
 //------------------------------------------------------------------------------
-void mqtt_manager()
+void mqtt_driver()
 {
 	static int time = 0;
-
-	if (time++ < MQTT_SEND_TIMEOUT)
-		return;
-	time = 0;
-
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
 
 	if (c == NULL)
 	{
-		mqtt_callback = NULL;
-		blink_mode(BL_WIFI_IP_ACQUIRED);
+		time = 0;
+		if (wifi_ip_acquired == true)
+			blink_mode(BL_WIFI_IP_ACQUIRED);
 		return;
 	}
+
+	if (time++ < MQTT_SEND_TIMEOUT)
+		return;
+	time = 0;
 
 	for (int i = 0; i < NUM_NODES; i++)
 	{
@@ -171,7 +170,6 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data)
 			if (PUB_TOPIC() != NULL && SUB_TOPIC() != NULL)
 			{
 				mqtt_sub();
-				mqtt_callback = mqtt_manager;
 				blink_mode(BL_MQTT_CONNECTED);
 			}
 			else
