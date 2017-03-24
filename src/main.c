@@ -31,6 +31,13 @@ static void sys_tick()
 }
 
 //------------------------------------------------------------------------------
+static void delay(int ms)
+{
+	mgos_ints_disable();
+	mgos_msleep(ms);
+}
+
+//------------------------------------------------------------------------------
 static void wifi_handler(enum mgos_wifi_status event, void *data)
 {
 	(void) data;
@@ -72,6 +79,7 @@ static void __low_level_init()
 //------------------------------------------------------------------------------
 enum mgos_app_init_result mgos_app_init(void)
 {
+	delay(1000);
 	welcome_str();
 	__low_level_init();
 	return 0;
