@@ -31,15 +31,15 @@
 ################################################################################
 
 ### Settings section ###########################################################
-  ["settings", "o", {"title": "Custom settings"}],
-  ["settings.num_nodes", "i", 2, {"title": "Number of lights or switches"}],
+  ["settings", "o", {hide: true}],
+  ["settings.num_nodes", "i", 2, {"title": "Number of nodes"}],
 ### Light settings #############################################################
-  ["settings.light", "o", {"title": "Light settings"}],
-  ["settings.light.pin0", "i", 14, {"title": "Pin for light 0"}],
-  ["settings.light.pin1", "i", 12, {"title": "Pin for light 1"}],
+  ["settings.light", "o", {hide: true}],
+  ["settings.light.pin0", "i", 14, {"title": "Light 0 pin"}],
+  ["settings.light.pin1", "i", 12, {"title": "Light 1 pin"}],
 ### Switch settings ############################################################
-  ["settings.sw", "o", {"title": "Switch settings"}],
-  ["settings.sw.pin0", "i", 4, {"title": "Pin for switch 0"}],
-  ["settings.sw.pin1", "i", 0, {"title": "Pin for switch 1"}],
+  ["settings.sw", "o", {hide: true}],
+  ["settings.sw.pin0", "i", 4, {"title": "Switch 0 pin"}],
+  ["settings.sw.pin1", "i", 0, {"title": "Switch 1 pin"}],
 ################################################################################
 ]
