@@ -87,6 +87,7 @@ static void mqtt_update()
 		mqtt_pub("{light: %d, state: %Q}", i,
 				bool_to_str_state(!pin_read(LIGHT_PIN(i))));
 	}
+	mqtt_pub("{led: %d}", gl_led_pwm);
 }
 
 //------------------------------------------------------------------------------
@@ -103,6 +104,12 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	if (json_scanf(s->p, s->len, "{light: %d, state: %Q}", &i, &state) == 2)
 	{
 		mqtt_light(i, str_to_bool_state(state));
+	}
+	if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
+	{
+		gl_led_pwm = abs(i);
+		if (gl_led_pwm > 100)
+			gl_led_pwm = 100;
 	}
 	else if (strncmp(s->p, "update", s->len) == 0)
 	{
