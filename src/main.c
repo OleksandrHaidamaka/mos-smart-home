@@ -31,10 +31,20 @@ static void sys_tick()
 }
 
 //------------------------------------------------------------------------------
+static void wifi_sta_start()
+{
+	get_cfg()->wifi.sta.enable = true;
+	mgos_wifi_setup_sta(&get_cfg()->wifi.sta);
+}
+
+//------------------------------------------------------------------------------
 static void delay(int ms)
 {
-	mgos_ints_disable();
-	mgos_msleep(ms);
+	if (ms)
+	{
+		mgos_ints_disable();
+		mgos_msleep(ms);
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -74,12 +84,15 @@ static void __low_level_init()
 	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
+
+	/* Отложенный старт wifi модуля */
+	mgos_set_timer(3000, false, wifi_sta_start, NULL);
 }
 
 //------------------------------------------------------------------------------
 enum mgos_app_init_result mgos_app_init(void)
 {
-	delay(1000);
+	delay(0);
 	welcome_str();
 	__low_level_init();
 	return 0;

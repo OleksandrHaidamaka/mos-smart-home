@@ -59,6 +59,7 @@ void led_pwm(int dim)  // range (0 - 100)  0 - off 100 - maximum
 void led_init()
 {
 	led_pwm(gl_led_pwm);
+	blink_mode(BL_WIFI_DISCONNECTED);
 }
 
 void blink_mode(enum bl_mode mode)
