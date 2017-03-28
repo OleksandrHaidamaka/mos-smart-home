@@ -86,13 +86,13 @@ static void __low_level_init()
 	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
 
 	/* Отложенный старт wifi модуля */
-	mgos_set_timer(3000, false, wifi_sta_start, NULL);
+	mgos_set_timer(1000, false, wifi_sta_start, NULL);
 }
 
 //------------------------------------------------------------------------------
 enum mgos_app_init_result mgos_app_init(void)
 {
-	delay(0);
+	delay(100);
 	welcome_str();
 	__low_level_init();
 	return 0;
