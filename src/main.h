@@ -17,6 +17,7 @@
 #include "fw/src/mgos_pwm.h"
 #include "led.h"
 #include "switch.h"
+#include "button.h"
 #include "mqtt.h"
 
 /*******************************************************************************
