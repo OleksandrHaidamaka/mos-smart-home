@@ -27,6 +27,7 @@ static void sys_tick()
 {
 	led_driver();
 	switch_driver();
+	button_driver();
 	mqtt_driver();
 }
 
@@ -81,6 +82,7 @@ static void __low_level_init()
 {
 	led_init();
 	switch_init();
+	button_init();
 	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
