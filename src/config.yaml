@@ -39,6 +39,6 @@
 ### Switch settings ############################################################
   ["settings.sw", "o", {hide: true}],
   ["settings.sw.pin0", "i", 4, {"title": "Switch 0 pin"}],
-  ["settings.sw.pin1", "i", 0, {"title": "Switch 1 pin"}],
+  ["settings.sw.pin1", "i", 5, {"title": "Switch 1 pin"}],
 ################################################################################
 ]
