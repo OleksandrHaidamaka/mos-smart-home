@@ -5,8 +5,11 @@
  *** INCLUDES
  ******************************************************************************/
 #include <stdio.h>
+#include <user_interface.h>
 
 #include "common/platform.h"
+#include "common/platforms/esp8266/esp_missing_includes.h"
+#include "fw/platforms/esp8266/src/esp_periph.h"
 #include "fw/src/mgos_sys_config.h"
 #include "fw/src/mgos_hal.h"
 #include "fw/src/mgos_app.h"
@@ -14,7 +17,7 @@
 #include "fw/src/mgos_timers.h"
 #include "fw/src/mgos_mqtt.h"
 #include "fw/src/mgos_wifi.h"
-#include "fw/src/mgos_pwm.h"
+#include "pwm_timer.h"
 #include "led.h"
 #include "switch.h"
 #include "button.h"
