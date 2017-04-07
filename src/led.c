@@ -9,6 +9,14 @@
  ******************************************************************************/
 #include "main.h"
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "common/platforms/esp8266/esp_missing_includes.h"
+#include "fw/src/mgos_gpio.h"
+#include "fw/platforms/esp8266/src/esp_gpio.h"
+#include "fw/platforms/esp8266/src/esp_periph.h"
+
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
@@ -27,6 +35,35 @@ struct blink_mode_t
 	int times;
 	bool repeat;
 };
+
+#define PWM_BASE_RATE_US 50
+/* The following constants are used to get the base 10 KHz freq (100 uS period)
+ * used to drive PWM. */
+#define TMR_PRESCALER_16 4 /* 16x prescaler */
+/* At 80 MHZ timer clock source is 26 MHz and each unit of this adds 0.2 uS. */
+#define TMR_RELOAD_VALUE_80 (250 - 8)
+/* At 160, the frequency is the same but the constant fraction that accounts for
+ * interrupt handling code running before reload needs to be adjusted. */
+#define TMR_RELOAD_VALUE_160 (250 - 4)
+
+#define FRC1_ENABLE_TIMER BIT7
+#define TM_INT_EDGE 0
+
+//IRAM NOINSTR void tim_callback(void *arg)
+//{
+//	(void) arg;
+//}
+//
+//void timer()
+//{
+//	ETS_FRC_TIMER1_INTR_ATTACH(tim_callback, NULL);
+//	RTC_CLR_REG_MASK(FRC1_INT_ADDRESS, FRC1_INT_CLR_MASK);
+//	RTC_REG_WRITE(FRC1_LOAD_ADDRESS, TMR_RELOAD_VALUE_80);
+//	RTC_REG_WRITE(FRC1_CTRL_ADDRESS,
+//	TMR_PRESCALER_16 | FRC1_ENABLE_TIMER | TM_INT_EDGE);
+//	TM1_EDGE_INT_ENABLE();
+//	ETS_FRC1_INTR_ENABLE();
+//}
 
 /*******************************************************************************
  *** VARIABLES
@@ -53,6 +90,7 @@ void led_pwm(int dim)  // range (0 - 100)  0 - off 100 - maximum
 	dim *= 100;
 	dim = 10000 - dim;
 	mgos_pwm_set(LED_PIN, 10000, dim);
+//	timer();
 }
 
 //------------------------------------------------------------------------------
@@ -95,8 +133,7 @@ void led_driver()
 		{
 			if (count >= main_blink_mode[mode].times)
 			{
-				led_mode_update:
-				led_pwm(0);
+				led_mode_update: led_pwm(0);
 				count = 0;
 				time = main_blink_mode[mode].time_long;
 
