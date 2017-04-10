@@ -12,12 +12,12 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define PWM_BASE_RATE_US     (50)
+#define PWM_BASE_RATE_US     (100)
 #define TMR_PRESCALER_16     (4)
-#define TMR_RELOAD_VALUE_80  (250 - 8)
-#define TMR_RELOAD_VALUE_160 (250 - 4)
+#define TMR_RELOAD_VALUE_80  (500 - 8)
+#define TMR_RELOAD_VALUE_160 (500 - 4)
 #define FRC1_ENABLE_TIMER    (1 << 7)
-//#define ESP_PWM_DEBUG
+#define ESP_PWM_DEBUG        // D7
 
 /*******************************************************************************
  *** STRUCTURES
