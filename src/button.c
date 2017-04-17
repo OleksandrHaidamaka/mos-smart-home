@@ -48,27 +48,11 @@ void button_init()
 //------------------------------------------------------------------------------
 void button_driver()
 {
-//	for (int i = 0; i < NUM_NODES; i++)
-//	{
-//		bool state = pin_read(SWITCH_PIN(i));
-//
-//		// If the switch changed, due to noise or pressing:
-//		if (state != switch_state[i].s_new)
-//		{
-//			switch_state[i].s_new = state;
-//			switch_state[i].elapsed_time = mg_time() + DEBOUNCE_TIME;
-//		}
-//
-//		if ((mg_time() > switch_state[i].elapsed_time))
-//		{
-//			if (state != switch_state[i].s_old)
-//			{
-//				switch_state[i].s_old = state;
-//				pin_write(LIGHT_PIN(i), switch_state[i].s_old);
-//				printf("%s(): switch %d = %d\n", __func__, i,
-//						switch_state[i].s_old);
-//				switch_state[i].update = 1;
-//			}
-//		}
-//	}
+	for (int i = 0; i < NUM_NODES; i++)
+	{
+		if(switch_state[i].update == true)
+		{
+
+		}
+	}
 }
