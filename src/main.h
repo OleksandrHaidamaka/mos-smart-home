@@ -44,6 +44,7 @@
 #define  NUM_NODES               get_cfg()->settings.num_nodes
 #define  LIGHT_PIN(n)   ((int *)&get_cfg()->settings.light.pin0)[n]
 #define  SWITCH_PIN(n)  ((int *)&get_cfg()->settings.sw.pin0)[n]
+#define  BUTTON_PIN(n)  ((int *)&get_cfg()->settings.sw.pin0)[n]
 
 /*******************************************************************************
  *** MACROSES

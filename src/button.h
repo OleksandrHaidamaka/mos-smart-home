@@ -6,6 +6,7 @@
  ******************************************************************************/
 typedef struct
 {
+	switch_state_t switch_state;
 	bool action;
 	bool push_up;
 	int push_up_time;
