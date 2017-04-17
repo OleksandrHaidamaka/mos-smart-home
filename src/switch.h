@@ -9,7 +9,7 @@ typedef struct
 	double elapsed_time;
 	bool s_new;
 	bool s_old;
-	bool update;
+	bool changed;
 } switch_state_t;
 
 /*******************************************************************************

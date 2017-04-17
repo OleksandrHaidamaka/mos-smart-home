@@ -17,23 +17,23 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-//switch_state_t* switch_state;
+button_state_t* button_state;
 
 //------------------------------------------------------------------------------
-//static void button_periph()
-//{
-//	for (int i = 0; i < NUM_NODES; i++)
-//	{
-//		pin_input_up(SWITCH_PIN(i));
-//	}
-//}
+static void button_periph()
+{
+	for (int i = 0; i < NUM_NODES; i++)
+	{
+		pin_input_up(SWITCH_PIN(i));
+	}
+}
 
 //------------------------------------------------------------------------------
 void button_init()
 {
-//	switch_state = calloc(NUM_NODES, sizeof(switch_state_t));
-//
-//	switch_periph();
+	button_state = calloc(NUM_NODES, sizeof(button_state_t));
+
+	button_periph();
 //	light_periph();
 //
 //	for (int i = 0; i < NUM_NODES; i++)
@@ -50,7 +50,7 @@ void button_driver()
 {
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		if(switch_state[i].update == true)
+		if(switch_state[i].changed == true)
 		{
 
 		}

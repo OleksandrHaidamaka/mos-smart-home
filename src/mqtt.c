@@ -152,9 +152,9 @@ void mqtt_driver()
 
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		if (switch_state[i].update == true)
+		if (switch_state[i].changed == true)
 		{
-			switch_state[i].update = false;
+			switch_state[i].changed = false;
 			mqtt_pub("{light: %d, state: %Q}", i,
 					bool_to_str_state(!switch_state[i].s_old));
 			return;
