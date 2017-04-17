@@ -6,10 +6,9 @@
  ******************************************************************************/
 typedef struct
 {
-	double elapsed_time;
-	bool s_new;
-	bool s_old;
-	bool update;
+	bool action;
+	bool push_up;
+	int push_up_time;
 } button_state_t;
 
 /*******************************************************************************
