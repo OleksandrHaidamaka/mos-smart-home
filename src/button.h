@@ -6,16 +6,18 @@
  ******************************************************************************/
 typedef struct
 {
-	switch_state_t switch_state;
-	bool action;
-	bool push_up;
-	int push_up_time;
-} button_state_t;
+	double elapsed_time;
+	bool s_new;
+	bool s_old;
+
+	void(*on_callback)(int i);
+	void(*off_callback)(int i);
+} switcher_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern button_state_t* button_state;
+extern switcher_t* button;
 
 /*******************************************************************************
  *** PROTOTYPES
