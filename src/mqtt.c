@@ -105,7 +105,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	{
 		mqtt_light(i, str_to_bool_state(state));
 	}
-	if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
+	else if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
 	{
 		gl_led_pwm = abs(i);
 		if (gl_led_pwm > 100)
@@ -152,13 +152,21 @@ void mqtt_driver()
 
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		if (switch_state[i].changed == true)
+		if (button_relay[i].mqtt_update == true)
 		{
-			switch_state[i].changed = false;
+			button_relay[i].mqtt_update = false;
 			mqtt_pub("{light: %d, state: %Q}", i,
-					bool_to_str_state(!switch_state[i].s_old));
+					bool_to_str_state(!pin_read(LIGHT_PIN(i))));
 			return;
 		}
+
+//		if (switch_state[i].changed == true)
+//		{
+//			switch_state[i].changed = false;
+//			mqtt_pub("{light: %d, state: %Q}", i,
+//					bool_to_str_state(!switch_state[i].s_old));
+//			return;
+//		}
 	}
 }
 

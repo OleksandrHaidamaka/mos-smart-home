@@ -19,6 +19,8 @@
  ******************************************************************************/
 switcher_t* button;
 
+button_relay_t* button_relay; // smart home object
+
 //------------------------------------------------------------------------------
 static void button_periph()
 {
@@ -32,7 +34,7 @@ void button_relay_on_callback(int i)
 {
 	bool state = !pin_read(LIGHT_PIN(i));
 	pin_write(LIGHT_PIN(i), state);
-	mqtt_pub("{light: %d, state: %Q}", i, bool_to_str_state(state));
+	button_relay[i].mqtt_update = true;
 }
 
 //------------------------------------------------------------------------------
@@ -52,8 +54,9 @@ void button_relay_init(void)
 	{
 		button[i].on_callback = button_relay_on_callback;
 		button[i].off_callback = NULL;
-		button[i].s_new = switch_state[i].s_old = pin_read(SWITCH_PIN(i));
-		pin_write(LIGHT_PIN(i), 0);
+		button[i].s_new = button[i].s_old = pin_read(SWITCH_PIN(i));
+		button_relay[i].mqtt_update = true;
+		pin_write(LIGHT_PIN(i), true); // off state
 		printf("%s(): button %d = %d\r\n", __func__, i, button[i].s_old);
 	}
 }
@@ -62,6 +65,7 @@ void button_relay_init(void)
 void button_init()
 {
 	button = calloc(NUM_NODES, sizeof(switcher_t));
+	button_relay = calloc(NUM_NODES, sizeof(button_relay_t));
 	button_periph();
 	button_relay_init();
 }
