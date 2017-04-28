@@ -8,7 +8,10 @@
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
+void mqtt_pub(const char *cmd, ...);
 void mqtt_driver();
 void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data);
+
+char* bool_to_str_state(bool state);
 
 #endif  //__MQTT_H__

@@ -59,7 +59,7 @@ void mqtt_pub(const char *cmd, ...)
 }
 
 //------------------------------------------------------------------------------
-static char* bool_to_str_state(bool state)
+char* bool_to_str_state(bool state)
 {
 	return (state == true ? "ON" : "OFF");
 }
