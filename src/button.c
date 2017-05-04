@@ -12,7 +12,6 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  DEBOUNCE_TIME  (0.05)  // time [s]
 
 /*******************************************************************************
  *** VARIABLES
@@ -54,10 +53,10 @@ void button_relay_init(void)
 	{
 		button[i].on_callback = button_relay_on_callback;
 		button[i].off_callback = NULL;
-		button[i].s_new = button[i].s_old = pin_read(SWITCH_PIN(i));
+		button[i].state = pin_read(SWITCH_PIN(i));
 		button_relay[i].mqtt_update = true;
 		pin_write(LIGHT_PIN(i), true); // off state
-		printf("%s(): button %d = %d\r\n", __func__, i, button[i].s_old);
+		printf("%s(): button %d = %d\r\n", __func__, i, button[i].state);
 	}
 }
 
@@ -77,31 +76,21 @@ void button_driver()
 	{
 		bool state = pin_read(SWITCH_PIN(i));
 
-		// If the switch changed, due to noise or pressing:
-		if (state != button[i].s_new)
+		if (state != button[i].state)
 		{
-			button[i].s_new = state;
-			button[i].elapsed_time = mg_time() + DEBOUNCE_TIME;
-		}
+			button[i].state = state;
 
-		if ((mg_time() > button[i].elapsed_time))
-		{
-			if (state != button[i].s_old)
+			switch (state)
 			{
-				button[i].s_old = state;
-
-				switch (state)
-				{
-				case false: // button push-up
-					if (button[i].on_callback != NULL)
-						button[i].on_callback(i);
-					printf("%s(): button %d = click\n", __func__, i);
-					break;
-				case true:  // button push-down
-					if (button[i].off_callback != NULL)
-						button[i].off_callback(i);
-					break;
-				}
+			case false: // button push-up
+				if (button[i].on_callback != NULL)
+					button[i].on_callback(i);
+				printf("%s(): button %d = click\n", __func__, i);
+				break;
+			case true:  // button push-down
+				if (button[i].off_callback != NULL)
+					button[i].off_callback(i);
+				break;
 			}
 		}
 	}
