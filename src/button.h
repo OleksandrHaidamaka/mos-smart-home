@@ -6,9 +6,7 @@
  ******************************************************************************/
 typedef struct
 {
-	double elapsed_time;
-	bool s_new;
-	bool s_old;
+	bool state;
 
 	void (*on_callback)(int i);
 	void (*off_callback)(int i);
