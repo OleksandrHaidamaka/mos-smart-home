@@ -16,14 +16,7 @@
 
 #if (NUM_BT_DRIVER > 0)
 int bt_driver_pin_map[NUM_BT_DRIVER] =
-{ D1, D2 };
-#endif
-
-#if (NUM_BT_RELAY_O > 0)
-in_out_t bt_relay_pin_map[NUM_BT_RELAY_O] =
-{
-{ .in = D1, .out = D5 },
-{ .in = D2, .out = D6 } };
+	{ D1, D2 };
 #endif
 
 /*******************************************************************************
@@ -83,12 +76,10 @@ void button_driver()
 			switch (state)
 			{
 			case false: // button push-up
-				if (bt_diver[i].on_callback != NULL)
-					bt_diver[i].on_callback(i); // переиндексацию сделать
+				if (bt_diver[i].on_callback != NULL) bt_diver[i].on_callback(i); // переиндексацию сделать
 				break;
-			case true:  // button push-down
-				if (bt_diver[i].off_callback != NULL)
-					bt_diver[i].off_callback(i);
+			case true: // button push-down
+				if (bt_diver[i].off_callback != NULL) bt_diver[i].off_callback(i);
 				break;
 			}
 		}

@@ -35,7 +35,7 @@ static void mqtt_sub()
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
 
 	struct mg_mqtt_topic_expression topic_exp =
-	{ SUB_TOPIC(), 0 };
+		{ SUB_TOPIC(), 0 };
 	mg_mqtt_subscribe(c, &topic_exp, 1, 42);
 	printf("sub: topic: <%s>\n", SUB_TOPIC());
 }
@@ -108,8 +108,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	else if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
 	{
 		gl_led_pwm = abs(i);
-		if (gl_led_pwm > 100)
-			gl_led_pwm = 100;
+		if (gl_led_pwm > 100) gl_led_pwm = 100;
 	}
 	else if (strncmp(s->p, "update", s->len) == 0)
 	{
@@ -123,8 +122,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	if (err == false)
 	{
 		blink_mode(BL_MQTT_SUB_MSG_OK);
-		if (MQTT_ACK() == true)
-			mqtt_pub("%.*s\n", (int) s->len, s->p);
+		if (MQTT_ACK() == true) mqtt_pub("%.*s\n", (int) s->len, s->p);
 	}
 	else
 	{
@@ -141,13 +139,11 @@ void mqtt_driver()
 	if (c == NULL)
 	{
 		time = 0;
-		if (wifi_ip_acquired == true)
-			blink_mode(BL_WIFI_IP_ACQUIRED);
+		if (wifi_ip_acquired == true) blink_mode(BL_WIFI_IP_ACQUIRED);
 		return;
 	}
 
-	if (time++ < MQTT_SEND_TIMEOUT)
-		return;
+	if (time++ < MQTT_SEND_TIMEOUT) return;
 	time = 0;
 
 //	for (int i = 0; i < NUM_NODES; i++)
@@ -187,8 +183,7 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data)
 				mqtt_sub();
 				blink_mode(BL_MQTT_CONNECTED);
 			}
-			else
-				printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
+			else printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
 		}
 		break;
 	case MG_EV_MQTT_PUBLISH:
