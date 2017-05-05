@@ -18,31 +18,4 @@
   ["mqtt.sub", "s", "toIoT/esp0", {title: "Subscribe topic"}],
   ["mqtt.ack", "b", false, {"title": "Acknowledge on mqtt request"}],
 ################################################################################
-
-### Pin definitions for NodeMCU ################################################
-#           D0 -->16 // IO ONLY!
-#           D1 -->5  // IO
-#           D2 -->4  // IO
-#           D3 -->0  // BOOT_MODE
-#           D4 -->2  // BOOT_MODE - LED_PIN
-#           D5 -->14 // IO
-#           D6 -->12 // IO
-#           D7 -->13 // IO
-#           D8 -->15 // BOOT_MODE
-#           D9 -->3  // Rx - I
-#           D10-->1  // Tx - O
-################################################################################
-
-### Settings section ###########################################################
-  ["settings", "o", {hide: true}],
-  ["settings.num_nodes", "i", 2, {"title": "Number of nodes"}],
-### Light settings #############################################################
-  ["settings.light", "o", {hide: true}],
-  ["settings.light.pin0", "i", 14, {"title": "Light 0 pin"}],
-  ["settings.light.pin1", "i", 12, {"title": "Light 1 pin"}],
-### Switch settings ############################################################
-  ["settings.sw", "o", {hide: true}],
-  ["settings.sw.pin0", "i", 4, {"title": "Switch 0 pin"}],
-  ["settings.sw.pin1", "i", 5, {"title": "Switch 1 pin"}],
-################################################################################
 ]

@@ -73,21 +73,21 @@ static bool str_to_bool_state(char* state)
 //------------------------------------------------------------------------------
 static void mqtt_light(int i, bool state)
 {
-	if (i < NUM_NODES)
+	if (i < 2)
 	{
-		pin_write(LIGHT_PIN(i), !state);
+		pin_write(i, !state);
 	}
 }
 
 //------------------------------------------------------------------------------
 static void mqtt_update()
 {
-	for (int i = 0; i < NUM_NODES; i++)
-	{
-		mqtt_pub("{light: %d, state: %Q}", i,
-				bool_to_str_state(!pin_read(LIGHT_PIN(i))));
-	}
-	mqtt_pub("{led: %d}", gl_led_pwm);
+//	for (int i = 0; i < NUM_NODES; i++)
+//	{
+//		mqtt_pub("{light: %d, state: %Q}", i,
+//				bool_to_str_state(!pin_read(LIGHT_PIN(i))));
+//	}
+//	mqtt_pub("{led: %d}", gl_led_pwm);
 }
 
 //------------------------------------------------------------------------------
@@ -150,24 +150,24 @@ void mqtt_driver()
 		return;
 	time = 0;
 
-	for (int i = 0; i < NUM_NODES; i++)
-	{
-		if (bt_relay[i].mqtt_update == true)
-		{
-			bt_relay[i].mqtt_update = false;
-			mqtt_pub("{light: %d, state: %Q}", i,
-					bool_to_str_state(!pin_read(LIGHT_PIN(i))));
-			return;
-		}
-
-//		if (switch_state[i].changed == true)
+//	for (int i = 0; i < NUM_NODES; i++)
+//	{
+//		if (bt_relay[i].mqtt_update == true)
 //		{
-//			switch_state[i].changed = false;
+//			bt_relay[i].mqtt_update = false;
 //			mqtt_pub("{light: %d, state: %Q}", i,
-//					bool_to_str_state(!switch_state[i].s_old));
+//					bool_to_str_state(!pin_read(LIGHT_PIN(i))));
 //			return;
 //		}
-	}
+//
+////		if (switch_state[i].changed == true)
+////		{
+////			switch_state[i].changed = false;
+////			mqtt_pub("{light: %d, state: %Q}", i,
+////					bool_to_str_state(!switch_state[i].s_old));
+////			return;
+////		}
+//	}
 }
 
 //------------------------------------------------------------------------------

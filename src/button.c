@@ -12,61 +12,59 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
+#define  NUM_BT_DRIVER       (NUM_BT_O + NUM_BT_RELAY_O)
+
+#if (NUM_BT_DRIVER > 0)
+int bt_driver_pin_map[NUM_BT_DRIVER] =
+{ D1, D2 };
+#endif
+
+#if (NUM_BT_RELAY_O > 0)
+in_out_t bt_relay_pin_map[NUM_BT_RELAY_O] =
+{
+{ .in = D1, .out = D5 },
+{ .in = D2, .out = D6 } };
+#endif
 
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-input_t* bt;
-bt_relay_t* bt_relay; // button_relay object
+input_t bt_diver[NUM_BT_DRIVER];
 
-//------------------------------------------------------------------------------
-static void button_periph()
-{
-	for (int i = 0; i < NUM_NODES; i++)
-	{
-		pin_input_up(SWITCH_PIN(i));
-	}
-}
+bt_relay_t bt_relay[NUM_BT_RELAY_O]; // button_relay object
 
 static void button_relay_on_callback(int i);
 
 //------------------------------------------------------------------------------
-static void light_periph()
+static void bt_relay_periph(void)
 {
-	for (int i = 0; i < NUM_NODES; i++)
+	for (int i = 0; i < NUM_BT_RELAY_O; i++)
 	{
-		pin_output(LIGHT_PIN(i));
+		pin_input_up(bt_relay_pin_map[i].in);
+		pin_output(bt_relay_pin_map[i].out);
 	}
 }
 
 //------------------------------------------------------------------------------
 void button_relay_init(void)
 {
-	light_periph();
+	bt_relay_periph();
 
-	for (int i = 0; i < NUM_NODES; i++)
+	for (int i = 0; i < NUM_BT_RELAY_O; i++)
 	{
-		bt_relay[i].mqtt_update = true;
-		bt[i].on_callback = button_relay_on_callback;
-		bt[i].off_callback = NULL;
-		bt[i].state = pin_read(SWITCH_PIN(i));
-		pin_write(LIGHT_PIN(i), true);
-	}
-}
+		bt_diver[i].on_callback = button_relay_on_callback; // переиндексацию сделать
+		bt_diver[i].off_callback = NULL;
+		bt_diver[i].state = pin_read(bt_driver_pin_map[i]);
 
-//------------------------------------------------------------------------------
-void button_init()
-{
-	bt = calloc(NUM_NODES, sizeof(input_t));
-	bt_relay = calloc(NUM_NODES, sizeof(bt_relay_t));
-	button_periph();
-	button_relay_init();
+		bt_relay[i].mqtt_update = true;
+		pin_write(bt_relay_pin_map[i].out, true);
+	}
 }
 
 //------------------------------------------------------------------------------
 void button_relay_on_callback(int i)
 {
-	pin_write(LIGHT_PIN(i), !pin_read(LIGHT_PIN(i)));
+	pin_write(bt_relay_pin_map[i].out, !pin_read(bt_relay_pin_map[i].out));
 	bt_relay[i].mqtt_update = true;
 	printf("%s(%d)\n", __func__, i);
 }
@@ -74,23 +72,23 @@ void button_relay_on_callback(int i)
 //------------------------------------------------------------------------------
 void button_driver()
 {
-	for (int i = 0; i < NUM_NODES; i++)
+	for (int i = 0; i < NUM_BT_DRIVER; i++)
 	{
-		bool state = pin_read(SWITCH_PIN(i));
+		bool state = pin_read(bt_driver_pin_map[i]);
 
-		if (state != bt[i].state)
+		if (state != bt_diver[i].state)
 		{
-			bt[i].state = state;
+			bt_diver[i].state = state;
 
 			switch (state)
 			{
 			case false: // button push-up
-				if (bt[i].on_callback != NULL)
-					bt[i].on_callback(i);
+				if (bt_diver[i].on_callback != NULL)
+					bt_diver[i].on_callback(i); // переиндексацию сделать
 				break;
 			case true:  // button push-down
-				if (bt[i].off_callback != NULL)
-					bt[i].off_callback(i);
+				if (bt_diver[i].off_callback != NULL)
+					bt_diver[i].off_callback(i);
 				break;
 			}
 		}

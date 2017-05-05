@@ -17,6 +17,7 @@
 #include "fw/src/mgos_timers.h"
 #include "fw/src/mgos_mqtt.h"
 #include "fw/src/mgos_wifi.h"
+#include "config.h"
 #include "pwm_timer.h"
 #include "led.h"
 #include "switch.h"
@@ -27,24 +28,6 @@
  *** DEFENITIONS
  ******************************************************************************/
 #define  SYS_TICK   (50) //time [ms]
-
-//  Node MCU pin-out
-#define  D0         (16)
-#define  D1         (5)
-#define  D2         (4)
-#define  D3         (0)
-#define  D4         (2)
-#define  D5         (14)
-#define  D6         (12)
-#define  D7         (13)
-#define  D8         (15)
-#define  D9         (3)
-#define  D10        (1)
-
-#define  NUM_NODES               get_cfg()->settings.num_nodes
-#define  LIGHT_PIN(n)   ((int *)&get_cfg()->settings.light.pin0)[n]
-#define  SWITCH_PIN(n)  ((int *)&get_cfg()->settings.sw.pin0)[n]
-#define  BUTTON_PIN(n)  ((int *)&get_cfg()->settings.sw.pin0)[n]
 
 /*******************************************************************************
  *** MACROSES
