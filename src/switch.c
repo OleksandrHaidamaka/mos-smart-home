@@ -12,12 +12,12 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  DEBOUNCE_TIME  (0.05)  // time [s]
 
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-switch_state_t* switch_state;
+input_t* sw;
+sw_relay_t* sw_relay; // switch_relay object
 
 //------------------------------------------------------------------------------
 static void switch_periph()
@@ -27,6 +27,9 @@ static void switch_periph()
 		pin_input_up(SWITCH_PIN(i));
 	}
 }
+
+static void switch_relay_off_callback(int i);
+static void switch_relay_on_callback(int i);
 
 //------------------------------------------------------------------------------
 static void light_periph()
@@ -38,20 +41,43 @@ static void light_periph()
 }
 
 //------------------------------------------------------------------------------
-void switch_init()
+void switch_relay_init(void)
 {
-	switch_state = calloc(NUM_NODES, sizeof(switch_state_t));
-
-	switch_periph();
 	light_periph();
 
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		switch_state[i].s_new = switch_state[i].s_old = pin_read(SWITCH_PIN(i));
-		switch_state[i].changed = true;
-		pin_write(LIGHT_PIN(i), switch_state[i].s_old);
-		printf("%s(): switch %d = %d\r\n", __func__, i, switch_state[i].s_old);
+		sw_relay[i].mqtt_update = true;
+		sw[i].off_callback = switch_relay_off_callback;
+		sw[i].on_callback = switch_relay_on_callback;
+		sw[i].state = pin_read(SWITCH_PIN(i));
+		pin_write(LIGHT_PIN(i), sw[i].state);
 	}
+}
+
+//------------------------------------------------------------------------------
+void switch_init()
+{
+	sw = calloc(NUM_NODES, sizeof(input_t));
+	sw_relay = calloc(NUM_NODES, sizeof(sw_relay_t));
+	switch_periph();
+	switch_relay_init();
+}
+
+//------------------------------------------------------------------------------
+static void switch_relay_off_callback(int i)
+{
+	pin_write(LIGHT_PIN(i), true);
+	sw_relay[i].mqtt_update = true;
+	printf("%s(%d)\n", __func__, i);
+}
+
+//------------------------------------------------------------------------------
+static void switch_relay_on_callback(int i)
+{
+	pin_write(LIGHT_PIN(i), false);
+	sw_relay[i].mqtt_update = true;
+	printf("%s(%d)\n", __func__, i);
 }
 
 //------------------------------------------------------------------------------
@@ -61,22 +87,20 @@ void switch_driver()
 	{
 		bool state = pin_read(SWITCH_PIN(i));
 
-		// If the switch changed, due to noise or pressing:
-		if (state != switch_state[i].s_new)
+		if (state != sw[i].state)
 		{
-			switch_state[i].s_new = state;
-			switch_state[i].elapsed_time = mg_time() + DEBOUNCE_TIME;
-		}
+			sw[i].state = state;
 
-		if ((mg_time() > switch_state[i].elapsed_time))
-		{
-			if (state != switch_state[i].s_old)
+			switch (state)
 			{
-				switch_state[i].s_old = state;
-				pin_write(LIGHT_PIN(i), switch_state[i].s_old);
-				printf("%s(): switch %d = %d\n", __func__, i,
-						switch_state[i].s_old);
-				switch_state[i].changed = 1;
+			case false: // switch on
+				if (sw[i].on_callback != NULL)
+					sw[i].on_callback(i);
+				break;
+			case true:  // switch off
+				if (sw[i].off_callback != NULL)
+					sw[i].off_callback(i);
+				break;
 			}
 		}
 	}
