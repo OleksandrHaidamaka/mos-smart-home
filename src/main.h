@@ -19,9 +19,9 @@
 #include "fw/src/mgos_wifi.h"
 #include "config.h"
 #include "pwm_timer.h"
-#include "led.h"
 #include "switch.h"
 #include "button.h"
+#include "led.h"
 #include "mqtt.h"
 
 /*******************************************************************************

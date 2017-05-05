@@ -56,8 +56,7 @@ static struct pwm_info *find_or_create_pwm_info(uint8_t pin, int create)
 			break;
 		}
 	}
-	if (p != NULL || !create)
-		return p;
+	if (p != NULL || !create) return p;
 	ETS_FRC1_INTR_DISABLE();
 	p = (struct pwm_info *) realloc(s_pwms, sizeof(*p) * (s_num_pwms + 1));
 	if (p != NULL)
@@ -94,10 +93,9 @@ static void remove_pwm_info(struct pwm_info *p)
 //------------------------------------------------------------------------------
 inline static void pwm_configure_timer(void)
 {
-	if (system_get_cpu_freq() == SYS_CPU_80MHZ)
-		s_pwm_timer_reload_value = TMR_RELOAD_VALUE_80;
-	else
-		s_pwm_timer_reload_value = TMR_RELOAD_VALUE_160;
+	if (system_get_cpu_freq() == SYS_CPU_80MHZ) s_pwm_timer_reload_value =
+	TMR_RELOAD_VALUE_80;
+	else s_pwm_timer_reload_value = TMR_RELOAD_VALUE_160;
 
 	ETS_FRC_TIMER1_INTR_ATTACH(pwm_timer_callback, NULL);
 	RTC_CLR_REG_MASK(FRC1_INT_ADDRESS, FRC1_INT_CLR_MASK);
@@ -113,19 +111,15 @@ int pwm_set(int pin, int period, int duty)
 {
 	struct pwm_info *p;
 
-	if (pin != 16 && get_gpio_info(pin) == NULL)
-		return 0;
+	if (pin != 16 && get_gpio_info(pin) == NULL) return 0;
 
-	if (period != 0
-			&& (period < PWM_BASE_RATE_US * 2 || duty < 0 || duty > period))
-		return 0;
+	if (period != 0 && (period < PWM_BASE_RATE_US * 2 || duty < 0 || duty > period)) return 0;
 
 	period /= PWM_BASE_RATE_US;
 	duty /= PWM_BASE_RATE_US;
 
 	p = find_or_create_pwm_info(pin, (period > 0 && duty >= 0));
-	if (p == NULL)
-		return 0;
+	if (p == NULL) return 0;
 
 	if (period == 0)
 	{
@@ -138,8 +132,7 @@ int pwm_set(int pin, int period, int duty)
 		return 1;
 	}
 
-	if (p->period == (uint32_t) period && p->duty == (uint32_t) duty)
-		return 1;
+	if (p->period == (uint32_t) period && p->duty == (uint32_t) duty) return 1;
 
 	mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT);
 #ifdef ESP_PWM_DEBUG
@@ -157,8 +150,7 @@ int pwm_set(int pin, int period, int duty)
 	}
 	ETS_FRC1_INTR_ENABLE();
 
-	if (duty == 0 || period == duty)
-		mgos_gpio_write(pin, (period == duty));
+	if (duty == 0 || period == duty) mgos_gpio_write(pin, (period == duty));
 
 	pwm_configure_timer();
 	return 1;
@@ -181,11 +173,9 @@ IRAM NOINSTR void pwm_timer_callback(void *arg)
 	for (i = 0; i < s_num_pwms; i++)
 	{
 		struct pwm_info *p = s_pwms + i;
-		if (--(p->cnt) > 0)
-			continue;
+		if (--(p->cnt) > 0) continue;
 		/* Edge cases were handled during setup. */
-		if (p->duty == 0 || p->duty == p->period)
-			continue;
+		if (p->duty == 0 || p->duty == p->period) continue;
 		if (p->pin != 16)
 		{ /* GPIO 16 is controlled via a different register */
 			uint32_t bit = ((uint32_t) 1) << p->pin;

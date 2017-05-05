@@ -56,8 +56,7 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
 		wifi_ip_acquired = true;
-		if (timer_id == 0)
-			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
+		if (timer_id == 0) timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		break;
 	case MGOS_WIFI_CONNECTED:
 		wifi_ip_acquired = false;
@@ -70,8 +69,7 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 		break;
 	case MGOS_WIFI_DISCONNECTED:
 		wifi_ip_acquired = false;
-		if (timer_id == 0)
-			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
+		if (timer_id == 0) timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		blink_mode(BL_WIFI_DISCONNECTED);
 		break;
 	}
