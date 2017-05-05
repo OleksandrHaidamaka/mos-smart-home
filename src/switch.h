@@ -6,16 +6,13 @@
  ******************************************************************************/
 typedef struct
 {
-	double elapsed_time;
-	bool s_new;
-	bool s_old;
-	bool changed;
-} switch_state_t;
+	bool mqtt_update;
+} sw_relay_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern switch_state_t* switch_state;
+extern sw_relay_t* sw_relay;
 
 /*******************************************************************************
  *** PROTOTYPES

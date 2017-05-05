@@ -152,9 +152,9 @@ void mqtt_driver()
 
 	for (int i = 0; i < NUM_NODES; i++)
 	{
-		if (button_relay[i].mqtt_update == true)
+		if (bt_relay[i].mqtt_update == true)
 		{
-			button_relay[i].mqtt_update = false;
+			bt_relay[i].mqtt_update = false;
 			mqtt_pub("{light: %d, state: %Q}", i,
 					bool_to_str_state(!pin_read(LIGHT_PIN(i))));
 			return;

@@ -6,22 +6,13 @@
  ******************************************************************************/
 typedef struct
 {
-	bool state;
-
-	void (*on_callback)(int i);
-	void (*off_callback)(int i);
-} switcher_t;
-
-typedef struct
-{
 	bool mqtt_update;
-} button_relay_t;
+} bt_relay_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern switcher_t* button;
-extern button_relay_t* button_relay;
+extern bt_relay_t* bt_relay;
 
 /*******************************************************************************
  *** PROTOTYPES
