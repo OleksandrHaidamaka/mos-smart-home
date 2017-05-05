@@ -4,11 +4,11 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  NUM_RELAY_O         (0)  // количество relay объектов
-#define  NUM_SW_O            (0)  // количество sw объектов
-#define  NUM_SW_RELAY_O      (0)  // количество sw-relay объектов
-#define  NUM_BT_O            (0)  // количество bt объектов
-#define  NUM_BT_RELAY_O      (2)  // количество bt-relay объектов
+#define  NUM_RELAY_IOT         (0)  // количество relay
+#define  NUM_SW_IOT            (0)  // количество sw
+#define  NUM_SW_RELAY_IOT      (0)  // количество sw-relay
+#define  NUM_BT_IOT            (0)  // количество bt
+#define  NUM_BT_RELAY_IOT      (2)  // количество bt-relay
 
 /*******************************************************************************
  *** COMMON TYPEDEF
@@ -22,6 +22,7 @@ typedef struct
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern in_out_t bt_relay_pin_map[NUM_BT_RELAY_O];
+extern in_out_t bt_iot_pin_map[NUM_BT_IOT];
+extern in_out_t bt_relay_iot_pin_map[NUM_BT_RELAY_IOT];
 
 #endif  // __CONFIG_H__

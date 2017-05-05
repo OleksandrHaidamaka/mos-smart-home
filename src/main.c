@@ -80,6 +80,7 @@ static void __low_level_init()
 {
 	led_init();
 //	switch_init();
+	button_driver_init();
 	button_relay_init();
 	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);

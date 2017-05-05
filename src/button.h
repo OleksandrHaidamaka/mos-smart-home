@@ -12,11 +12,12 @@ typedef struct
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern bt_relay_t bt_relay[NUM_BT_RELAY_O];
+extern bt_relay_t bt_relay[NUM_BT_RELAY_IOT];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
+void button_driver_init(void);
 void button_relay_init(void);
 void button_driver();
 
