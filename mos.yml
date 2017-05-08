@@ -4,6 +4,7 @@ mongoose_os_version: master
 skeleton_version: 2017-03-17
 sources:
 - src
+- src/driver
 filesystem:
 - fs
 extra_files: null
