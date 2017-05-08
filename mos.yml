@@ -5,6 +5,7 @@ skeleton_version: 2017-03-17
 sources:
 - src
 - src/driver
+- src/iot
 filesystem:
 - fs
 extra_files: null

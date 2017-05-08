@@ -19,8 +19,9 @@
 #include "fw/src/mgos_wifi.h"
 #include "config.h"
 #include "pwm_timer.h"
-#include "switch.h"
-#include "button.h"
+#include "driver/switch.h"
+#include "driver/button.h"
+#include "iot/bt_relay.h"
 #include "led.h"
 #include "mqtt.h"
 
@@ -50,17 +51,6 @@
 #define pin_output(pin)        mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT);
 #define pin_write(pin, state)  mgos_gpio_write(pin, state)
 #define pin_read(pin)          mgos_gpio_read(pin)
-
-/*******************************************************************************
- *** COMMON TYPEDEF
- ******************************************************************************/
-typedef struct
-{
-	bool state;
-
-	void (*on_callback)(int i);
-	void (*off_callback)(int i);
-} input_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
