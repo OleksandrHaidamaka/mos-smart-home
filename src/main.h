@@ -18,11 +18,11 @@
 #include "fw/src/mgos_mqtt.h"
 #include "fw/src/mgos_wifi.h"
 #include "config/config.h"
-#include "led.h"
-#include "mqtt.h"
-#include "pwm_timer.h"
+#include "driver/pwm_timer.h"
 #include "driver/switch.h"
 #include "driver/button.h"
+#include "driver/led.h"
+#include "driver/mqtt.h"
 #include "iot/bt_relay.h"
 
 /*******************************************************************************
