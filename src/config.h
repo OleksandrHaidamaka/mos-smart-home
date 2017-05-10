@@ -19,10 +19,15 @@ typedef struct
 	int out;
 } in_out_t;
 
+typedef struct
+{
+	in_out_t pin_map;
+	bool mqtt_update;
+} bt_relay_t;
+
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern in_out_t bt_iot_pin_map[NUM_BT_IOT];
-extern in_out_t bt_relay_iot_pin_map[NUM_BT_RELAY_IOT];
+bt_relay_t bt_relay[NUM_BT_RELAY_IOT];
 
 #endif  // __CONFIG_H__
