@@ -19,10 +19,6 @@
  ******************************************************************************/
 static void button_relay_on_callback(int i);
 
-/*******************************************************************************
- *** VARIABLES
- ******************************************************************************/
-
 //------------------------------------------------------------------------------
 static void bt_relay_periph(void)
 {
@@ -40,15 +36,15 @@ void button_relay_init(void)
 
 	for (int i = 0; i < NUM_BT_RELAY_IOT; i++)
 	{
-		bt_driver[i + BT_RELAY_OFFSET].on_callback = button_relay_on_callback;
 		bt_driver[i + BT_RELAY_OFFSET].off_callback = NULL;
+		bt_driver[i + BT_RELAY_OFFSET].on_callback = button_relay_on_callback;
 		bt_driver[i + BT_RELAY_OFFSET].state = pin_read(bt_driver[i].pin);
 		pin_write(bt_relay[i].pin.out, true);
 	}
 }
 
 //------------------------------------------------------------------------------
-void button_relay_on_callback(int i)
+static void button_relay_on_callback(int i)
 {
 	i -= BT_RELAY_OFFSET;
 	pin_write(bt_relay[i].pin.out, !pin_read(bt_relay[i].pin.out));

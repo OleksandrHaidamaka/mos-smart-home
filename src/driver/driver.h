@@ -6,8 +6,8 @@
  ******************************************************************************/
 typedef struct
 {
-	void (*on_callback)(int i);
 	void (*off_callback)(int i);
+	void (*on_callback)(int i);
 	int pin;
 	bool state;
 } input_t;
