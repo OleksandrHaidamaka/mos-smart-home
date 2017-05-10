@@ -25,12 +25,12 @@ void button_driver_init(void)
 
 	for (i = 0, end = NUM_BT_IOT; i < end; i++)
 	{
-		bt_driver_pin_map[i] = bt_iot_pin_map[i].in;
+		bt_driver_pin_map[i] = bt_relay[i].pin_map.in;
 	}
 
 	for (end += NUM_BT_RELAY_IOT; i < end; i++)
 	{
-		bt_driver_pin_map[i] = bt_relay_iot_pin_map[i].in;
+		bt_driver_pin_map[i] = bt_relay[i].pin_map.in;
 	}
 }
 
@@ -48,10 +48,12 @@ void button_driver()
 			switch (state)
 			{
 			case false: // button push-up
-				if (bt_diver[i].on_callback != NULL) bt_diver[i].on_callback(i);
+				if (bt_diver[i].on_callback != NULL)
+					bt_diver[i].on_callback(i);
 				break;
 			case true: // button push-down
-				if (bt_diver[i].off_callback != NULL) bt_diver[i].off_callback(i);
+				if (bt_diver[i].off_callback != NULL)
+					bt_diver[i].off_callback(i);
 				break;
 			}
 		}
