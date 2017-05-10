@@ -1,25 +1,23 @@
-#ifndef __SWITCH_H__
-#define __SWITCH_H__
+#ifndef __SW_RELAY_H__
+#define __SW_RELAY_H__
 
 /*******************************************************************************
- *** INCLUDES
+ *** TYPEDEF
  ******************************************************************************/
-#include "driver.h"
-
-/*******************************************************************************
- *** DEFENITIONS
- ******************************************************************************/
-#define  NUM_SW_DRIVER  (NUM_SW_IOT + NUM_SW_RELAY_IOT)
+typedef struct
+{
+	in_out_t pin;
+	bool mqtt;
+} sw_relay_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern input_t sw_driver[NUM_SW_DRIVER];
+extern sw_relay_t sw_relay[NUM_SW_RELAY_IOT];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void switch_driver_init(void);
-void switch_driver();
+void switch_relay_init(void);
 
-#endif  //__SWITCH_H__
+#endif  //__SW_RELAY_H__
