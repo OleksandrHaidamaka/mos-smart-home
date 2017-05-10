@@ -19,15 +19,18 @@ typedef struct
 	int out;
 } in_out_t;
 
+/*******************************************************************************
+ *** PRIVATE TYPEDEF
+ ******************************************************************************/
 typedef struct
 {
-	in_out_t pin_map;
-	bool mqtt_update;
+	in_out_t pin;
+	bool mqtt;
 } bt_relay_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-bt_relay_t bt_relay[NUM_BT_RELAY_IOT];
+extern bt_relay_t bt_relay[NUM_BT_RELAY_IOT];
 
 #endif  // __CONFIG_H__

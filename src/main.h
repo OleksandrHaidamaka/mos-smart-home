@@ -17,13 +17,13 @@
 #include "fw/src/mgos_timers.h"
 #include "fw/src/mgos_mqtt.h"
 #include "fw/src/mgos_wifi.h"
-#include "config.h"
+#include "config/config.h"
+#include "led.h"
+#include "mqtt.h"
 #include "pwm_timer.h"
 #include "driver/switch.h"
 #include "driver/button.h"
 #include "iot/bt_relay.h"
-#include "led.h"
-#include "mqtt.h"
 
 /*******************************************************************************
  *** DEFENITIONS
@@ -46,8 +46,8 @@
 /*******************************************************************************
  *** MACROSES
  ******************************************************************************/
-#define pin_input_up(pin)    { mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_INPUT);  \
-                               mgos_gpio_set_pull(pin, MGOS_GPIO_PULL_UP); }
+#define pin_input(pin, mode) { mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_INPUT);  \
+                               mgos_gpio_set_pull(pin, mode); }
 #define pin_output(pin)        mgos_gpio_set_mode(pin, MGOS_GPIO_MODE_OUTPUT);
 #define pin_write(pin, state)  mgos_gpio_write(pin, state)
 #define pin_read(pin)          mgos_gpio_read(pin)
