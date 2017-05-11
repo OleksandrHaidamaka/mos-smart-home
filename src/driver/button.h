@@ -20,6 +20,6 @@ extern input_t bt_driver[NUM_BT_DRIVER];
  *** PROTOTYPES
  ******************************************************************************/
 void button_driver_init(void);
-void button_driver();
+void button_driver_handler();
 
 #endif  //__BUTTON_H__

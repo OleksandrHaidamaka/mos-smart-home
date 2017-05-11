@@ -9,6 +9,7 @@ typedef struct
 	void (*off_callback)(int i);
 	void (*on_callback)(int i);
 	int pin;
+	int iot_ind;
 	bool state;
 } input_t;
 

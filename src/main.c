@@ -25,10 +25,10 @@ static void welcome_str()
 //------------------------------------------------------------------------------
 static void sys_tick()
 {
-	led_driver();
-	switch_driver();
-	button_driver();
-	mqtt_driver();
+	led_driver_handler();
+	switch_driver_handler();
+	button_driver_handler();
+	mqtt_driver_handler();
 }
 
 //------------------------------------------------------------------------------
@@ -80,10 +80,10 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 //------------------------------------------------------------------------------
 static void __low_level_init()
 {
-	led_init();
+	led_driver_init();
 	switch_driver_init();
-	switch_relay_init();
 	button_driver_init();
+	switch_relay_init();
 	button_relay_init();
 	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);

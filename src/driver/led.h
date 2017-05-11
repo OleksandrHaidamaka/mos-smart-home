@@ -31,8 +31,8 @@ extern int gl_led_pwm;
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void led_init();
-void led_driver();
+void led_driver_init();
+void led_driver_handler();
 void blink_mode(enum bl_mode);
 void led_pwm(int dim);
 

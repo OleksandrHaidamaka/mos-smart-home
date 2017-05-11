@@ -19,5 +19,7 @@ extern sw_relay_t sw_relay[NUM_SW_RELAY_IOT];
  *** PROTOTYPES
  ******************************************************************************/
 void switch_relay_init(void);
+void switch_relay_off_callback(int i);
+void switch_relay_on_callback(int i);
 
 #endif  //__SW_RELAY_H__
