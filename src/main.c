@@ -39,7 +39,7 @@ static void wifi_sta_start()
 }
 
 //------------------------------------------------------------------------------
-static void delay(int ms)
+void delay(int ms)
 {
 	if (ms)
 	{
