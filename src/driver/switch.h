@@ -20,6 +20,6 @@ extern input_t sw_driver[NUM_SW_DRIVER];
  *** PROTOTYPES
  ******************************************************************************/
 void switch_driver_init(void);
-void switch_driver();
+void switch_driver_handler();
 
 #endif  //__SWITCH_H__

@@ -19,5 +19,6 @@ extern bt_relay_t bt_relay[NUM_BT_RELAY_IOT];
  *** PROTOTYPES
  ******************************************************************************/
 void button_relay_init(void);
+void button_relay_on_callback(int i);
 
 #endif  //__BT_RELAY_H__

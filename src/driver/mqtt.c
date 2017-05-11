@@ -131,7 +131,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 }
 
 //------------------------------------------------------------------------------
-void mqtt_driver()
+void mqtt_driver_handler()
 {
 	static int time = 0;
 	struct mg_connection *c = mgos_mqtt_get_global_conn();

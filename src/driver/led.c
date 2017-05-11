@@ -61,7 +61,7 @@ void led_pwm(int dim)  // range (0 - 100)  0 - off 100 - maximum
 }
 
 //------------------------------------------------------------------------------
-void led_init()
+void led_driver_init()
 {
 	led_pwm(gl_led_pwm);
 	blink_mode(BL_WIFI_DISCONNECTED);
@@ -75,7 +75,7 @@ void blink_mode(enum bl_mode mode)
 }
 
 //------------------------------------------------------------------------------
-void led_driver()
+void led_driver_handler()
 {
 	static enum bl_mode mode = BL_WIFI_DISCONNECTED;
 	static int time = 0;
