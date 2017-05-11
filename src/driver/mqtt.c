@@ -12,7 +12,7 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT   (250/SYS_TICK)  // time [ms]
+#define  MQTT_SEND_TIMEOUT  (250/SYS_TICK)  // time [ms]
 
 /*******************************************************************************
  *** MACROSES
@@ -21,21 +21,13 @@
 #define  SUB_TOPIC()    get_cfg()->mqtt.sub
 #define  MQTT_ACK()     get_cfg()->mqtt.ack
 
-/*******************************************************************************
- *** TYPEDEFS
- ******************************************************************************/
-
-/*******************************************************************************
- *** VARIABLES
- ******************************************************************************/
-
 //------------------------------------------------------------------------------
 static void mqtt_sub()
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
 
 	struct mg_mqtt_topic_expression topic_exp =
-		{ SUB_TOPIC(), 0 };
+	{ SUB_TOPIC(), 0 };
 	mg_mqtt_subscribe(c, &topic_exp, 1, 42);
 	printf("sub: topic: <%s>\n", SUB_TOPIC());
 }
@@ -71,9 +63,9 @@ static bool str_to_bool_state(char* state)
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_light(int i, bool state)
+static void mqtt_sw_relay_action(int i, bool state)
 {
-	if (i < 2)
+	if (i < NUM_SW_RELAY_IOT)
 	{
 		pin_write(i, !state);
 	}
@@ -82,12 +74,24 @@ static void mqtt_light(int i, bool state)
 //------------------------------------------------------------------------------
 static void mqtt_update()
 {
-//	for (int i = 0; i < NUM_NODES; i++)
-//	{
-//		mqtt_pub("{light: %d, state: %Q}", i,
-//				bool_to_str_state(!pin_read(LIGHT_PIN(i))));
-//	}
-//	mqtt_pub("{led: %d}", gl_led_pwm);
+	int i;
+
+	for (i = 0; i < NUM_SW_RELAY_IOT; i++)
+	{
+		delay(MQTT_SEND_TIMEOUT);
+		mqtt_pub("{sw-relay: %d, state: %Q}", i,
+				bool_to_str_state(!pin_read(sw_relay[i].pin.out)));
+	}
+
+	for (i = 0; i < NUM_BT_RELAY_IOT; i++)
+	{
+		delay(MQTT_SEND_TIMEOUT);
+		mqtt_pub("{bt-relay: %d, state: %Q}", i,
+				bool_to_str_state(!pin_read(bt_relay[i].pin.out)));
+	}
+
+	delay(MQTT_SEND_TIMEOUT);
+	mqtt_pub("{led: %d}", gl_led_pwm);
 }
 
 //------------------------------------------------------------------------------
@@ -101,14 +105,15 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	printf("sub: topic: <%s> msg: %.*s\n", SUB_TOPIC(), (int) s->len, s->p);
 
 	/* parsing commands */
-	if (json_scanf(s->p, s->len, "{light: %d, state: %Q}", &i, &state) == 2)
+	if (json_scanf(s->p, s->len, "{sw-relay: %d, state: %Q}", &i, &state) == 2)
 	{
-		mqtt_light(i, str_to_bool_state(state));
+		mqtt_sw_relay_action(i, str_to_bool_state(state));
 	}
 	else if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
 	{
 		gl_led_pwm = abs(i);
-		if (gl_led_pwm > 100) gl_led_pwm = 100;
+		if (gl_led_pwm > 100)
+			gl_led_pwm = 100;
 	}
 	else if (strncmp(s->p, "update", s->len) == 0)
 	{
@@ -122,7 +127,8 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	if (err == false)
 	{
 		blink_mode(BL_MQTT_SUB_MSG_OK);
-		if (MQTT_ACK() == true) mqtt_pub("%.*s\n", (int) s->len, s->p);
+		if (MQTT_ACK() == true)
+			mqtt_pub("%.*s\n", (int) s->len, s->p);
 	}
 	else
 	{
@@ -139,11 +145,13 @@ void mqtt_driver_handler()
 	if (c == NULL)
 	{
 		time = 0;
-		if (wifi_ip_acquired == true) blink_mode(BL_WIFI_IP_ACQUIRED);
+		if (wifi_ip_acquired == true)
+			blink_mode(BL_WIFI_IP_ACQUIRED);
 		return;
 	}
 
-	if (time++ < MQTT_SEND_TIMEOUT) return;
+	if (time++ < MQTT_SEND_TIMEOUT)
+		return;
 	time = 0;
 
 //	for (int i = 0; i < NUM_NODES; i++)
@@ -183,7 +191,8 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data)
 				mqtt_sub();
 				blink_mode(BL_MQTT_CONNECTED);
 			}
-			else printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
+			else
+				printf("Run 'mos config-set mqtt.sub=... mqtt.pub=...'\n");
 		}
 		break;
 	case MG_EV_MQTT_PUBLISH:
