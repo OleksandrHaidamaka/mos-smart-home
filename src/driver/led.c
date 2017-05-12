@@ -33,6 +33,7 @@ struct blink_mode_t
  *** VARIABLES
  ******************************************************************************/
 int gl_led_pwm = 100; // range (0 - 100)  0 - off 100 - maximum
+bool gl_led_mqtt = true;
 
 struct blink_mode_t main_blink_mode[] =
 {
