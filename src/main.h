@@ -32,14 +32,14 @@
 #define  SYS_TICK   (50) //time [ms]
 
 //  Pin definitions for NodeMCU (ESP8266)
-#define  D0         (16) // IO ONLY!
+#define  D0         (16) // IO ONLY(no pull-up)
 #define  D1         (5)  // IO
 #define  D2         (4)  // IO
 #define  D3         (0)  // BOOT_MODE
 #define  D4         (2)  // BOOT_MODE - LED_PIN
 #define  D5         (14) // IO
 #define  D6         (12) // IO
-#define  D7         (13) // IO
+#define  D7         (13) // IO strange behaviour
 #define  D8         (15) // BOOT_MODE
 #define  D9         (3)  // Rx - I
 #define  D10        (1)  // Tx - O

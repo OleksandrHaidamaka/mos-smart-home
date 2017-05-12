@@ -125,7 +125,7 @@ void mqtt_driver_handler()
 		{
 			sw_relay[i].mqtt = false;
 			mqtt_pub("{sw_relay: %d, state: %Q}", i,
-					bool_to_str_state(!pin_read(sw_relay[i].pin.out)));
+					bool_to_str_state(!pin_read(sw_relay[i].pin.in)));
 			return;
 		}
 	}
@@ -159,11 +159,11 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	printf("%s(%s msg: %.*s)\n", __func__, SUB_TOPIC(), (int) s->len, s->p);
 
 	/* parsing commands */
-	if (json_scanf(s->p, s->len, "{sw-relay: %d, state: %Q}", &i, &state) == 2)
+	if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &state) == 2)
 	{
 		mqtt_sw_relay_action(i, str_to_bool_state(state));
 	}
-	else if (json_scanf(s->p, s->len, "{bt-relay: %d, state: %Q}", &i, &state)
+	else if (json_scanf(s->p, s->len, "{bt_relay: %d, state: %Q}", &i, &state)
 			== 2)
 	{
 		mqtt_bt_relay_action(i, str_to_bool_state(state));
@@ -174,7 +174,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 		if (gl_led_pwm > 100)
 			gl_led_pwm = 100;
 	}
-	else if (strncmp(s->p, "update", s->len) == 0)
+	else if (strncmp(s->p, "update", sizeof("update") - 1) == 0)
 	{
 		mqtt_update();
 	}
