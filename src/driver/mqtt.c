@@ -21,6 +21,11 @@
 #define  SUB_TOPIC()    get_cfg()->mqtt.sub
 #define  MQTT_ACK()     get_cfg()->mqtt.ack
 
+/*******************************************************************************
+ *** VARIABLES
+ ******************************************************************************/
+bool mqtt_connack = false;
+
 //------------------------------------------------------------------------------
 static void mqtt_sub()
 {
@@ -101,8 +106,9 @@ void mqtt_driver_handler()
 	static int time = 0;
 	int i;
 
-	if (c == NULL)
+	if ((c == NULL) || (mqtt_connack == false))
 	{
+		mqtt_connack = false;
 		time = 0;
 		if (wifi_ip_acquired == true)
 			blink_mode(BL_WIFI_IP_ACQUIRED);
@@ -118,7 +124,7 @@ void mqtt_driver_handler()
 		if (sw_relay[i].mqtt == true)
 		{
 			sw_relay[i].mqtt = false;
-			mqtt_pub("{sw-relay: %d, state: %Q}", i,
+			mqtt_pub("{sw_relay: %d, state: %Q}", i,
 					bool_to_str_state(!pin_read(sw_relay[i].pin.out)));
 			return;
 		}
@@ -129,7 +135,7 @@ void mqtt_driver_handler()
 		if (bt_relay[i].mqtt == true)
 		{
 			bt_relay[i].mqtt = false;
-			mqtt_pub("{bt-relay: %d, state: %Q}", i,
+			mqtt_pub("{bt_relay: %d, state: %Q}", i,
 					bool_to_str_state(!pin_read(bt_relay[i].pin.out)));
 			return;
 		}
@@ -203,6 +209,7 @@ void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data)
 		{
 			if (PUB_TOPIC() != NULL && SUB_TOPIC() != NULL)
 			{
+				mqtt_connack = true;
 				mqtt_sub();
 				blink_mode(BL_MQTT_CONNECTED);
 			}
