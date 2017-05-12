@@ -1,7 +1,7 @@
 /*
  @autor:       Alexandr Haidamaka
  @file:        mqtt.c
- @description: MQTT functionality
+ @description: MQTT driver functionality
  */
 
 /*******************************************************************************
@@ -96,6 +96,9 @@ static void mqtt_get_status()
 	for (i = 0; i < NUM_SW_RELAY_IOT; i++)
 		sw_relay[i].mqtt = true;
 
+	for (i = 0; i < NUM_BT_IOT; i++)
+		bt[i].mqtt = true;
+
 	for (i = 0; i < NUM_BT_RELAY_IOT; i++)
 		bt_relay[i].mqtt = true;
 
@@ -140,6 +143,17 @@ void mqtt_driver_handler()
 			sw_relay[i].mqtt = false;
 			mqtt_pub("{sw_relay: %d, state: %Q}", i,
 					bool_to_str_state(!pin_read(sw_relay[i].pin.in)));
+			return;
+		}
+	}
+
+	for (i = 0; i < NUM_BT_IOT; i++)
+	{
+		if (bt[i].mqtt == true)
+		{
+			bt[i].mqtt = false;
+			mqtt_pub("{bt: %d, state: %Q}", i,
+					bool_to_str_state(!pin_read(bt[i].in)));
 			return;
 		}
 	}

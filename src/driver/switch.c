@@ -21,7 +21,7 @@ void switch_driver_init(void)
 
 	for (i = 0, j = 0, end = NUM_SW_IOT; i < end; i++, j++)
 	{
-		sw_driver[i].pin = sw[i].in;
+		sw_driver[i].pin = sw[j].in;
 		sw_driver[i].state = pin_read(sw_driver[i].pin);
 		sw_driver[i].off_callback = switch_off_callback;
 		sw_driver[i].on_callback = switch_on_callback;
