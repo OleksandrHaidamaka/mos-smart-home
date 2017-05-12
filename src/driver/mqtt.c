@@ -86,9 +86,12 @@ static void mqtt_bt_relay_action(int i, bool state)
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_update()
+static void mqtt_get_status()
 {
 	int i;
+
+	for (i = 0; i < NUM_SW_IOT; i++)
+		sw[i].mqtt = true;
 
 	for (i = 0; i < NUM_SW_RELAY_IOT; i++)
 		sw_relay[i].mqtt = true;
@@ -118,6 +121,17 @@ void mqtt_driver_handler()
 	if (time++ < MQTT_SEND_TIMEOUT)
 		return;
 	time = 0;
+
+	for (i = 0; i < NUM_SW_IOT; i++)
+	{
+		if (sw[i].mqtt == true)
+		{
+			sw[i].mqtt = false;
+			mqtt_pub("{sw: %d, state: %Q}", i,
+					bool_to_str_state(!pin_read(sw[i].in)));
+			return;
+		}
+	}
 
 	for (i = 0; i < NUM_SW_RELAY_IOT; i++)
 	{
@@ -174,9 +188,9 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 		if (gl_led_pwm > 100)
 			gl_led_pwm = 100;
 	}
-	else if (strncmp(s->p, "update", sizeof("update") - 1) == 0)
+	else if (strncmp(s->p, "get status", sizeof("get status") - 1) == 0)
 	{
-		mqtt_update();
+		mqtt_get_status();
 	}
 	else
 	{
