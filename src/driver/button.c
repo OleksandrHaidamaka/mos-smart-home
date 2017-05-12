@@ -21,7 +21,10 @@ void button_driver_init(void)
 
 	for (i = 0, j = 0, end = NUM_BT_IOT; i < end; i++, j++)
 	{
-		bt_driver[i].pin = bt_relay[i].pin.in;
+		bt_driver[i].pin = bt[j].in;
+		bt_driver[i].state = pin_read(bt_driver[i].pin);
+		bt_driver[i].off_callback = NULL;
+		bt_driver[i].on_callback = button_on_callback;
 		bt_driver[i].iot_ind = j;
 	}
 

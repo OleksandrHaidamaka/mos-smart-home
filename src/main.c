@@ -81,10 +81,15 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 static void __low_level_init()
 {
 	led_driver_init();
+
 	switch_driver_init();
 	button_driver_init();
+
+	switch_init();
 	switch_relay_init();
+	button_init();
 	button_relay_init();
+
 	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
 	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
