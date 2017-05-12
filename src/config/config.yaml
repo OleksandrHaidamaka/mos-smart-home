@@ -13,7 +13,8 @@
 ### MQTT settings ##############################################################
   ["device.id", "esp0"],
   ["device.password", ""],
-  ["mqtt.server", "192.168.0.100:1883"],
+  ["mqtt.server", "broker.mqttdashboard.com:1883"],
+# ["mqtt.server", "192.168.0.100:1883"],
   ["mqtt.pub", "s", "fromIoT/esp0", {title: "Publish topic"}],
   ["mqtt.sub", "s", "toIoT/esp0", {title: "Subscribe topic"}],
   ["mqtt.ack", "b", false, {"title": "Acknowledge on mqtt request"}],
