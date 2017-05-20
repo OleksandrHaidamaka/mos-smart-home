@@ -68,6 +68,15 @@ static bool str_to_bool_state(char* state)
 }
 
 //------------------------------------------------------------------------------
+static void mqtt_relay_action(int i, bool state)
+{
+	if (i < NUM_RELAY_IOT)
+	{
+		pin_write(relay[i].out, !state);
+	}
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_sw_relay_action(int i, bool state)
 {
 	if (i < NUM_SW_RELAY_IOT)
@@ -89,6 +98,9 @@ static void mqtt_bt_relay_action(int i, bool state)
 static void mqtt_get_status()
 {
 	int i;
+
+	for (i = 0; i < NUM_RELAY_IOT; i++)
+		relay[i].mqtt = true;
 
 	for (i = 0; i < NUM_SW_IOT; i++)
 		sw[i].mqtt = true;
@@ -124,6 +136,17 @@ void mqtt_driver_handler()
 	if (time++ < MQTT_SEND_TIMEOUT)
 		return;
 	time = 0;
+
+	for (i = 0; i < NUM_RELAY_IOT; i++)
+	{
+		if (relay[i].mqtt == true)
+		{
+			relay[i].mqtt = false;
+			mqtt_pub("{relay: %d, state: %Q}", i,
+					bool_to_str_state(!pin_read(relay[i].out)));
+			return;
+		}
+	}
 
 	for (i = 0; i < NUM_SW_IOT; i++)
 	{
@@ -187,7 +210,12 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	printf("%s(%s msg: %.*s)\n", __func__, SUB_TOPIC(), (int) s->len, s->p);
 
 	/* parsing commands */
-	if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &state) == 2)
+	if (json_scanf(s->p, s->len, "{relay: %d, state: %Q}", &i, &state) == 2)
+	{
+		mqtt_relay_action(i, str_to_bool_state(state));
+	}
+	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &state)
+			== 2)
 	{
 		mqtt_sw_relay_action(i, str_to_bool_state(state));
 	}
