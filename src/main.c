@@ -82,9 +82,12 @@ static void __low_level_init()
 {
 	led_driver_init();
 
+	/* Driver init */
 	switch_driver_init();
 	button_driver_init();
 
+	/* IoT init */
+	relay_init();
 	switch_init();
 	switch_relay_init();
 	button_init();

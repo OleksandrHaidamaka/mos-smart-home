@@ -14,8 +14,8 @@
  ******************************************************************************/
 relay_t relay[NUM_RELAY_IOT] = 													// relay object
 {
-	{ .out = D5 },
-	{ .out = D6 },
+	{ .out = D5, .mqtt = true },
+	{ .out = D6, .mqtt = true },
 };
 
 sw_t sw[NUM_SW_IOT] = 															// switch object
