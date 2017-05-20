@@ -23,6 +23,7 @@
 #include "driver/button.h"
 #include "driver/led.h"
 #include "driver/mqtt.h"
+#include "relay.h"
 #include "iot/sw.h"
 #include "iot/sw_relay.h"
 #include "iot/bt.h"
