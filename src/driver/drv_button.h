@@ -1,25 +1,25 @@
-#ifndef __SWITCH_H__
-#define __SWITCH_H__
+#ifndef __BUTTON_H__
+#define __BUTTON_H__
 
 /*******************************************************************************
  *** INCLUDES
  ******************************************************************************/
-#include "driver.h"
+#include "drv.h"
 
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  NUM_SW_DRIVER  (NUM_SW_IOT + NUM_SW_RELAY_IOT)
+#define  NUM_BT_DRIVER  (NUM_BT_IOT + NUM_BT_RELAY_IOT)
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern input_t sw_driver[NUM_SW_DRIVER];
+extern input_t bt_driver[NUM_BT_DRIVER];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void switch_driver_init(void);
-void switch_driver_handler();
+void button_driver_init(void);
+void button_driver_handler();
 
-#endif  //__SWITCH_H__
+#endif  //__BUTTON_H__
