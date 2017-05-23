@@ -1,5 +1,5 @@
-#ifndef __BT_H__
-#define __BT_H__
+#ifndef __IOT_BT_H__
+#define __IOT_BT_H__
 
 /*******************************************************************************
  *** TYPEDEF
@@ -8,17 +8,17 @@ typedef struct
 {
 	int in;
 	bool mqtt;
-} bt_t;
+} iot_bt_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern bt_t bt[NUM_BT_IOT];
+extern iot_bt_t iot_bt[NUM_IOT_BT];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void button_init(void);
-void button_on_callback(int i);
+void iot_button_init(void);
+void iot_button_on_callback(int i);
 
-#endif  //__BT_H__
+#endif  //__IOT_BT_H__

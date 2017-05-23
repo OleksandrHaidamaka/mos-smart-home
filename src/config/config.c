@@ -12,31 +12,31 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-relay_t relay[NUM_RELAY_IOT] = 													// relay object
+iot_relay_t iot_relay[NUM_IOT_RELAY] = 					// relay object
 {
 	{ .out = D5, .mqtt = true },
 	{ .out = D6, .mqtt = true },
 };
 
-sw_t sw[NUM_SW_IOT] = 															// switch object
+iot_sw_t iot_sw[NUM_IOT_SW] = 							// switch object
 {
 	{ .in = D2, .mqtt = true },
 	{ .in = D3, .mqtt = true },
 };
 
-sw_relay_t sw_relay[NUM_SW_RELAY_IOT] = 										// switch_relay object
+iot_sw_relay_t iot_sw_relay[NUM_IOT_SW_RELAY] = 		// switch_relay object
 {
 	{{ .in = D2, .out = D5 }, .mqtt = true },
 	{{ .in = D3, .out = D6 }, .mqtt = true },
 };
 
-bt_t bt[NUM_BT_IOT] = 															// button object
+iot_bt_t iot_bt[NUM_IOT_BT] = 							// button object
 {
 	{ .in = D2, .mqtt = true },
 	{ .in = D3, .mqtt = true },
 };
 
-bt_relay_t bt_relay[NUM_BT_RELAY_IOT] = 										// button_relay object
+iot_bt_relay_t iot_bt_relay[NUM_IOT_BT_RELAY] = 		// button_relay object
 {
 	{{ .in = D2, .out = D5 }, .mqtt = true },
 	{{ .in = D3, .out = D6 }, .mqtt = true },

@@ -1,25 +1,25 @@
-#ifndef __SW_RELAY_H__
-#define __SW_RELAY_H__
+#ifndef __IOT_SW_RELAY_H__
+#define __IOT_SW_RELAY_H__
 
 /*******************************************************************************
  *** TYPEDEF
  ******************************************************************************/
 typedef struct
 {
-	in_out_t pin;
+	drv_in_out_t pin;
 	bool mqtt;
-} sw_relay_t;
+} iot_sw_relay_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern sw_relay_t sw_relay[NUM_SW_RELAY_IOT];
+extern iot_sw_relay_t iot_sw_relay[NUM_IOT_SW_RELAY];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void switch_relay_init(void);
-void switch_relay_off_callback(int i);
-void switch_relay_on_callback(int i);
+void iot_switch_relay_init(void);
+void iot_switch_relay_off_callback(int i);
+void iot_switch_relay_on_callback(int i);
 
-#endif  //__SW_RELAY_H__
+#endif  //__IOT_SW_RELAY_H__

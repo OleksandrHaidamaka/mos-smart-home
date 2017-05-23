@@ -1,11 +1,11 @@
-#ifndef __MQTT_H__
-#define __MQTT_H__
+#ifndef __DRV_MQTT_H__
+#define __DRV_MQTT_H__
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void mqtt_pub(const char *cmd, ...);
-void mqtt_driver_handler();
-void mqtt_handler(struct mg_connection *c, int ev, void *p, void* user_data);
+void drv_mqtt_pub(const char *cmd, ...);
+void drv_mqtt_handler(void);
+void drv_mqtt_callback(struct mg_connection *c, int ev, void *p, void* user_data);
 
-#endif  //__MQTT_H__
+#endif  //__DRV_MQTT_H__

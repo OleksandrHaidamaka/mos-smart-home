@@ -4,10 +4,10 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  NUM_RELAY_IOT         (2)  // количество relay (реле, розетка)
-#define  NUM_SW_IOT            (2)  // количество sw (геркон, выключатель)
-#define  NUM_SW_RELAY_IOT      (2)  // количество sw-relay (модуль sw-relay)
-#define  NUM_BT_IOT            (2)  // количество bt (кнопка, датчик движения)
-#define  NUM_BT_RELAY_IOT      (2)  // количество bt-relay (модуль bt-relay)
+#define  NUM_IOT_RELAY         (2)  // количество iot_relay (реле, розетка)
+#define  NUM_IOT_SW            (2)  // количество iot_sw (геркон, выключатель)
+#define  NUM_IOT_SW_RELAY      (2)  // количество iot_sw-relay (модуль sw-relay)
+#define  NUM_IOT_BT            (2)  // количество iot_bt (кнопка, датчик движения)
+#define  NUM_IOT_BT_RELAY      (2)  // количество iot_bt-relay (модуль bt-relay)
 
 #endif  // __CONFIG_H__

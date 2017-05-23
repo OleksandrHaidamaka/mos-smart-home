@@ -1,5 +1,5 @@
-#ifndef __LED_H__
-#define __LED_H__
+#ifndef __DRV_LED_H__
+#define __DRV_LED_H__
 
 /*******************************************************************************
  *** DEFENITIONS
@@ -13,7 +13,7 @@
 /*******************************************************************************
  *** ENUM
  ******************************************************************************/
-enum bl_mode
+enum drv_led_blink_mode
 {
 	BL_WIFI_DISCONNECTED,
 	BL_WIFI_IP_ACQUIRED,
@@ -26,15 +26,15 @@ enum bl_mode
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern int gl_led_pwm;
-extern bool gl_led_mqtt;
+extern int gl_drv_led_pwm;
+extern bool gl_drv_led_mqtt;
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void led_driver_init();
-void led_driver_handler();
-void blink_mode(enum bl_mode);
-void led_pwm(int dim);
+void drv_led_init(void);
+void drv_led_handler(void);
+void drv_led_blink_mode(enum drv_led_blink_mode mode);
+void drv_led_pwm(int dim);
 
-#endif  //__LED_H__
+#endif  //__DRV_LED_H__

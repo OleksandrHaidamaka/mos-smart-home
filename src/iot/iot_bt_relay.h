@@ -1,24 +1,24 @@
-#ifndef __BT_RELAY_H__
-#define __BT_RELAY_H__
+#ifndef __IOT_BT_RELAY_H__
+#define __IOT_BT_RELAY_H__
 
 /*******************************************************************************
  *** TYPEDEF
  ******************************************************************************/
 typedef struct
 {
-	in_out_t pin;
+	drv_in_out_t pin;
 	bool mqtt;
-} bt_relay_t;
+} iot_bt_relay_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern bt_relay_t bt_relay[NUM_BT_RELAY_IOT];
+extern iot_bt_relay_t iot_bt_relay[NUM_IOT_BT_RELAY];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void button_relay_init(void);
-void button_relay_on_callback(int i);
+void iot_button_relay_init(void);
+void iot_button_relay_on_callback(int i);
 
-#endif  //__BT_RELAY_H__
+#endif  //__IOT_BT_RELAY_H__

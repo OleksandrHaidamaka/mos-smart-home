@@ -1,7 +1,7 @@
 /*
  @autor:       Alexandr Haidamaka
- @file:        bt.c
- @description: button iot functionality
+ @file:        iot_bt.c
+ @description: iot button functionality
  */
 
 /*******************************************************************************
@@ -10,17 +10,17 @@
 #include "../main.h"
 
 //------------------------------------------------------------------------------
-void button_init(void)
+void iot_button_init(void)
 {
-	for (int i = 0; i < NUM_BT_IOT; i++)
+	for (int i = 0; i < NUM_IOT_BT; i++)
 	{
-		pin_input(bt[i].in, MGOS_GPIO_PULL_UP);
+		pin_input(iot_bt[i].in, MGOS_GPIO_PULL_UP);
 	}
 }
 
 //------------------------------------------------------------------------------
-void button_on_callback(int i)
+void iot_button_on_callback(int i)
 {
-	bt[i].mqtt = true;
+	iot_bt[i].mqtt = true;
 	printf("%s(%d)\n", __func__, i);
 }
