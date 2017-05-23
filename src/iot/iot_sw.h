@@ -1,5 +1,5 @@
-#ifndef __SW_H__
-#define __SW_H__
+#ifndef __IOT_SW_H__
+#define __IOT_SW_H__
 
 /*******************************************************************************
  *** TYPEDEF
@@ -8,18 +8,18 @@ typedef struct
 {
 	int in;
 	bool mqtt;
-} sw_t;
+} iot_sw_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern sw_t sw[NUM_SW_IOT];
+extern iot_sw_t iot_sw[NUM_IOT_SW];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void switch_init(void);
-void switch_off_callback(int i);
-void switch_on_callback(int i);
+void iot_switch_init(void);
+void iot_switch_off_callback(int i);
+void iot_switch_on_callback(int i);
 
-#endif  //__SW_H__
+#endif  //__IOT_SW_H__

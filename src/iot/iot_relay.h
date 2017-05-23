@@ -1,5 +1,5 @@
-#ifndef __RELAY_H__
-#define __RELAY_H__
+#ifndef __IOT_RELAY_H__
+#define __IOT_RELAY_H__
 
 /*******************************************************************************
  *** TYPEDEF
@@ -8,16 +8,16 @@ typedef struct
 {
 	int out;
 	bool mqtt;
-} relay_t;
+} iot_relay_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern relay_t relay[NUM_RELAY_IOT];
+extern iot_relay_t iot_relay[NUM_IOT_RELAY];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void relay_init(void);
+void iot_relay_init(void);
 
-#endif  //__RELAY_H__
+#endif  //__IOT_RELAY_H__

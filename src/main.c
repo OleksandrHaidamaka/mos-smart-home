@@ -25,10 +25,10 @@ static void welcome_str()
 //------------------------------------------------------------------------------
 static void sys_tick()
 {
-	led_driver_handler();
-	switch_driver_handler();
-	button_driver_handler();
-	mqtt_driver_handler();
+	drv_led_handler();
+	drv_switch_handler();
+	drv_button_handler();
+	drv_mqtt_handler();
 }
 
 //------------------------------------------------------------------------------
@@ -65,14 +65,14 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 		{
 			mgos_clear_timer(timer_id);
 			timer_id = 0;
-			led_pwm(gl_led_pwm);
+			drv_led_pwm(gl_drv_led_pwm);
 		}
 		break;
 	case MGOS_WIFI_DISCONNECTED:
 		wifi_ip_acquired = false;
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
-		blink_mode(BL_WIFI_DISCONNECTED);
+		drv_led_blink_mode(BL_WIFI_DISCONNECTED);
 		break;
 	}
 }
@@ -80,22 +80,21 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 //------------------------------------------------------------------------------
 static void __low_level_init()
 {
-	led_driver_init();
-
 	/* Driver init */
-	switch_driver_init();
-	button_driver_init();
+	drv_led_init();
+	drv_switch_init();
+	drv_button_init();
 
 	/* IoT init */
-	relay_init();
-	switch_init();
-	switch_relay_init();
-	button_init();
-	button_relay_init();
+	iot_relay_init();
+	iot_switch_init();
+	iot_switch_relay_init();
+	iot_button_init();
+	iot_button_relay_init();
 
 	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 	mgos_wifi_add_on_change_cb(wifi_handler, 0);
-	mgos_mqtt_add_global_handler(mqtt_handler, NULL);
+	mgos_mqtt_add_global_handler(drv_mqtt_callback, NULL);
 
 	/* Отложенный старт wifi модуля */
 	mgos_set_timer(1000, false, wifi_sta_start, NULL);

@@ -1,5 +1,5 @@
-#ifndef __BUTTON_H__
-#define __BUTTON_H__
+#ifndef __DRV_BUTTON_H__
+#define __DRV_BUTTON_H__
 
 /*******************************************************************************
  *** INCLUDES
@@ -9,17 +9,17 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  NUM_BT_DRIVER  (NUM_BT_IOT + NUM_BT_RELAY_IOT)
+#define  NUM_DRV_BT  (NUM_IOT_BT + NUM_IOT_BT_RELAY)
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern input_t bt_driver[NUM_BT_DRIVER];
+extern drv_input_t drv_bt[NUM_DRV_BT];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void button_driver_init(void);
-void button_driver_handler();
+void drv_button_init(void);
+void drv_button_handler(void);
 
-#endif  //__BUTTON_H__
+#endif  //__DRV_BUTTON_H__

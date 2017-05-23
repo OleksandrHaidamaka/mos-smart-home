@@ -1,7 +1,7 @@
 /*
  @autor:       Alexandr Haidamaka
- @file:        led.c
- @description: Led driver functionality
+ @file:        drv_led.c
+ @description: driver led functionality
  */
 
 /*******************************************************************************
@@ -15,13 +15,9 @@
 #define LED_PWM_PERIOD  (10000) // [us]
 
 /*******************************************************************************
- *** MACROSES
- ******************************************************************************/
-
-/*******************************************************************************
  *** TYPEDEFS
  ******************************************************************************/
-struct blink_mode_t
+struct drv_blink_mode_t
 {
 	int time_short;
 	int time_long;
@@ -32,10 +28,10 @@ struct blink_mode_t
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-int gl_led_pwm = 100; // range (0 - 100)  0 - off 100 - maximum
-bool gl_led_mqtt = true;
+int gl_drv_led_pwm = 100; // range (0 - 100)  0 - off 100 - maximum
+bool gl_drv_led_mqtt = true;
 
-struct blink_mode_t main_blink_mode[] =
+struct drv_blink_mode_t drv_blink_mode[] =
 {
 //       time short, time long, number of short blinks, repeat flag
 		{ 250 / SYS_TICK, 500 / SYS_TICK, 1, true }, // BL_WIFI_DISCONNECTED
@@ -46,8 +42,8 @@ struct blink_mode_t main_blink_mode[] =
 		{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }  // BL_MQTT_PUB_MSG
 };
 
-enum bl_mode bl_mode_current = BL_WIFI_DISCONNECTED;
-enum bl_mode bl_mode_new = BL_WIFI_DISCONNECTED;
+enum drv_led_blink_mode drv_led_blink_mode_current = BL_WIFI_DISCONNECTED;
+enum drv_led_blink_mode drv_led_blink_mode_new = BL_WIFI_DISCONNECTED;
 
 inline static int dim_to_duty(int dim)
 {
@@ -56,30 +52,30 @@ inline static int dim_to_duty(int dim)
 }
 
 //------------------------------------------------------------------------------
-void led_pwm(int dim)  // range (0 - 100)  0 - off 100 - maximum
+void drv_led_pwm(int dim)  // range (0 - 100)  0 - off 100 - maximum
 {
 	pwm_set(LED_PIN, LED_PWM_PERIOD, dim_to_duty(dim));
 }
 
 //------------------------------------------------------------------------------
-void led_driver_init()
+void drv_led_init()
 {
-	led_pwm(gl_led_pwm);
-	blink_mode(BL_WIFI_DISCONNECTED);
+	drv_led_pwm(gl_drv_led_pwm);
+	drv_led_blink_mode(BL_WIFI_DISCONNECTED);
 }
 
-void blink_mode(enum bl_mode mode)
+void drv_led_blink_mode(enum drv_led_blink_mode mode)
 {
-	bl_mode_new = mode;
+	drv_led_blink_mode_new = mode;
 
-	if (main_blink_mode[mode].repeat == true)
-		bl_mode_current = mode;
+	if (drv_blink_mode[mode].repeat == true)
+		drv_led_blink_mode_current = mode;
 }
 
 //------------------------------------------------------------------------------
-void led_driver_handler()
+void drv_led_handler()
 {
-	static enum bl_mode mode = BL_WIFI_DISCONNECTED;
+	static enum drv_led_blink_mode mode = BL_WIFI_DISCONNECTED;
 	static int time = 0;
 	static int state = 0;
 	static int count = 0;
@@ -88,7 +84,7 @@ void led_driver_handler()
 	if (time != 0)
 		time--;
 
-	if (mode != bl_mode_new)
+	if (mode != drv_led_blink_mode_new)
 	{
 		state = 0;
 		goto led_mode_update;
@@ -99,26 +95,26 @@ void led_driver_handler()
 	case 0:
 		if (time == 0)
 		{
-			if (count >= main_blink_mode[mode].times)
+			if (count >= drv_blink_mode[mode].times)
 			{
-				led_mode_update: led_pwm(0);
+				led_mode_update: drv_led_pwm(0);
 				count = 0;
-				time = main_blink_mode[mode].time_long;
+				time = drv_blink_mode[mode].time_long;
 
-				mode = bl_mode_new;
+				mode = drv_led_blink_mode_new;
 
 				if (go_to_bl_mode_current == true)
 				{
 					go_to_bl_mode_current = false;
-					mode = bl_mode_new = bl_mode_current;
+					mode = drv_led_blink_mode_new = drv_led_blink_mode_current;
 				}
-				if (main_blink_mode[mode].repeat == false)
+				if (drv_blink_mode[mode].repeat == false)
 					go_to_bl_mode_current = true;
 
 				break;
 			}
-			led_pwm(gl_led_pwm);
-			time = main_blink_mode[mode].time_short;
+			drv_led_pwm(gl_drv_led_pwm);
+			time = drv_blink_mode[mode].time_short;
 			state++;
 			count++;
 		}
@@ -126,8 +122,8 @@ void led_driver_handler()
 	case 1:
 		if (time == 0)
 		{
-			led_pwm(0);
-			time = main_blink_mode[mode].time_short;
+			drv_led_pwm(0);
+			time = drv_blink_mode[mode].time_short;
 			state--;
 		}
 		break;

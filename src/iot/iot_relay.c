@@ -1,7 +1,7 @@
 /*
  @autor:       Alexandr Haidamaka
- @file:        relay.c
- @description: relay iot functionality
+ @file:        iot_relay.c
+ @description: iot relay functionality
  */
 
 /*******************************************************************************
@@ -10,11 +10,11 @@
 #include "../main.h"
 
 //------------------------------------------------------------------------------
-void relay_init(void)
+void iot_relay_init(void)
 {
-	for (int i = 0; i < NUM_RELAY_IOT; i++)
+	for (int i = 0; i < NUM_IOT_RELAY; i++)
 	{
-		pin_output(relay[i].out);
-		pin_write(relay[i].out, true);
+		pin_output(iot_relay[i].out);
+		pin_write(iot_relay[i].out, true);
 	}
 }

@@ -1,5 +1,5 @@
-#ifndef __SWITCH_H__
-#define __SWITCH_H__
+#ifndef __DRV_SWITCH_H__
+#define __DRV_SWITCH_H__
 
 /*******************************************************************************
  *** INCLUDES
@@ -9,17 +9,17 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  NUM_SW_DRIVER  (NUM_SW_IOT + NUM_SW_RELAY_IOT)
+#define  NUM_DRV_SW  (NUM_IOT_SW + NUM_IOT_SW_RELAY)
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern input_t sw_driver[NUM_SW_DRIVER];
+extern drv_input_t drv_sw[NUM_DRV_SW];
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void switch_driver_init(void);
-void switch_driver_handler();
+void drv_switch_init(void);
+void drv_switch_handler();
 
-#endif  //__SWITCH_H__
+#endif  //__DRV_SWITCH_H__

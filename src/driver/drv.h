@@ -11,12 +11,12 @@ typedef struct
 	int pin;
 	int iot_ind;
 	bool state;
-} input_t;
+} drv_input_t;
 
 typedef struct
 {
 	int in;
 	int out;
-} in_out_t;
+} drv_in_out_t;
 
 #endif  // __DRIVER_H__

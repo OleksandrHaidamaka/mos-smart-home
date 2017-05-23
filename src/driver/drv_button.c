@@ -1,7 +1,7 @@
 /*
  @autor:       Alexandr Haidamaka
- @file:        button.c
- @description: button driver functionality
+ @file:        drv_button.c
+ @description: driver button functionality
  */
 
 /*******************************************************************************
@@ -12,52 +12,52 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-input_t bt_driver[NUM_BT_DRIVER];
+drv_input_t drv_bt[NUM_DRV_BT];
 
 //------------------------------------------------------------------------------
-void button_driver_init(void)
+void drv_button_init(void)
 {
 	int i, j, end;
 
-	for (i = 0, j = 0, end = NUM_BT_IOT; i < end; i++, j++)
+	for (i = 0, j = 0, end = NUM_IOT_BT; i < end; i++, j++)
 	{
-		bt_driver[i].pin = bt[j].in;
-		bt_driver[i].state = pin_read(bt_driver[i].pin);
-		bt_driver[i].off_callback = NULL;
-		bt_driver[i].on_callback = button_on_callback;
-		bt_driver[i].iot_ind = j;
+		drv_bt[i].pin = iot_bt[j].in;
+		drv_bt[i].state = pin_read(drv_bt[i].pin);
+		drv_bt[i].off_callback = NULL;
+		drv_bt[i].on_callback = iot_button_on_callback;
+		drv_bt[i].iot_ind = j;
 	}
 
-	for (j = 0, end += NUM_BT_RELAY_IOT; i < end; i++, j++)
+	for (j = 0, end += NUM_IOT_BT_RELAY; i < end; i++, j++)
 	{
-		bt_driver[i].pin = bt_relay[j].pin.in;
-		bt_driver[i].state = pin_read(bt_driver[i].pin);
-		bt_driver[i].off_callback = NULL;
-		bt_driver[i].on_callback = button_relay_on_callback;
-		bt_driver[i].iot_ind = j;
+		drv_bt[i].pin = iot_bt_relay[j].pin.in;
+		drv_bt[i].state = pin_read(drv_bt[i].pin);
+		drv_bt[i].off_callback = NULL;
+		drv_bt[i].on_callback = iot_button_relay_on_callback;
+		drv_bt[i].iot_ind = j;
 	}
 }
 
 //------------------------------------------------------------------------------
-void button_driver_handler()
+void drv_button_handler()
 {
-	for (int i = 0; i < NUM_BT_DRIVER; i++)
+	for (int i = 0; i < NUM_DRV_BT; i++)
 	{
-		bool state = pin_read(bt_driver[i].pin);
+		bool state = pin_read(drv_bt[i].pin);
 
-		if (state != bt_driver[i].state)
+		if (state != drv_bt[i].state)
 		{
-			bt_driver[i].state = state;
+			drv_bt[i].state = state;
 
 			switch (state)
 			{
 			case false: // button push-up
-				if (bt_driver[i].on_callback != NULL)
-					bt_driver[i].on_callback(bt_driver[i].iot_ind);
+				if (drv_bt[i].on_callback != NULL)
+					drv_bt[i].on_callback(drv_bt[i].iot_ind);
 				break;
 			case true: // button push-down
-				if (bt_driver[i].off_callback != NULL)
-					bt_driver[i].off_callback(bt_driver[i].iot_ind);
+				if (drv_bt[i].off_callback != NULL)
+					drv_bt[i].off_callback(drv_bt[i].iot_ind);
 				break;
 			}
 		}
