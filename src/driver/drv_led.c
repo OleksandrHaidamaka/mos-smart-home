@@ -42,8 +42,8 @@ struct drv_blink_mode_t drv_blink_mode[] =
 		{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }  // BL_MQTT_PUB_MSG
 };
 
-enum drv_led_blink_mode drv_led_blink_mode_current = BL_WIFI_DISCONNECTED;
-enum drv_led_blink_mode drv_led_blink_mode_new = BL_WIFI_DISCONNECTED;
+enum drv_led_blink_mode_t drv_led_blink_mode_current = BL_WIFI_DISCONNECTED;
+enum drv_led_blink_mode_t drv_led_blink_mode_new = BL_WIFI_DISCONNECTED;
 
 inline static int dim_to_duty(int dim)
 {
@@ -64,7 +64,7 @@ void drv_led_init()
 	drv_led_blink_mode(BL_WIFI_DISCONNECTED);
 }
 
-void drv_led_blink_mode(enum drv_led_blink_mode mode)
+void drv_led_blink_mode(enum drv_led_blink_mode_t mode)
 {
 	drv_led_blink_mode_new = mode;
 
@@ -75,7 +75,7 @@ void drv_led_blink_mode(enum drv_led_blink_mode mode)
 //------------------------------------------------------------------------------
 void drv_led_handler()
 {
-	static enum drv_led_blink_mode mode = BL_WIFI_DISCONNECTED;
+	static enum drv_led_blink_mode_t mode = BL_WIFI_DISCONNECTED;
 	static int time = 0;
 	static int state = 0;
 	static int count = 0;
