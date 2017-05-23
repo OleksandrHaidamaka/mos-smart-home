@@ -7,13 +7,9 @@
 #define LED_PIN            (D4)
 
 /*******************************************************************************
- *** MACROSES
- ******************************************************************************/
-
-/*******************************************************************************
  *** ENUM
  ******************************************************************************/
-enum drv_led_blink_mode
+enum drv_led_blink_mode_t
 {
 	BL_WIFI_DISCONNECTED,
 	BL_WIFI_IP_ACQUIRED,
@@ -34,7 +30,7 @@ extern bool gl_drv_led_mqtt;
  ******************************************************************************/
 void drv_led_init(void);
 void drv_led_handler(void);
-void drv_led_blink_mode(enum drv_led_blink_mode mode);
+void drv_led_blink_mode(enum drv_led_blink_mode_t mode);
 void drv_led_pwm(int dim);
 
 #endif  //__DRV_LED_H__
