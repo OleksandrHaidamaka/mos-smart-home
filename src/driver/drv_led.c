@@ -15,23 +15,12 @@
 #define LED_PWM_PERIOD  (10000) // [us]
 
 /*******************************************************************************
- *** TYPEDEFS
- ******************************************************************************/
-struct drv_blink_mode_t
-{
-	int time_short;
-	int time_long;
-	int times;
-	bool repeat;
-};
-
-/*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
 int gl_drv_led_pwm = 100; // range (0 - 100)  0 - off 100 - maximum
 bool gl_drv_led_mqtt = true;
 
-struct drv_blink_mode_t drv_blink_mode[] =
+drv_blink_mode_t drv_blink_mode[] =
 {
 //       time short, time long, number of short blinks, repeat flag
 		{ 250 / SYS_TICK, 500 / SYS_TICK, 1, true }, // BL_WIFI_DISCONNECTED
