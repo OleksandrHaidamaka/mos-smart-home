@@ -32,7 +32,7 @@ void drv_button_init(void)
 	{
 		drv_bt[i].pin = iot_bt_relay[j].pin.in;
 		drv_bt[i].state = pin_read(drv_bt[i].pin);
-		drv_bt[i].off_callback = NULL;
+		drv_bt[i].off_callback = iot_button_relay_off_callback;
 		drv_bt[i].on_callback = iot_button_relay_on_callback;
 		drv_bt[i].iot_ind = j;
 	}

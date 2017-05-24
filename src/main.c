@@ -25,10 +25,14 @@ static void welcome_str()
 //------------------------------------------------------------------------------
 static void sys_tick()
 {
+	/* Driver handlers */
 	drv_led_handler();
 	drv_switch_handler();
 	drv_button_handler();
 	drv_mqtt_handler();
+
+	/* IoT handlers */
+	iot_button_relay_handler();
 }
 
 //------------------------------------------------------------------------------

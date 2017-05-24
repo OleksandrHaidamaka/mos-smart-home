@@ -4,9 +4,9 @@
 /*******************************************************************************
  *** ENUM
  ******************************************************************************/
-enum iot_mode_t
+typedef enum
 {
-	NORMAL_MODE, ALARM_MODE, PANIC_MODE, SOS_MODE, DISCO_MODE
-};
+	NORMAL_MODE, DISCO_MODE, SOS_MODE, ALARM_MODE, SIZE_IOT_MODE
+} iot_mode_t;
 
 #endif  // __IOT_H__

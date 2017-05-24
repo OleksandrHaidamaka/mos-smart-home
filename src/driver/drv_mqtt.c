@@ -24,6 +24,9 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
+const char* iot_mode_str[] =
+{ "normal", "disco", "sos", "alarm" };
+
 static bool drv_mqtt_connack = false;
 
 //------------------------------------------------------------------------------
@@ -68,6 +71,23 @@ static bool str_to_bool_state(char* state)
 }
 
 //------------------------------------------------------------------------------
+//static const char* ind_to_mode_str(iot_mode_t i)
+//{
+//	return iot_mode_str[(int) i];
+//}
+
+//------------------------------------------------------------------------------
+static iot_mode_t mode_str_to_ind(char* mode)
+{
+	for (int i = 0; i < SIZE_IOT_MODE; i++)
+		if (strcmp(mode, iot_mode_str[i]) == 0)
+		{
+			return (iot_mode_t) i;
+		}
+	return NORMAL_MODE;
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_relay_action(int i, bool state)
 {
 	if (i < NUM_IOT_RELAY)
@@ -92,6 +112,13 @@ static void mqtt_bt_relay_action(int i, bool state)
 	{
 		pin_write(iot_bt_relay[i].pin.out, !state);
 	}
+}
+
+//------------------------------------------------------------------------------
+static void mqtt_bt_relay_mode(int i, char* mode)
+{
+	if (i < NUM_IOT_BT_RELAY)
+		iot_bt_relay[i].mode = mode_str_to_ind(mode);
 }
 
 //------------------------------------------------------------------------------
@@ -205,24 +232,29 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	struct mg_str *s = &msg->payload;
 	int i;
 	bool err = false;
-	char* state;
+	char* arg;
 
 	printf("%s(%s msg: %.*s)\n", __func__, SUB_TOPIC(), (int) s->len, s->p);
 
 	/* parsing commands */
-	if (json_scanf(s->p, s->len, "{relay: %d, state: %Q}", &i, &state) == 2)
+	if (json_scanf(s->p, s->len, "{relay: %d, state: %Q}", &i, &arg) == 2)
 	{
-		mqtt_relay_action(i, str_to_bool_state(state));
+		mqtt_relay_action(i, str_to_bool_state(arg));
 	}
-	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &state)
+	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &arg)
 			== 2)
 	{
-		mqtt_sw_relay_action(i, str_to_bool_state(state));
+		mqtt_sw_relay_action(i, str_to_bool_state(arg));
 	}
-	else if (json_scanf(s->p, s->len, "{bt_relay: %d, state: %Q}", &i, &state)
+	else if (json_scanf(s->p, s->len, "{bt_relay: %d, state: %Q}", &i, &arg)
 			== 2)
 	{
-		mqtt_bt_relay_action(i, str_to_bool_state(state));
+		mqtt_bt_relay_action(i, str_to_bool_state(arg));
+	}
+	else if (json_scanf(s->p, s->len, "{bt_relay: %d, mode: %Q}", &i, &arg)
+			== 2)
+	{
+		mqtt_bt_relay_mode(i, arg);
 	}
 	else if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
 	{
@@ -230,7 +262,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 		if (gl_drv_led_pwm > 100)
 			gl_drv_led_pwm = 100;
 	}
-	else if (strncmp(s->p, "get status", sizeof("get status") - 1) == 0)
+	else if (strncmp(s->p, "status", sizeof("status") - 1) == 0)
 	{
 		mqtt_get_status();
 	}
@@ -252,7 +284,8 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 }
 
 //------------------------------------------------------------------------------
-void drv_mqtt_callback(struct mg_connection *c, int ev, void *p, void* user_data)
+void drv_mqtt_callback(struct mg_connection *c, int ev, void *p,
+		void* user_data)
 {
 	(void) c;
 	(void) user_data;
