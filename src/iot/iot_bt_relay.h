@@ -13,7 +13,9 @@ typedef struct
 {
 	drv_in_out_t pin;
 	bool mqtt;
-	enum iot_mode_t mode;
+	iot_mode_t mode;
+	int alarm_time;
+	bool alarm_time_en;
 } iot_bt_relay_t;
 
 /*******************************************************************************
@@ -25,6 +27,8 @@ extern iot_bt_relay_t iot_bt_relay[NUM_IOT_BT_RELAY];
  *** PROTOTYPES
  ******************************************************************************/
 void iot_button_relay_init(void);
+void iot_button_relay_off_callback(int i);
 void iot_button_relay_on_callback(int i);
+void iot_button_relay_handler(void);
 
 #endif  //__IOT_BT_RELAY_H__
