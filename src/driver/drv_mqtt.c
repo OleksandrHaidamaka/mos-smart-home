@@ -77,18 +77,18 @@ static bool str_to_bool_state(char* state)
 //}
 
 //------------------------------------------------------------------------------
-static iot_mode_t mode_str_to_ind(char* mode)
+static iot_mode_e mode_str_to_ind(char* mode)
 {
 	for (int i = 0; i < SIZE_IOT_MODE; i++)
 		if (strcmp(mode, iot_mode_str[i]) == 0)
 		{
-			return (iot_mode_t) i;
+			return (iot_mode_e) i;
 		}
 	return NORMAL_MODE;
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_relay_action(int i, bool state)
+static void mqtt_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_RELAY)
 	{
@@ -97,7 +97,7 @@ static void mqtt_relay_action(int i, bool state)
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_sw_relay_action(int i, bool state)
+static void mqtt_sw_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_SW_RELAY)
 	{
@@ -106,11 +106,12 @@ static void mqtt_sw_relay_action(int i, bool state)
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_bt_relay_action(int i, bool state)
+static void mqtt_bt_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_BT_RELAY)
 	{
-		pin_write(iot_bt_relay[i].pin.out, !state);
+		if (iot_bt_relay[i].mode.mode == NORMAL_MODE)
+			pin_write(iot_bt_relay[i].pin.out, !state);
 	}
 }
 
@@ -118,7 +119,25 @@ static void mqtt_bt_relay_action(int i, bool state)
 static void mqtt_bt_relay_mode(int i, char* mode)
 {
 	if (i < NUM_IOT_BT_RELAY)
-		iot_bt_relay[i].mode = mode_str_to_ind(mode);
+	{
+		iot_mode_e mode_new = mode_str_to_ind(mode);
+
+		switch ((int) mode_new)
+		{
+		case NORMAL_MODE:
+			pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
+			break;
+
+		case DISCO_MODE:
+		case SOS_MODE:
+		case ALARM_MODE:
+			iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
+			iot_bt_relay[i].mode.stack.state = 0;
+			iot_bt_relay[i].mode.stack.time = 0;
+			break;
+		}
+		iot_bt_relay[i].mode.mode = mode_new;
+	}
 }
 
 //------------------------------------------------------------------------------
@@ -239,17 +258,17 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	/* parsing commands */
 	if (json_scanf(s->p, s->len, "{relay: %d, state: %Q}", &i, &arg) == 2)
 	{
-		mqtt_relay_action(i, str_to_bool_state(arg));
+		mqtt_relay_state(i, str_to_bool_state(arg));
 	}
 	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &arg)
 			== 2)
 	{
-		mqtt_sw_relay_action(i, str_to_bool_state(arg));
+		mqtt_sw_relay_state(i, str_to_bool_state(arg));
 	}
 	else if (json_scanf(s->p, s->len, "{bt_relay: %d, state: %Q}", &i, &arg)
 			== 2)
 	{
-		mqtt_bt_relay_action(i, str_to_bool_state(arg));
+		mqtt_bt_relay_state(i, str_to_bool_state(arg));
 	}
 	else if (json_scanf(s->p, s->len, "{bt_relay: %d, mode: %Q}", &i, &arg)
 			== 2)
