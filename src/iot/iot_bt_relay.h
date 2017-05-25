@@ -14,8 +14,6 @@ typedef struct
 	drv_in_out_t pin;
 	bool mqtt;
 	iot_mode_t mode;
-	int alarm_time;
-	bool alarm_time_en;
 } iot_bt_relay_t;
 
 /*******************************************************************************
