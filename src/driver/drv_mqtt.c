@@ -141,7 +141,7 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_get_status()
+static void mqtt_status()
 {
 	int i;
 
@@ -283,7 +283,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	}
 	else if (strncmp(s->p, "status", sizeof("status") - 1) == 0)
 	{
-		mqtt_get_status();
+		mqtt_status();
 	}
 	else
 	{
