@@ -320,6 +320,7 @@ void drv_mqtt_callback(struct mg_connection *c, int ev, void *p,
 			{
 				drv_mqtt_connack = true;
 				drv_mqtt_sub();
+				mqtt_status();
 				drv_led_blink_mode(BL_MQTT_CONNECTED);
 			}
 			else
