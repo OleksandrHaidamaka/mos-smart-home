@@ -11,7 +11,7 @@
 ################################################################################
 
 ### MQTT settings ##############################################################
-  ["mqtt.enable", true],
+  ["mqtt.enable", false],
 # ["mqtt.server", "broker.mqttdashboard.com:1883"],
   ["mqtt.server", "192.168.0.100:1883"],
   ["mqtt.pub", "s", "from/esp0", {title: "Publish topic"}],

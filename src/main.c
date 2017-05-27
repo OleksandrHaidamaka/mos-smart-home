@@ -60,11 +60,13 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
 		wifi_ip_acquired = true;
+		get_cfg()->mqtt.enable = true;
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		break;
 	case MGOS_WIFI_CONNECTED:
 		wifi_ip_acquired = false;
+		get_cfg()->mqtt.enable = false;
 		if (timer_id)
 		{
 			mgos_clear_timer(timer_id);
@@ -74,6 +76,7 @@ static void wifi_handler(enum mgos_wifi_status event, void *data)
 		break;
 	case MGOS_WIFI_DISCONNECTED:
 		wifi_ip_acquired = false;
+		get_cfg()->mqtt.enable = false;
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		drv_led_blink_mode(BL_WIFI_DISCONNECTED);

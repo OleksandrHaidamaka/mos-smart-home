@@ -158,7 +158,8 @@ static void mqtt_status()
 		iot_bt[i].mqtt = true;
 
 	for (i = 0; i < NUM_IOT_BT_RELAY; i++)
-		iot_bt_relay[i].mqtt = true;
+		if (iot_bt_relay[i].mode.mode == NORMAL_MODE)
+			iot_bt_relay[i].mqtt = true;
 
 	gl_drv_led_mqtt = true;
 }
