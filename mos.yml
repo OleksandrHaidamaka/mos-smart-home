@@ -1,7 +1,7 @@
 arch: esp8266
 version: 1.0
 mongoose_os_version: master
-skeleton_version: 2017-05-16
+skeleton_version: 2017-05-18
 sources:
 - src
 - src/config
@@ -9,7 +9,6 @@ sources:
 - src/iot
 filesystem:
 - fs
-extra_files: null
 build_vars:
   APP_CONF_SCHEMA: src/config/config.yaml
   MGOS_ENABLE_MQTT: 1
