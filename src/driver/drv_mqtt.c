@@ -126,6 +126,7 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 		{
 		case NORMAL_MODE:
 			pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
+			iot_bt_relay[i].mqtt = true;
 			break;
 
 		case DISCO_MODE:
