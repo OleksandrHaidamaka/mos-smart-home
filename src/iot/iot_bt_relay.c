@@ -17,7 +17,16 @@
 #define ALARM_PANIC_MODE_DELAY   (3000 / SYS_TICK)
 
 //------------------------------------------------------------------------------
-void go_to_normal_task(int i)
+void iot_button_relay_mode_task_handler(int i, void (*handler)(int))
+{
+	iot_bt_relay[i].mode.task.count = 0;
+	iot_bt_relay[i].mode.task.state = 0;
+	iot_bt_relay[i].mode.task.time = 0;
+	iot_bt_relay[i].mode.task.handler = handler;
+}
+
+//------------------------------------------------------------------------------
+void iot_button_relay_task_go_to_normal(int i)
 {
 	if (iot_bt_relay[i].mode.task.time != 0)
 	{
@@ -27,7 +36,7 @@ void go_to_normal_task(int i)
 
 	if (iot_bt_relay[i].mode.task.count++ > 6)
 	{
-		iot_bt_relay[i].mode.task.handler = NULL;
+		iot_button_relay_mode_task_handler(i, NULL);
 		pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
 		iot_bt_relay[i].mqtt = true;
 	}
@@ -48,7 +57,7 @@ void go_to_normal_task(int i)
 }
 
 //------------------------------------------------------------------------------
-void sos_panic_task(int i)
+void iot_button_relay_task_sos_panic(int i)
 {
 	if (iot_bt_relay[i].mode.task.time != 0)
 	{
