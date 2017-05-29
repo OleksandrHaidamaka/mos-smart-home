@@ -6,21 +6,23 @@
  ******************************************************************************/
 typedef enum
 {
-	NORMAL_MODE, DISCO_MODE, SOS_MODE, ALARM_MODE, SIZE_IOT_MODE
+	NORMAL_MODE, DISCO_MODE, SOS_MODE, ALARM_MODE, PANIC_MODE, SIZE_IOT_MODE,
 } iot_mode_e;
 
 typedef struct
 {
+	void (*handler)(int);
+	int count;
 	int state;
 	int time;
-} stack_t;
+} task_t;
 
 typedef struct
 {
-	stack_t stack;
-	iot_mode_e mode;
+	task_t task;
+	iot_mode_e name;
 	int timer;
-	bool timer_start;
+	bool long_press;
 	bool pin_state;
 } iot_mode_t;
 

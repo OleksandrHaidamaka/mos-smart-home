@@ -25,7 +25,7 @@
  *** VARIABLES
  ******************************************************************************/
 const char* iot_mode_str[] =
-{ "normal", "disco", "sos", "alarm" };
+{ "normal", "disco", "sos", "alarm", "panic" };
 
 static bool drv_mqtt_connack = false;
 
@@ -71,10 +71,10 @@ static bool str_to_bool_state(char* state)
 }
 
 //------------------------------------------------------------------------------
-//static const char* ind_to_mode_str(iot_mode_t i)
-//{
-//	return iot_mode_str[(int) i];
-//}
+static const char* ind_to_mode_str(iot_mode_e i)
+{
+	return iot_mode_str[(int) i];
+}
 
 //------------------------------------------------------------------------------
 static iot_mode_e mode_str_to_ind(char* mode)
@@ -110,7 +110,8 @@ static void mqtt_bt_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_BT_RELAY)
 	{
-		if (iot_bt_relay[i].mode.mode == NORMAL_MODE)
+		if (iot_bt_relay[i].mode.name == NORMAL_MODE
+				|| iot_bt_relay[i].mode.name == ALARM_MODE)
 			pin_write(iot_bt_relay[i].pin.out, !state);
 	}
 }
@@ -125,19 +126,40 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 		switch ((int) mode_new)
 		{
 		case NORMAL_MODE:
-			pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
-			iot_bt_relay[i].mqtt = true;
+			if (iot_bt_relay[i].mode.name == ALARM_MODE)
+			{
+				iot_bt_relay[i].mode.task.count = 0;
+				iot_bt_relay[i].mode.task.state = 0;
+				iot_bt_relay[i].mode.task.time = 0;
+				iot_bt_relay[i].mode.task.handler = go_to_normal_task;
+			}
+			else
+			{
+				iot_bt_relay[i].mode.task.handler = NULL;
+				pin_write(iot_bt_relay[i].pin.out,
+						iot_bt_relay[i].mode.pin_state);
+				iot_bt_relay[i].mqtt = true;
+			}
 			break;
 
-		case DISCO_MODE:
 		case SOS_MODE:
+			iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
+			iot_bt_relay[i].mode.task.state = 0;
+			iot_bt_relay[i].mode.task.time = 0;
+			iot_bt_relay[i].mode.task.handler = sos_panic_task;
+			break;
+
 		case ALARM_MODE:
 			iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
-			iot_bt_relay[i].mode.stack.state = 0;
-			iot_bt_relay[i].mode.stack.time = 0;
+			break;
+
+		case PANIC_MODE:
+			iot_bt_relay[i].mode.task.state = 0;
+			iot_bt_relay[i].mode.task.time = 0;
+			iot_bt_relay[i].mode.task.handler = sos_panic_task;
 			break;
 		}
-		iot_bt_relay[i].mode.mode = mode_new;
+		iot_bt_relay[i].mode.name = mode_new;
 	}
 }
 
@@ -159,7 +181,7 @@ static void mqtt_status()
 		iot_bt[i].mqtt = true;
 
 	for (i = 0; i < NUM_IOT_BT_RELAY; i++)
-		if (iot_bt_relay[i].mode.mode == NORMAL_MODE)
+		if (iot_bt_relay[i].mode.name == NORMAL_MODE)
 			iot_bt_relay[i].mqtt = true;
 
 	gl_drv_led_mqtt = true;
@@ -234,8 +256,12 @@ void drv_mqtt_handler(void)
 		if (iot_bt_relay[i].mqtt == true)
 		{
 			iot_bt_relay[i].mqtt = false;
-			drv_mqtt_pub("{bt_relay: %d, state: %Q}", i,
-					bool_to_str_state(!pin_read(iot_bt_relay[i].pin.out)));
+
+			if (iot_bt_relay[i].mode.long_press == true)
+				drv_mqtt_pub("{bt_relay: %d, mode: %Q}", i, ind_to_mode_str(i));
+			else
+				drv_mqtt_pub("{bt_relay: %d, state: %Q}", i,
+						bool_to_str_state(!pin_read(iot_bt_relay[i].pin.out)));
 			return;
 		}
 	}
