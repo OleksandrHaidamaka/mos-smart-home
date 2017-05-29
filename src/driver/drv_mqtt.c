@@ -127,36 +127,29 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 		{
 		case NORMAL_MODE:
 			if (iot_bt_relay[i].mode.name == ALARM_MODE)
-			{
-				iot_bt_relay[i].mode.task.count = 0;
-				iot_bt_relay[i].mode.task.state = 0;
-				iot_bt_relay[i].mode.task.time = 0;
-				iot_bt_relay[i].mode.task.handler = go_to_normal_task;
-			}
+				iot_button_relay_mode_task_handler(i, iot_button_relay_task_go_to_normal);
 			else
 			{
-				iot_bt_relay[i].mode.task.handler = NULL;
-				pin_write(iot_bt_relay[i].pin.out,
-						iot_bt_relay[i].mode.pin_state);
+				iot_button_relay_mode_task_handler(i, NULL);
+				pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
 				iot_bt_relay[i].mqtt = true;
 			}
 			break;
 
 		case SOS_MODE:
-			iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
-			iot_bt_relay[i].mode.task.state = 0;
-			iot_bt_relay[i].mode.task.time = 0;
-			iot_bt_relay[i].mode.task.handler = sos_panic_task;
+			if (iot_bt_relay[i].mode.name == NORMAL_MODE)
+				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
+			iot_button_relay_mode_task_handler(i, iot_button_relay_task_sos_panic);
 			break;
 
 		case ALARM_MODE:
-			iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
+			if (iot_bt_relay[i].mode.name == NORMAL_MODE)
+				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
+			iot_button_relay_mode_task_handler(i, NULL);
 			break;
 
 		case PANIC_MODE:
-			iot_bt_relay[i].mode.task.state = 0;
-			iot_bt_relay[i].mode.task.time = 0;
-			iot_bt_relay[i].mode.task.handler = sos_panic_task;
+			iot_button_relay_mode_task_handler(i, iot_button_relay_task_sos_panic);
 			break;
 		}
 		iot_bt_relay[i].mode.name = mode_new;
