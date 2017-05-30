@@ -121,9 +121,9 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 {
 	if (i < NUM_IOT_BT_RELAY)
 	{
-		iot_mode_e mode_new = mode_str_to_ind(mode);
+		iot_mode_e mode_name_new = mode_str_to_ind(mode);
 
-		switch ((int) mode_new)
+		switch ((int) mode_name_new)
 		{
 		case NORMAL_MODE:
 			if (iot_bt_relay[i].mode.name == ALARM_MODE)
@@ -143,16 +143,19 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 			break;
 
 		case ALARM_MODE:
+			iot_button_relay_mode_task_handler(i, NULL);
 			if (iot_bt_relay[i].mode.name == NORMAL_MODE)
 				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
-			iot_button_relay_mode_task_handler(i, NULL);
+			else
+				pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
 			break;
 
 		case PANIC_MODE:
 			iot_button_relay_mode_task_handler(i, iot_button_relay_task_sos_panic);
 			break;
 		}
-		iot_bt_relay[i].mode.name = mode_new;
+
+		iot_bt_relay[i].mode.name = mode_name_new;
 	}
 }
 
