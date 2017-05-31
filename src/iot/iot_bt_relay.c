@@ -88,6 +88,7 @@ void iot_button_relay_init(void)
 		pin_input(iot_bt_relay[i].pin.in, MGOS_GPIO_PULL_UP);
 		pin_output(iot_bt_relay[i].pin.out);
 		pin_write(iot_bt_relay[i].pin.out, true);
+		iot_bt_relay[i].mode.name = NORMAL_MODE;
 		iot_bt_relay[i].mode.task.handler = NULL;
 	}
 }
@@ -127,6 +128,7 @@ inline static void iot_button_relay_off_on_callback_handler()
 			switch ((int) iot_bt_relay[i].mode.name)
 			{
 			case NORMAL_MODE:
+				iot_bt_relay[i].mode.long_press = true;
 				iot_bt_relay[i].mqtt = true;
 				pin_write(iot_bt_relay[i].pin.out,
 						!pin_read(iot_bt_relay[i].pin.out));

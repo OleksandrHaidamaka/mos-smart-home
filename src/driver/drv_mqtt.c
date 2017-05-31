@@ -272,15 +272,15 @@ void drv_mqtt_handler(void)
 						"{bt_relay: %d, state: %Q, mode_current: %Q, mode_requsted: %Q}",
 						i,
 						bool_to_str_state(!pin_read(iot_bt_relay[i].pin.out)),
-						ind_to_mode_str(pin_read(iot_bt_relay[i].mode.name)),
+						ind_to_mode_str(iot_bt_relay[i].mode.name),
 						ind_to_mode_str(NORMAL_MODE));
 			else
 				drv_mqtt_pub(
 						"{bt_relay: %d, state: %Q, mode_current: %Q, mode_requsted: %Q}",
 						i,
 						bool_to_str_state(!pin_read(iot_bt_relay[i].pin.out)),
-						ind_to_mode_str(pin_read(iot_bt_relay[i].mode.name)),
-						ind_to_mode_str(pin_read(iot_bt_relay[i].mode.name)));
+						ind_to_mode_str(iot_bt_relay[i].mode.name),
+						ind_to_mode_str(iot_bt_relay[i].mode.name));
 			return;
 		}
 	}
