@@ -12,7 +12,7 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT  (250/SYS_TICK)  // time [ms]
+#define  MQTT_SEND_TIMEOUT  (300/SYS_TICK)  // time [ms]
 
 /*******************************************************************************
  *** MACROSES
@@ -122,6 +122,7 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 	if (i < NUM_IOT_BT_RELAY)
 	{
 		iot_mode_e mode_name_new = mode_str_to_ind(mode);
+		iot_bt_relay[i].mqtt = false;
 
 		switch ((int) mode_name_new)
 		{
