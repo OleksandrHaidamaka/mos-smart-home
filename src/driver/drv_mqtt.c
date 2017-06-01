@@ -24,10 +24,9 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-const char* iot_mode_str[] =
-{ "normal", "disco", "sos", "alarm", "panic" };
-
-bool drv_mqtt_connack = false;
+drv_mqtt_t drv_mqtt =
+{ .handler = NULL, .iot_mode =
+{ "normal", "disco", "sos", "alarm", "panic" } };
 
 //------------------------------------------------------------------------------
 static void drv_mqtt_sub()
@@ -73,14 +72,14 @@ static bool str_to_bool_state(char* state)
 //------------------------------------------------------------------------------
 static const char* ind_to_mode_str(iot_mode_e i)
 {
-	return iot_mode_str[(int) i];
+	return drv_mqtt.iot_mode[(int) i];
 }
 
 //------------------------------------------------------------------------------
 static iot_mode_e mode_str_to_ind(char* mode)
 {
 	for (int i = 0; i < SIZE_IOT_MODE; i++)
-		if (strcmp(mode, iot_mode_str[i]) == 0)
+		if (strcmp(mode, drv_mqtt.iot_mode[i]) == 0)
 		{
 			return (iot_mode_e) i;
 		}
@@ -197,12 +196,9 @@ void drv_mqtt_handler(void)
 	static int time = 0;
 	int i;
 
-	if ((c == NULL) || (drv_mqtt_connack == false))
+	if (c == NULL)
 	{
-		drv_mqtt_connack = false;
 		time = 0;
-		if (wifi_ip_acquired == true)
-			drv_led_blink_mode(BL_WIFI_IP_ACQUIRED);
 		return;
 	}
 
@@ -364,7 +360,7 @@ void drv_mqtt_callback(struct mg_connection *c, int ev, void *p,
 		{
 			if (PUB_TOPIC() != NULL && SUB_TOPIC() != NULL)
 			{
-				drv_mqtt_connack = true;
+				drv_mqtt.handler = drv_mqtt_handler;
 				drv_mqtt_sub();
 				mqtt_status();
 				drv_led_blink_mode(BL_MQTT_CONNECTED);
