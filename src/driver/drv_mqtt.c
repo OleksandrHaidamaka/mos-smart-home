@@ -212,7 +212,7 @@ void drv_mqtt_handler(void)
 		{
 			iot_relay[i].mqtt = false;
 			drv_mqtt_pub(
-					"{relay: %d, state: %Q, mode_current: %Q, mode_requsted: %Q}",
+					"{relay: %d, state: %Q, mode_current: %Q, mode_requested: %Q}",
 					i, bool_to_str_state(!pin_read(iot_relay[i].out)),
 					ind_to_mode_str(NORMAL_MODE), ind_to_mode_str(NORMAL_MODE));
 			return;
@@ -225,7 +225,7 @@ void drv_mqtt_handler(void)
 		{
 			iot_sw[i].mqtt = false;
 			drv_mqtt_pub(
-					"{sw: %d, state: %Q, mode_current: %Q, mode_requsted: %Q}",
+					"{sw: %d, state: %Q, mode_current: %Q, mode_requested: %Q}",
 					i, bool_to_str_state(!pin_read(iot_sw[i].in)),
 					ind_to_mode_str(NORMAL_MODE), ind_to_mode_str(NORMAL_MODE));
 			return;
@@ -238,7 +238,7 @@ void drv_mqtt_handler(void)
 		{
 			iot_sw_relay[i].mqtt = false;
 			drv_mqtt_pub(
-					"{sw_relay: %d, state: %Q, mode_current: %Q, mode_requsted: %Q}",
+					"{sw_relay: %d, state: %Q, mode_current: %Q, mode_requested: %Q}",
 					i, bool_to_str_state(!pin_read(iot_sw_relay[i].pin.in)),
 					ind_to_mode_str(NORMAL_MODE), ind_to_mode_str(NORMAL_MODE));
 			return;
@@ -265,14 +265,14 @@ void drv_mqtt_handler(void)
 
 			if (iot_bt_relay[i].mode.long_press == true)
 				drv_mqtt_pub(
-						"{bt_relay: %d, state: %Q, mode_current: %Q, mode_requsted: %Q}",
+						"{bt_relay: %d, state: %Q, mode_current: %Q, mode_requested: %Q}",
 						i,
 						bool_to_str_state(!pin_read(iot_bt_relay[i].pin.out)),
 						ind_to_mode_str(iot_bt_relay[i].mode.name),
 						ind_to_mode_str(NORMAL_MODE));
 			else
 				drv_mqtt_pub(
-						"{bt_relay: %d, state: %Q, mode_current: %Q, mode_requsted: %Q}",
+						"{bt_relay: %d, state: %Q, mode_current: %Q, mode_requested: %Q}",
 						i,
 						bool_to_str_state(!pin_read(iot_bt_relay[i].pin.out)),
 						ind_to_mode_str(iot_bt_relay[i].mode.name),
