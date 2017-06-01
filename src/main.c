@@ -13,7 +13,6 @@
  *** VARIABLES
  ******************************************************************************/
 mgos_timer_id timer_id;
-bool wifi_ip_acquired;
 
 //------------------------------------------------------------------------------
 static void welcome_str()
@@ -29,7 +28,9 @@ static void sys_tick()
 	drv_led_handler();
 	drv_switch_handler();
 	drv_button_handler();
-	drv_mqtt_handler();
+
+	if (drv_mqtt.handler != NULL)
+		drv_mqtt.handler();
 
 	/* IoT handlers */
 	iot_button_relay_handler();
@@ -53,31 +54,26 @@ void delay(int ms)
 }
 
 //------------------------------------------------------------------------------
-static void wifi_handler(enum mgos_wifi_status event, void *data)
+static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 {
 	(void) data;
 	switch ((int) event)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
-		wifi_ip_acquired = true;
 		get_cfg()->mqtt.enable = true;
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
+		drv_led_blink_mode(BL_WIFI_IP_ACQUIRED);
 		break;
 	case MGOS_WIFI_CONNECTED:
-		wifi_ip_acquired = false;
-		drv_mqtt_connack = false;
-		get_cfg()->mqtt.enable = false;
 		if (timer_id)
 		{
 			mgos_clear_timer(timer_id);
 			timer_id = 0;
-			drv_led_pwm(gl_drv_led_pwm);
+			drv_led_pwm(100);
 		}
 		break;
 	case MGOS_WIFI_DISCONNECTED:
-		wifi_ip_acquired = false;
-		drv_mqtt_connack = false;
 		get_cfg()->mqtt.enable = false;
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
@@ -101,18 +97,21 @@ static void __low_level_init()
 	iot_button_init();
 	iot_button_relay_init();
 
-	timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
-	mgos_wifi_add_on_change_cb(wifi_handler, 0);
+	/* регистрация wifi & mqtt callback's */
+	mgos_wifi_add_on_change_cb(drv_wifi_callback, NULL);
 	mgos_mqtt_add_global_handler(drv_mqtt_callback, NULL);
 
-	/* Отложенный старт wifi модуля */
+	/* старт sys_tick таймера */
+	mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
+
+	/* oтложенный старт wifi модуля */
 	mgos_set_timer(1000, false, wifi_sta_start, NULL);
 }
 
 //------------------------------------------------------------------------------
 enum mgos_app_init_result mgos_app_init(void)
 {
-	delay(100);
+	delay(0);
 	welcome_str();
 	__low_level_init();
 	return 0;
