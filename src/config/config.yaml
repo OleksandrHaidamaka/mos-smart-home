@@ -12,8 +12,8 @@
 
 ### MQTT settings ##############################################################
   ["mqtt.enable", true],
-  ["mqtt.server", "broker.mqttdashboard.com:1883"],
-# ["mqtt.server", "192.168.0.100:1883"],
+# ["mqtt.server", "broker.mqttdashboard.com:1883"],
+  ["mqtt.server", "192.168.0.100:1883"],
   ["mqtt.pub", "s", "from/esp0",            {title: "Publish topic"}],
   ["mqtt.sub", "s", "to/esp0",              {title: "Subscribe topic"}],
   ["mqtt.ack", "b", false,                  {title: "Acknowledge on mqtt request"}],
