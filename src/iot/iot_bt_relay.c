@@ -88,14 +88,44 @@ void iot_button_relay_init(void)
 		pin_input(iot_bt_relay[i].pin.in, MGOS_GPIO_PULL_UP);
 		pin_output(iot_bt_relay[i].pin.out);
 		pin_write(iot_bt_relay[i].pin.out, true);
+		iot_bt_relay[i].bt_handler = NULL;
 		iot_bt_relay[i].mode.name = NORMAL_MODE;
 		iot_bt_relay[i].mode.task.handler = NULL;
 	}
 }
 
 //------------------------------------------------------------------------------
+void iot_button_relay_off_on_callback_handler(int i)
+{
+	iot_bt_relay[i].mode.timer++;
+	switch ((int) iot_bt_relay[i].mode.name)
+	{
+	case NORMAL_MODE:
+		iot_bt_relay[i].bt_handler = NULL;
+		iot_bt_relay[i].mqtt = true;
+		pin_write(iot_bt_relay[i].pin.out, !pin_read(iot_bt_relay[i].pin.out));
+		break;
+	case SOS_MODE:
+		iot_bt_relay[i].bt_handler = NULL;
+		iot_bt_relay[i].mqtt = true;
+		break;
+	case ALARM_MODE:
+	case PANIC_MODE:
+		if (iot_bt_relay[i].mode.timer > ALARM_PANIC_MODE_DELAY)
+		{
+			iot_bt_relay[i].bt_handler = NULL;
+			iot_bt_relay[i].mode.long_press = true;
+			iot_bt_relay[i].mqtt = true;
+		}
+		break;
+	}
+}
+
+//------------------------------------------------------------------------------
 void iot_button_relay_off_callback(int i)
 {
+	iot_bt_relay[i].bt_handler = NULL;
+
 	if (iot_bt_relay[i].mode.long_press == false)
 	{
 		switch ((int) iot_bt_relay[i].mode.name)
@@ -111,52 +141,22 @@ void iot_button_relay_off_callback(int i)
 //------------------------------------------------------------------------------
 void iot_button_relay_on_callback(int i)
 {
-	printf("%s(%d)\n", __func__, i);
+	iot_bt_relay[i].bt_handler = iot_button_relay_off_on_callback_handler;
 	iot_bt_relay[i].mode.timer = 0;
 	iot_bt_relay[i].mode.long_press = false;
-}
-
-inline static void iot_button_relay_off_on_callback_handler()
-{
-	int i;
-
-	for (i = 0; i < NUM_IOT_BT_RELAY; i++)
-	{
-		if (iot_bt_relay[i].mode.long_press == false)
-		{
-			iot_bt_relay[i].mode.timer++;
-			switch ((int) iot_bt_relay[i].mode.name)
-			{
-			case NORMAL_MODE:
-				iot_bt_relay[i].mode.long_press = true;
-				iot_bt_relay[i].mqtt = true;
-				pin_write(iot_bt_relay[i].pin.out,
-						!pin_read(iot_bt_relay[i].pin.out));
-				break;
-			case SOS_MODE:
-				iot_bt_relay[i].mode.long_press = true;
-				iot_bt_relay[i].mqtt = true;
-				break;
-			case ALARM_MODE:
-			case PANIC_MODE:
-				if (iot_bt_relay[i].mode.timer > ALARM_PANIC_MODE_DELAY)
-				{
-					iot_bt_relay[i].mode.long_press = true;
-					iot_bt_relay[i].mqtt = true;
-				}
-				break;
-			}
-		}
-	}
+	printf("%s(%d)\n", __func__, i);
 }
 
 //------------------------------------------------------------------------------
 void iot_button_relay_handler(void)
 {
-	iot_button_relay_off_on_callback_handler();
-
 	for (int i = 0; i < NUM_IOT_BT_RELAY; i++)
 	{
+		//пост обработка кнопки
+		if (iot_bt_relay[i].bt_handler != NULL)
+			iot_bt_relay[i].bt_handler(i);
+
+		//выполнение задачи режима
 		if (iot_bt_relay[i].mode.task.handler != NULL)
 			iot_bt_relay[i].mode.task.handler(i);
 	}

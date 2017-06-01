@@ -27,7 +27,7 @@
 const char* iot_mode_str[] =
 { "normal", "disco", "sos", "alarm", "panic" };
 
-static bool drv_mqtt_connack = false;
+bool drv_mqtt_connack = false;
 
 //------------------------------------------------------------------------------
 static void drv_mqtt_sub()
