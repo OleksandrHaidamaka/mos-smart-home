@@ -14,6 +14,7 @@ typedef struct
 	drv_in_out_t pin;
 	bool mqtt;
 	iot_mode_t mode;
+	void (*bt_handler)(int);
 } iot_bt_relay_t;
 
 /*******************************************************************************
