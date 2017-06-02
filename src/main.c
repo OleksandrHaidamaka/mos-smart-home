@@ -75,6 +75,7 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 		break;
 	case MGOS_WIFI_DISCONNECTED:
 		get_cfg()->mqtt.enable = false;
+		drv_mqtt.handler = NULL;
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		drv_led_blink_mode(BL_WIFI_DISCONNECTED);

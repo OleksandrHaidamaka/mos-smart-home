@@ -13,8 +13,9 @@
  *** DEFENITIONS
  ******************************************************************************/
 #define GO_TO_NORMAL_TASK_DELAY  (50 / SYS_TICK)
-#define SOS_PANIC_TASK_DELAY     (250 / SYS_TICK)
-#define ALARM_PANIC_MODE_DELAY   (3000 / SYS_TICK)
+#define SOS_TASK_DELAY           (200 / SYS_TICK)
+#define PANIC_TASK_DELAY         (500 / SYS_TICK) // change time in future
+#define ALARM_PANIC_MODE_DELAY   (4000 / SYS_TICK)
 
 //------------------------------------------------------------------------------
 void iot_button_relay_mode_task_handler(int i, void (*handler)(int))
@@ -26,13 +27,36 @@ void iot_button_relay_mode_task_handler(int i, void (*handler)(int))
 }
 
 //------------------------------------------------------------------------------
-void iot_button_relay_task_go_to_normal(int i)
+int iot_button_task_blink(int i, int delay)
 {
 	if (iot_bt_relay[i].mode.task.time != 0)
 	{
 		iot_bt_relay[i].mode.task.time--;
-		return;
+		return 0;
 	}
+
+	switch (iot_bt_relay[i].mode.task.state)
+	{
+	case 0: // off relay
+		pin_write(iot_bt_relay[i].pin.out, true);
+		iot_bt_relay[i].mode.task.state = 1;
+		iot_bt_relay[i].mode.task.time = delay;
+		break;
+	case 1: // on relay
+		pin_write(iot_bt_relay[i].pin.out, false);
+		iot_bt_relay[i].mode.task.state = 0;
+		iot_bt_relay[i].mode.task.time = delay;
+		break;
+	}
+
+	return 1;
+}
+
+//------------------------------------------------------------------------------
+void iot_button_relay_task_go_to_normal(int i)
+{
+	if (iot_button_task_blink(i, GO_TO_NORMAL_TASK_DELAY) == 0)
+		return;
 
 	if (iot_bt_relay[i].mode.task.count++ > 6)
 	{
@@ -40,44 +64,18 @@ void iot_button_relay_task_go_to_normal(int i)
 		pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
 		iot_bt_relay[i].mqtt = true;
 	}
-
-	switch (iot_bt_relay[i].mode.task.state)
-	{
-	case 0: // off relay
-		pin_write(iot_bt_relay[i].pin.out, true);
-		iot_bt_relay[i].mode.task.state = 1;
-		iot_bt_relay[i].mode.task.time = GO_TO_NORMAL_TASK_DELAY;
-		break;
-	case 1: // on relay
-		pin_write(iot_bt_relay[i].pin.out, false);
-		iot_bt_relay[i].mode.task.state = 0;
-		iot_bt_relay[i].mode.task.time = GO_TO_NORMAL_TASK_DELAY;
-		break;
-	}
 }
 
 //------------------------------------------------------------------------------
-void iot_button_relay_task_sos_panic(int i)
+void iot_button_relay_task_sos(int i)
 {
-	if (iot_bt_relay[i].mode.task.time != 0)
-	{
-		iot_bt_relay[i].mode.task.time--;
-		return;
-	}
+	iot_button_task_blink(i, SOS_TASK_DELAY);
+}
 
-	switch (iot_bt_relay[i].mode.task.state)
-	{
-	case 0: // off relay
-		pin_write(iot_bt_relay[i].pin.out, true);
-		iot_bt_relay[i].mode.task.state = 1;
-		iot_bt_relay[i].mode.task.time = SOS_PANIC_TASK_DELAY;
-		break;
-	case 1: // on relay
-		pin_write(iot_bt_relay[i].pin.out, false);
-		iot_bt_relay[i].mode.task.state = 0;
-		iot_bt_relay[i].mode.task.time = SOS_PANIC_TASK_DELAY;
-		break;
-	}
+//------------------------------------------------------------------------------
+void iot_button_relay_task_panic(int i)
+{
+	iot_button_task_blink(i, PANIC_TASK_DELAY);
 }
 
 //------------------------------------------------------------------------------

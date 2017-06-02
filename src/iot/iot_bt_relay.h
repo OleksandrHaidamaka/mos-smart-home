@@ -31,6 +31,7 @@ void iot_button_relay_on_callback(int i);
 void iot_button_relay_handler(void);
 void iot_button_relay_mode_task_handler(int i, void (*handler)(int));
 void iot_button_relay_task_go_to_normal(int i);
-void iot_button_relay_task_sos_panic(int i);
+void iot_button_relay_task_sos(int i);
+void iot_button_relay_task_panic(int i);
 
 #endif  //__IOT_BT_RELAY_H__
