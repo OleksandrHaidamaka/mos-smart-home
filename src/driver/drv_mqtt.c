@@ -12,7 +12,7 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT  (300/SYS_TICK)  // time [ms]
+#define  MQTT_SEND_TIMEOUT  (350/SYS_TICK)  // time [ms]
 
 /*******************************************************************************
  *** MACROSES
@@ -25,7 +25,7 @@
  *** VARIABLES
  ******************************************************************************/
 drv_mqtt_t drv_mqtt =
-{ .handler = NULL, .iot_mode =
+{ .handler = NULL, .time = 0, .iot_mode =
 { "normal", "disco", "sos", "alarm", "panic" } };
 
 //------------------------------------------------------------------------------
@@ -76,7 +76,7 @@ static const char* ind_to_mode_str(iot_mode_e i)
 }
 
 //------------------------------------------------------------------------------
-static iot_mode_e mode_str_to_ind(char* mode)
+static iot_mode_e str_mode_to_ind(char* mode)
 {
 	for (int i = 0; i < SIZE_IOT_MODE; i++)
 		if (strcmp(mode, drv_mqtt.iot_mode[i]) == 0)
@@ -116,11 +116,10 @@ static void mqtt_bt_relay_state(int i, bool state)
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_bt_relay_mode(int i, char* mode)
+static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 {
 	if (i < NUM_IOT_BT_RELAY)
 	{
-		iot_mode_e mode_name_new = mode_str_to_ind(mode);
 		iot_bt_relay[i].mqtt = false;
 
 		switch ((int) mode_name_new)
@@ -142,8 +141,7 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 			if (iot_bt_relay[i].mode.name == NORMAL_MODE)
 				iot_bt_relay[i].mode.pin_state = pin_read(
 						iot_bt_relay[i].pin.out);
-			iot_button_relay_mode_task_handler(i,
-					iot_button_relay_task_sos_panic);
+			iot_button_relay_mode_task_handler(i, iot_button_relay_task_sos);
 			break;
 
 		case ALARM_MODE:
@@ -157,8 +155,7 @@ static void mqtt_bt_relay_mode(int i, char* mode)
 			break;
 
 		case PANIC_MODE:
-			iot_button_relay_mode_task_handler(i,
-					iot_button_relay_task_sos_panic);
+			iot_button_relay_mode_task_handler(i, iot_button_relay_task_panic);
 			break;
 		}
 
@@ -193,18 +190,19 @@ static void mqtt_status()
 void drv_mqtt_handler(void)
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
-	static int time = 0;
-	int i;
 
 	if (c == NULL)
 	{
-		time = 0;
+		drv_mqtt.time = 0;
+		drv_led_blink_mode(BL_WIFI_IP_ACQUIRED);
 		return;
 	}
 
-	if (time++ < MQTT_SEND_TIMEOUT)
+	if (drv_mqtt.time++ < MQTT_SEND_TIMEOUT)
 		return;
-	time = 0;
+
+	int i;
+	drv_mqtt.time = 0;
 
 	for (i = 0; i < NUM_IOT_RELAY; i++)
 	{
@@ -316,7 +314,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	else if (json_scanf(s->p, s->len, "{bt_relay: %d, mode: %Q}", &i, &arg)
 			== 2)
 	{
-		mqtt_bt_relay_mode(i, arg);
+		mqtt_bt_relay_mode(i, str_mode_to_ind(arg));
 	}
 	else if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
 	{

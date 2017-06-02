@@ -7,6 +7,7 @@
 typedef struct
 {
 	void (*handler)(void);
+	int time;
 	char* iot_mode[];
 } drv_mqtt_t;
 
