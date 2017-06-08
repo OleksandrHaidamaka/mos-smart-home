@@ -10,7 +10,6 @@ sources:
 filesystem:
 - fs
 config_schema:
-
 ### SNTP settings ##############################################################
   - ["sntp.enable", false]
 ################################################################################
@@ -31,9 +30,10 @@ config_schema:
   - ["mqtt.ack", "b", false,         {title: "Acknowledge on mqtt request"}]
   - ["debug.stdout_topic", "debug/esp0"]
 ################################################################################
-
-libs:
-  - origin: https://github.com/mongoose-os-libs/mqtt
 build_vars:
   SSL: mbedTLS
   MGOS_ENABLE_RPC: 0
+  MGOS_ENABLE_WEB_CONFIG: 1
+  MGOS_ENABLE_FILE_UPLOAD: 1  
+libs:
+  - origin: https://github.com/mongoose-os-libs/mqtt
