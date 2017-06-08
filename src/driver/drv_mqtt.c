@@ -32,10 +32,10 @@ drv_mqtt_t drv_mqtt =
 static void drv_mqtt_sub()
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
-
-	struct mg_mqtt_topic_expression topic_exp =
-	{ SUB_TOPIC(), 0 };
-	mg_mqtt_subscribe(c, &topic_exp, 1, 42);
+	struct mg_mqtt_topic_expression te =
+	{ .topic = SUB_TOPIC(), .qos = 1 };
+	uint16_t sub_id = mgos_mqtt_get_packet_id();
+	mg_mqtt_subscribe(c, &te, 1, sub_id);
 	printf("%s(%s)\n", __func__, SUB_TOPIC());
 }
 
@@ -45,14 +45,14 @@ void drv_mqtt_pub(const char *cmd, ...)
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
 
 	char msg[128];
-	static uint16_t message_id;
 	struct json_out jmo = JSON_OUT_BUF(msg, sizeof(msg));
 	va_list ap;
 	int n;
 	va_start(ap, cmd);
 	n = json_vprintf(&jmo, cmd, ap);
 	va_end(ap);
-	mg_mqtt_publish(c, PUB_TOPIC(), message_id++, MG_MQTT_QOS(0), msg, n);
+	mg_mqtt_publish(c, PUB_TOPIC(), mgos_mqtt_get_packet_id(), MG_MQTT_QOS(1),
+			msg, n);
 	drv_led_blink_mode(BL_MQTT_PUB_MSG);
 	printf("%s(%s msg: %s)\n", __func__, PUB_TOPIC(), msg);
 }
