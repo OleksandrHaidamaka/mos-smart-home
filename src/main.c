@@ -93,6 +93,7 @@ static void __low_level_init()
 
 	/* IoT init */
 	iot_relay_init();
+	iot_dimmer_init();
 	iot_switch_init();
 	iot_switch_relay_init();
 	iot_button_init();
