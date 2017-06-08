@@ -24,6 +24,7 @@
 #include "driver/drv_led.h"
 #include "driver/drv_mqtt.h"
 #include "iot/iot_relay.h"
+#include "iot/iot_dimmer.h"
 #include "iot/iot_sw.h"
 #include "iot/iot_sw_relay.h"
 #include "iot/iot_bt.h"
