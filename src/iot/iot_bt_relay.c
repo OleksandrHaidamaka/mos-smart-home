@@ -13,9 +13,9 @@
  *** DEFENITIONS
  ******************************************************************************/
 #define GO_TO_NORMAL_TASK_DELAY  (50 / SYS_TICK)
-#define SOS_TASK_DELAY           (200 / SYS_TICK)
-#define PANIC_TASK_DELAY         (500 / SYS_TICK) // change time in future
-#define ALARM_PANIC_MODE_DELAY   (4000 / SYS_TICK)
+#define SOS_TASK_DELAY           (300 / SYS_TICK)
+#define PANIC_TASK_DELAY         (100 / SYS_TICK)
+#define ALARM_PANIC_MODE_DELAY   (5000 / SYS_TICK)
 
 //------------------------------------------------------------------------------
 void iot_button_relay_mode_task_handler(int i, void (*handler)(int))

@@ -19,6 +19,7 @@
 #include "mgos_mqtt.h"
 #include "config/config.h"
 #include "driver/drv_timer.h"
+#include "driver/drv_dimmer.h"
 #include "driver/drv_switch.h"
 #include "driver/drv_button.h"
 #include "driver/drv_led.h"
