@@ -8,7 +8,7 @@ typedef struct
 {
 	void (*handler)(void);
 	int time;
-	char* iot_mode[];
+	const char* const iot_mode[];
 } drv_mqtt_t;
 
 /*******************************************************************************
@@ -16,7 +16,8 @@ typedef struct
  ******************************************************************************/
 void drv_mqtt_pub(const char *cmd, ...);
 void drv_mqtt_handler(void);
-void drv_mqtt_callback(struct mg_connection *c, int ev, void *p, void* user_data);
+void drv_mqtt_callback(struct mg_connection *c, int ev, void *p,
+		void* user_data);
 
 /*******************************************************************************
  *** EXTERN VARIABLES

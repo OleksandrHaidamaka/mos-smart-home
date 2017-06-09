@@ -6,14 +6,6 @@
  ******************************************************************************/
 typedef struct
 {
-	int time_short;
-	int time_long;
-	int times;
-	bool repeat;
-} drv_blink_mode_t;
-
-typedef struct
-{
 	void (*off_callback)(int i);
 	void (*on_callback)(int i);
 	int pin;

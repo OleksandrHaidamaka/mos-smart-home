@@ -87,6 +87,21 @@ static iot_mode_e str_mode_to_ind(char* mode)
 }
 
 //------------------------------------------------------------------------------
+static void mqtt_led_state(bool state)
+{
+	if (state == true)
+	{
+		led_out()
+		drv_led.handler = drv_led_handler;
+	}
+	else
+	{
+		drv_led.handler = NULL;
+		led_in()
+	}
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_RELAY)
@@ -183,7 +198,7 @@ static void mqtt_status()
 	for (i = 0; i < NUM_IOT_BT_RELAY; i++)
 		iot_bt_relay[i].mqtt = true;
 
-	gl_drv_led_mqtt = true;
+	drv_led.mqtt = true;
 }
 
 //------------------------------------------------------------------------------
@@ -279,10 +294,10 @@ void drv_mqtt_handler(void)
 		}
 	}
 
-	if (gl_drv_led_mqtt == true)
+	if (drv_led.mqtt == true)
 	{
-		gl_drv_led_mqtt = false;
-		drv_mqtt_pub("{led: %d}", gl_drv_led_pwm);
+		drv_led.mqtt = false;
+		drv_mqtt_pub("{led: %Q}", bool_to_str_state(drv_led.handler != NULL));
 	}
 }
 
@@ -316,11 +331,9 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	{
 		mqtt_bt_relay_mode(i, str_mode_to_ind(arg));
 	}
-	else if (json_scanf(s->p, s->len, "{led: %d}", &i) == 1)
+	else if (json_scanf(s->p, s->len, "{led: %Q}", &arg) == 1)
 	{
-		gl_drv_led_pwm = abs(i);
-		if (gl_drv_led_pwm > 100)
-			gl_drv_led_pwm = 100;
+		mqtt_led_state(str_to_bool_state(arg));
 	}
 	else if (strncmp(s->p, "status", sizeof("status") - 1) == 0)
 	{

@@ -25,9 +25,11 @@ static void welcome_str()
 static void sys_tick()
 {
 	/* Driver handlers */
-	drv_led_handler();
 	drv_switch_handler();
 	drv_button_handler();
+
+	if (drv_led.handler != NULL)
+		drv_led.handler();
 
 	if (drv_mqtt.handler != NULL)
 		drv_mqtt.handler();
@@ -70,7 +72,7 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 		{
 			mgos_clear_timer(timer_id);
 			timer_id = 0;
-			drv_led_pwm(100);
+			drv_led_init();
 		}
 		break;
 	case MGOS_WIFI_DISCONNECTED:
@@ -87,6 +89,7 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 static void __low_level_init()
 {
 	/* Driver init */
+	drv_tim_init();
 	drv_led_init();
 	drv_switch_init();
 	drv_button_init();

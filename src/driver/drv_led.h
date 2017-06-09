@@ -5,6 +5,9 @@
  *** DEFENITIONS
  ******************************************************************************/
 #define LED_PIN            (D4)
+#define led_in()           pin_input(LED_PIN, MGOS_GPIO_PULL_UP);
+#define led_out()          pin_output(LED_PIN);
+#define led_off_on(state)  pin_write(LED_PIN, !state)
 
 /*******************************************************************************
  *** ENUM
@@ -20,17 +23,35 @@ enum drv_led_blink_mode_t
 };
 
 /*******************************************************************************
+ *** TYPEDEF
+ ******************************************************************************/
+typedef struct
+{
+	int time_short;
+	int time_long;
+	int times;
+	bool repeat;
+} drv_blink_mode_t;
+
+typedef struct
+{
+	void (*handler)(void);
+	bool mqtt;
+	enum drv_led_blink_mode_t mode_current;
+	enum drv_led_blink_mode_t mode_new;
+	drv_blink_mode_t mode[];
+} drv_led_t;
+
+/*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern int gl_drv_led_pwm;
-extern bool gl_drv_led_mqtt;
+extern drv_led_t drv_led;
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
 void drv_led_init(void);
-void drv_led_handler(void);
 void drv_led_blink_mode(enum drv_led_blink_mode_t mode);
-void drv_led_pwm(int dim);
+void drv_led_handler();
 
 #endif  //__DRV_LED_H__
