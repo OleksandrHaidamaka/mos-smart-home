@@ -6,14 +6,20 @@
  ******************************************************************************/
 typedef struct
 {
-	drv_in_out_t pin;
+	int phase;
 	bool mqtt;
+} iot_sub_dimmer_t;
+
+typedef struct
+{
+	int zero;
+	iot_sub_dimmer_t sub[NUM_IOT_DIMMER];
 } iot_dimmer_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern iot_dimmer_t iot_dimmer[NUM_IOT_DIMMER];
+extern iot_dimmer_t iot_dimmer;
 
 /*******************************************************************************
  *** PROTOTYPES

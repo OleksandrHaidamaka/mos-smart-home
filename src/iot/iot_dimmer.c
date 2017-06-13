@@ -12,10 +12,11 @@
 //------------------------------------------------------------------------------
 void iot_dimmer_init(void)
 {
+	pin_input(iot_dimmer.zero, MGOS_GPIO_PULL_NONE);
+
 	for (int i = 0; i < NUM_IOT_DIMMER; i++)
 	{
-		pin_input(iot_dimmer[i].pin.in, MGOS_GPIO_PULL_NONE);
-		pin_output(iot_dimmer[i].pin.out);
-		pin_write(iot_dimmer[i].pin.out, false);
+		pin_output(iot_dimmer.sub[i].phase);
+		pin_write(iot_dimmer.sub[i].phase, false);
 	}
 }
