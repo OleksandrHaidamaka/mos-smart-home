@@ -15,8 +15,27 @@
 drv_dimmer_t drv_dimmer[NUM_DRV_DIMMER];
 
 //------------------------------------------------------------------------------
+void ac_zero_callback(int pin, void* arg)
+{
+	//TODO
+	(void) pin;
+	(void) arg;
+}
+
+//------------------------------------------------------------------------------
 void drv_dimmer_init(void)
 {
+	if (NUM_IOT_DIMMER)
+	{
+		mgos_gpio_set_int_handler(iot_dimmer.zero, MGOS_GPIO_INT_EDGE_POS,
+				ac_zero_callback, NULL);
+		mgos_gpio_enable_int(iot_dimmer.zero);
+	}
+//	else
+//	{
+//
+//	}
+
 //	int i, j, end;
 //
 //	for (i = 0, j = 0, end = NUM_IOT_BT; i < end; i++, j++)
