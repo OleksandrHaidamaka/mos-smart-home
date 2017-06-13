@@ -17,7 +17,8 @@
 typedef struct
 {
 	void (*zero_callback)(int i);
-	drv_in_out_t pin;
+	int zero;
+	int phase[NUM_DRV_DIMMER];
 	int iot_ind;
 } drv_dimmer_t;
 
