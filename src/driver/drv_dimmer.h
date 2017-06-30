@@ -9,28 +9,27 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  NUM_DRV_DIMMER  (NUM_IOT_DIMMER + NUM_IOT_BT_DIMMER)
+#define  NUM_DRV_DIMMER  (NUM_IOT_DIMMER + NUM_IOT_SW_DIMMER + NUM_IOT_BT_DIMMER)
 
 /*******************************************************************************
  *** TYPEDEF
  ******************************************************************************/
 typedef struct
 {
-	void (*zero_callback)(int i);
 	int zero;
 	int phase[NUM_DRV_DIMMER];
-	int iot_ind;
 } drv_dimmer_t;
 
 /*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern drv_dimmer_t drv_dimmer[NUM_DRV_DIMMER];
+extern drv_dimmer_t drv_dimmer;
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
 void drv_dimmer_init(void);
-void drv_dimmer_handler(void);
+int drv_dimmer_get_phase(int i);
+void drv_dimmer_set_phase(int i, int value);
 
 #endif  //__DRV_DIMMER_H__
