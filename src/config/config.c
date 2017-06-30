@@ -23,7 +23,7 @@ iot_dimmer_t iot_dimmer =								// dimmer object
 	.zero = D1,
 	{
 		{ .phase = D2, .mqtt = true },
-		{ .phase = D3, .mqtt = true },
+//		{ .phase = D3, .mqtt = true },
 	}
 };
 
@@ -47,6 +47,6 @@ iot_bt_t iot_bt[NUM_IOT_BT] = 							// button object
 
 iot_bt_relay_t iot_bt_relay[NUM_IOT_BT_RELAY] = 		// button_relay object
 {
-	{{ .in = D2, .out = D5 }, .mqtt = true },
-	{{ .in = D1, .out = D6 }, .mqtt = true },
+//	{{ .in = D2, .out = D5 }, .mqtt = true },
+//	{{ .in = D1, .out = D6 }, .mqtt = true },
 };

@@ -12,12 +12,11 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
-drv_dimmer_t drv_dimmer[NUM_DRV_DIMMER];
+drv_dimmer_t drv_dimmer;
 
 //------------------------------------------------------------------------------
-void ac_zero_callback(int pin, void* arg)
+void drv_dimmer_zero_handler(int pin, void* arg)
 {
-	//TODO
 	(void) pin;
 	(void) arg;
 }
@@ -25,60 +24,26 @@ void ac_zero_callback(int pin, void* arg)
 //------------------------------------------------------------------------------
 void drv_dimmer_init(void)
 {
-	if (NUM_IOT_DIMMER)
+	if (NUM_DRV_DIMMER)
 	{
-		mgos_gpio_set_int_handler(iot_dimmer.zero, MGOS_GPIO_INT_EDGE_POS,
-				ac_zero_callback, NULL);
-		mgos_gpio_enable_int(iot_dimmer.zero);
+		drv_dimmer.zero = iot_dimmer.zero;
+		mgos_gpio_set_int_handler(drv_dimmer.zero, MGOS_GPIO_INT_EDGE_POS,
+				drv_dimmer_zero_handler, NULL);
+		mgos_gpio_enable_int(drv_dimmer.zero);
 	}
-//	else
-//	{
-//
-//	}
 
-//	int i, j, end;
-//
-//	for (i = 0, j = 0, end = NUM_IOT_BT; i < end; i++, j++)
-//	{
-//		drv_bt[i].pin = iot_bt[j].in;
-//		drv_bt[i].state = pin_read(drv_bt[i].pin);
-//		drv_bt[i].off_callback = NULL;
-//		drv_bt[i].on_callback = iot_button_on_callback;
-//		drv_bt[i].iot_ind = j;
-//	}
-//
-//	for (j = 0, end += NUM_IOT_BT_RELAY; i < end; i++, j++)
-//	{
-//		drv_bt[i].pin = iot_bt_relay[j].pin.in;
-//		drv_bt[i].state = pin_read(drv_bt[i].pin);
-//		drv_bt[i].off_callback = iot_button_relay_off_callback;
-//		drv_bt[i].on_callback = iot_button_relay_on_callback;
-//		drv_bt[i].iot_ind = j;
-//	}
+	for (int i = 0; i < NUM_DRV_DIMMER; i++)
+		drv_dimmer.phase[i] = 100;
 }
 
 //------------------------------------------------------------------------------
-void drv_dimmer_handler()
+int drv_dimmer_get_phase(int i)
 {
-//	for (int i = 0; i < NUM_DRV_BT; i++)
-//	{
-//		bool state = pin_read(drv_bt[i].pin);
-//
-//		if (state != drv_bt[i].state)
-//		{
-//			drv_bt[i].state = state;
-//
-//			switch (state)
-//			{
-//			case false: // button push-up
-//				if (drv_bt[i].on_callback != NULL)
-//					drv_bt[i].on_callback(drv_bt[i].iot_ind);
-//				break;
-//			case true: // button push-down
-//				if (drv_bt[i].off_callback != NULL)
-//					drv_bt[i].off_callback(drv_bt[i].iot_ind);
-//				break;
-//			}
-//		}
-//	}
+	return drv_dimmer.phase[i];
+}
+
+//------------------------------------------------------------------------------
+void drv_dimmer_set_phase(int i, int value)
+{
+	drv_dimmer.phase[i] = value;
 }
