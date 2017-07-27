@@ -1,7 +1,7 @@
 /*
  @autor:       Alexandr Haidamaka
- @file:        drv_timer.c
- @description: driver timer functionality
+ @file:        hal_timer.c
+ @description: hal timer functionality
  */
 
 /*******************************************************************************
@@ -24,16 +24,20 @@
 /*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
+int hal_pwm[NUM_DRV_DIMMER];
+bool zero_detected = false;
 
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void drv_tim_callback(void *arg);
+void hal_tim_callback(void *arg);
 
 //------------------------------------------------------------------------------
-void drv_tim_init(void)
+void hal_tim_init(void)
 {
-	ETS_FRC_TIMER1_INTR_ATTACH(drv_tim_callback, NULL);
+	if (NUM_DRV_DIMMER == 0)
+		return;
+	ETS_FRC_TIMER1_INTR_ATTACH(hal_tim_callback, NULL);
 	RTC_CLR_REG_MASK(FRC1_INT_ADDRESS, FRC1_INT_CLR_MASK);
 	RTC_REG_WRITE(FRC1_LOAD_ADDRESS, TIM_RELOAD_VALUE_80);
 	RTC_REG_WRITE(FRC1_CTRL_ADDRESS, TIM_PRESCALER_16 | TIM_FRC1_ENABLE);
@@ -46,7 +50,7 @@ void drv_tim_init(void)
 }
 
 //------------------------------------------------------------------------------
-IRAM NOINSTR void drv_tim_callback(void *arg)
+IRAM NOINSTR void hal_tim_callback(void *arg)
 {
 	RTC_REG_WRITE(FRC1_LOAD_ADDRESS, TIM_RELOAD_VALUE_80);
 	(void) arg;
@@ -58,6 +62,24 @@ IRAM NOINSTR void drv_tim_callback(void *arg)
 		GPIO_REG_WRITE(GPIO_OUT_ADDRESS, v);
 	}
 #endif
+
+	pin_write(D2, false);
+
+	if (zero_detected)
+	{
+		for (int i = 0; i < NUM_DRV_DIMMER; i++)
+		{
+			if (hal_pwm[i] != 0)
+			{
+				if (--hal_pwm[i] == 0)
+				{
+					pin_write(D2, true);
+					zero_detected = false;
+					// дернуть ножкой
+				}
+			}
+		}
+	}
 
 	RTC_CLR_REG_MASK(FRC1_INT_ADDRESS, FRC1_INT_CLR_MASK);
 }

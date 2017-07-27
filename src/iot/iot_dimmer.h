@@ -6,13 +6,13 @@
  ******************************************************************************/
 typedef struct
 {
-	int phase;
+	int pin_phase;
 	bool mqtt;
 } iot_sub_dimmer_t;
 
 typedef struct
 {
-	int zero;
+	int pin_zero;
 	iot_sub_dimmer_t sub[NUM_IOT_DIMMER];
 } iot_dimmer_t;
 

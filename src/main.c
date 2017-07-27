@@ -89,7 +89,7 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 static void __low_level_init()
 {
 	/* Driver init */
-	drv_tim_init();
+	hal_tim_init();
 	drv_led_init();
 	drv_dimmer_init();
 	drv_switch_init();
