@@ -1,7 +1,12 @@
+name: smart_home
 arch: esp8266
 version: 1.0
-mongoose_os_version: master
 skeleton_version: 2017-05-18
+
+libs_version: ${mos_version}
+modules_version: ${mos_version}
+mongoose_os_version: ${mos_version}
+
 sources:
 - src
 - src/config
@@ -16,7 +21,7 @@ config_schema:
 
 ### WIFI settings ##############################################################
   - ["wifi.ap.enable", false]
-  - ["wifi.sta.enable", false]
+  - ["wifi.sta.enable", true]
   - ["wifi.sta.ssid", "TP-LINK-Landgraf"]
   - ["wifi.sta.pass", "07031987"]
 ################################################################################
@@ -30,10 +35,15 @@ config_schema:
   - ["mqtt.ack", "b", false,         {title: "Acknowledge on mqtt request"}]
   - ["debug.stdout_topic", "debug/esp0"]
 ################################################################################
-build_vars:
-  SSL: mbedTLS
+cdefs:
   MGOS_ENABLE_RPC: 0
   MGOS_ENABLE_WEB_CONFIG: 1
-  MGOS_ENABLE_FILE_UPLOAD: 1  
+  MGOS_ENABLE_FILE_UPLOAD: 1
 libs:
+  - origin: https://github.com/mongoose-os-libs/http-server
+  - origin: https://github.com/mongoose-os-libs/ota-http-server
+  - origin: https://github.com/mongoose-os-libs/wifi
   - origin: https://github.com/mongoose-os-libs/mqtt
+  
+build_vars:
+  SSL: mbedTLS
