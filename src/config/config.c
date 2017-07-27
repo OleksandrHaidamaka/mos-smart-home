@@ -20,10 +20,10 @@ iot_relay_t iot_relay[NUM_IOT_RELAY] = 					// relay object
 
 iot_dimmer_t iot_dimmer =								// dimmer object
 {
-	.zero = D1,
+	.pin_zero = D1,
 	{
-		{ .phase = D2, .mqtt = true },
-//		{ .phase = D3, .mqtt = true },
+		{ .pin_phase = D2, .mqtt = true },
+//		{ .pin_phase = D3, .mqtt = true },
 	}
 };
 
