@@ -13,7 +13,7 @@
  *** DEFENITIONS
  ******************************************************************************/
 #define TIM_PRESCALER_16     (4)
-#define TIM_RELOAD_VALUE_80  (500 - 8) // T=(V/5) = 500/5 = 100 [us]
+#define TIM_RELOAD_VALUE_80  (250 - 8) // T=(V/5) = 500/5 = 100 [us]
 #define TIM_FRC1_ENABLE      (1 << 7)
 #define TIM_DEBUG            (0) // D7
 
@@ -25,7 +25,7 @@
  *** VARIABLES
  ******************************************************************************/
 int hal_pwm[NUM_DRV_DIMMER];
-bool zero_detected = false;
+int phase_state[NUM_DRV_DIMMER];
 
 /*******************************************************************************
  *** PROTOTYPES
@@ -63,22 +63,65 @@ IRAM NOINSTR void hal_tim_callback(void *arg)
 	}
 #endif
 
-	pin_write(D2, false);
+	static int zero_state = 0;
+	static int zero_cnt = 0;
 
-	if (zero_detected)
+	switch (zero_state)
 	{
-		for (int i = 0; i < NUM_DRV_DIMMER; i++)
+	case 0:
+		if (pin_read(drv_dimmer.pin_zero))
 		{
-			if (hal_pwm[i] != 0)
+			for (int i = 0; i < NUM_DRV_DIMMER; i++)
 			{
-				if (--hal_pwm[i] == 0)
-				{
-					pin_write(D2, true);
-					zero_detected = false;
-					// дернуть ножкой
-				}
+				hal_pwm[i] = drv_dimmer.pwm[i];
+				phase_state[i] = 1;
 			}
+			zero_state++;
 		}
+		break;
+
+	case 1:
+		if (++zero_cnt > 100)
+		{
+			zero_cnt = 0;
+			zero_state = 0;
+		}
+		break;
+	}
+
+	switch (phase_state[0])
+	{
+	case 1:
+		phase_state[0] = 4;
+
+		if (hal_pwm[0] == 0)
+			pin_write(D2, true);
+		else if (hal_pwm[0] == 200)
+			pin_write(D2, false);
+		else
+		{
+
+			hal_pwm[0]--;
+			phase_state[0] = 2;
+		}
+		break;
+
+	case 2:
+		if (hal_pwm[0])
+			hal_pwm[0]--;
+		if (hal_pwm[0] == 0)
+		{
+			pin_write(D2, true);
+			phase_state[0]++;
+		}
+		break;
+	case 3:
+		pin_write(D2, false);
+		phase_state[0]++;
+		break;
+
+	default:
+		break;
 	}
 
 	RTC_CLR_REG_MASK(FRC1_INT_ADDRESS, FRC1_INT_CLR_MASK);
