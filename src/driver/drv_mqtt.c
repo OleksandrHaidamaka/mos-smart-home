@@ -167,7 +167,7 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 				pin_write(iot_bt_relay[i].pin.out,
 						iot_bt_relay[i].mode.pin_state);
 			iot_button_relay_mode_task_handler(i,
-					iot_button_relay_task_off_alarm);
+					iot_button_relay_task_on_alarm);
 			break;
 
 		case PANIC_MODE:
