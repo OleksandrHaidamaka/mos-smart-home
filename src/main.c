@@ -89,15 +89,12 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 static void __low_level_init()
 {
 	/* Driver init */
-	hal_tim_init();
 	drv_led_init();
-	drv_dimmer_init();
 	drv_switch_init();
 	drv_button_init();
 
 	/* IoT init */
 	iot_relay_init();
-	iot_dimmer_init();
 	iot_switch_init();
 	iot_switch_relay_init();
 	iot_button_init();

@@ -18,15 +18,6 @@ iot_relay_t iot_relay[NUM_IOT_RELAY] = 					// relay object
 //	{ .out = D6, .mqtt = true },
 };
 
-iot_dimmer_t iot_dimmer =								// dimmer object
-{
-	.pin_zero = D1,
-	{
-		{ .pin_phase = D2, .mqtt = true },
-//		{ .pin_phase = D3, .mqtt = true },
-	}
-};
-
 iot_sw_t iot_sw[NUM_IOT_SW] = 							// switch object
 {
 //	{ .in = D2, .mqtt = true },
@@ -47,6 +38,6 @@ iot_bt_t iot_bt[NUM_IOT_BT] = 							// button object
 
 iot_bt_relay_t iot_bt_relay[NUM_IOT_BT_RELAY] = 		// button_relay object
 {
-//	{{ .in = D2, .out = D5 }, .mqtt = true },
-//	{{ .in = D1, .out = D6 }, .mqtt = true },
+	{{ .in = D2, .out = D5 }, .mqtt = true },
+	{{ .in = D1, .out = D6 }, .mqtt = true },
 };
