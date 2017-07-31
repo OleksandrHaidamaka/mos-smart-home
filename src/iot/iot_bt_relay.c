@@ -12,7 +12,7 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define GO_TO_NORMAL_TASK_DELAY  (50 / SYS_TICK)
+#define SHORT_TASK_DELAY         (50 / SYS_TICK)
 #define SOS_TASK_DELAY           (300 / SYS_TICK)
 #define PANIC_TASK_DELAY         (100 / SYS_TICK)
 #define ALARM_PANIC_MODE_DELAY   (5000 / SYS_TICK)
@@ -53,12 +53,25 @@ int iot_button_task_blink(int i, int delay)
 }
 
 //------------------------------------------------------------------------------
-void iot_button_relay_task_go_to_normal(int i)
+void iot_button_relay_task_on_alarm(int i)
 {
-	if (iot_button_task_blink(i, GO_TO_NORMAL_TASK_DELAY) == 0)
+	if (iot_button_task_blink(i, SHORT_TASK_DELAY) == 0)
 		return;
 
-	if (iot_bt_relay[i].mode.task.count++ > 6)
+	if (iot_bt_relay[i].mode.task.count++ > (2 * 3))
+	{
+		iot_button_relay_mode_task_handler(i, NULL);
+		pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
+	}
+}
+
+//------------------------------------------------------------------------------
+void iot_button_relay_task_off_alarm(int i)
+{
+	if (iot_button_task_blink(i, SHORT_TASK_DELAY) == 0)
+		return;
+
+	if (iot_bt_relay[i].mode.task.count++ > (2 * 4))
 	{
 		iot_button_relay_mode_task_handler(i, NULL);
 		pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
@@ -87,23 +100,40 @@ void iot_button_relay_init(void)
 		pin_output(iot_bt_relay[i].pin.out);
 		pin_write(iot_bt_relay[i].pin.out, true);
 		iot_bt_relay[i].bt_handler = NULL;
-		iot_bt_relay[i].mode.name = NORMAL_MODE;
+		iot_bt_relay[i].mode.cur_name = iot_bt_relay[i].mode.req_name =
+				NORMAL_MODE;
 		iot_bt_relay[i].mode.task.handler = NULL;
 	}
 }
 
-//------------------------------------------------------------------------------
-void iot_button_relay_off_on_callback_handler(int i)
+void bt_handler_normal_mode(int i)
 {
 	iot_bt_relay[i].mode.timer++;
-	switch ((int) iot_bt_relay[i].mode.name)
+
+	if (iot_bt_relay[i].mode.timer > ALARM_PANIC_MODE_DELAY)
+	{
+		iot_bt_relay[i].mode.req_name = ALARM_MODE;
+		iot_bt_relay[i].bt_handler = NULL;
+		iot_bt_relay[i].mode.long_press = true;
+		iot_bt_relay[i].mqtt = true;
+		pin_write(iot_bt_relay[i].pin.out, !pin_read(iot_bt_relay[i].pin.out));
+	}
+}
+
+//------------------------------------------------------------------------------
+void iot_button_relay_on_callback_handler(int i)
+{
+	iot_bt_relay[i].mode.timer++;
+	switch ((int) iot_bt_relay[i].mode.cur_name)
 	{
 	case NORMAL_MODE:
-		iot_bt_relay[i].bt_handler = NULL;
+		iot_bt_relay[i].mode.req_name = NORMAL_MODE;
+		iot_bt_relay[i].bt_handler = bt_handler_normal_mode;
 		iot_bt_relay[i].mqtt = true;
 		pin_write(iot_bt_relay[i].pin.out, !pin_read(iot_bt_relay[i].pin.out));
 		break;
 	case SOS_MODE:
+		iot_bt_relay[i].mode.req_name = NORMAL_MODE;
 		iot_bt_relay[i].bt_handler = NULL;
 		iot_bt_relay[i].mqtt = true;
 		break;
@@ -111,6 +141,7 @@ void iot_button_relay_off_on_callback_handler(int i)
 	case PANIC_MODE:
 		if (iot_bt_relay[i].mode.timer > ALARM_PANIC_MODE_DELAY)
 		{
+			iot_bt_relay[i].mode.req_name = NORMAL_MODE;
 			iot_bt_relay[i].bt_handler = NULL;
 			iot_bt_relay[i].mode.long_press = true;
 			iot_bt_relay[i].mqtt = true;
@@ -126,10 +157,11 @@ void iot_button_relay_off_callback(int i)
 
 	if (iot_bt_relay[i].mode.long_press == false)
 	{
-		switch ((int) iot_bt_relay[i].mode.name)
+		switch ((int) iot_bt_relay[i].mode.cur_name)
 		{
 		case ALARM_MODE:
 		case PANIC_MODE:
+			iot_bt_relay[i].mode.req_name = iot_bt_relay[i].mode.cur_name;
 			iot_bt_relay[i].mqtt = true;
 			break;
 		}
@@ -139,7 +171,7 @@ void iot_button_relay_off_callback(int i)
 //------------------------------------------------------------------------------
 void iot_button_relay_on_callback(int i)
 {
-	iot_bt_relay[i].bt_handler = iot_button_relay_off_on_callback_handler;
+	iot_bt_relay[i].bt_handler = iot_button_relay_on_callback_handler;
 	iot_bt_relay[i].mode.timer = 0;
 	iot_bt_relay[i].mode.long_press = false;
 	printf("%s(%d)\n", __func__, i);
