@@ -23,8 +23,8 @@ typedef struct
 typedef struct
 {
 	task_t task;
-	iot_mode_e cur_name;
-	iot_mode_e req_name;
+	iot_mode_e current;
+	iot_mode_e requested;
 	int timer;
 	bool long_press;
 	bool pin_state;
