@@ -100,7 +100,7 @@ void iot_button_relay_init(void)
 		pin_output(iot_bt_relay[i].pin.out);
 		pin_write(iot_bt_relay[i].pin.out, true);
 		iot_bt_relay[i].bt_handler = NULL;
-		iot_bt_relay[i].mode.cur_name = iot_bt_relay[i].mode.req_name =
+		iot_bt_relay[i].mode.current = iot_bt_relay[i].mode.requested =
 				NORMAL_MODE;
 		iot_bt_relay[i].mode.task.handler = NULL;
 	}
@@ -112,7 +112,7 @@ void bt_handler_normal_mode(int i)
 
 	if (iot_bt_relay[i].mode.timer > ALARM_PANIC_MODE_DELAY)
 	{
-		iot_bt_relay[i].mode.req_name = ALARM_MODE;
+		iot_bt_relay[i].mode.requested = ALARM_MODE;
 		iot_bt_relay[i].bt_handler = NULL;
 		iot_bt_relay[i].mode.long_press = true;
 		iot_bt_relay[i].mqtt = true;
@@ -124,16 +124,16 @@ void bt_handler_normal_mode(int i)
 void iot_button_relay_on_callback_handler(int i)
 {
 	iot_bt_relay[i].mode.timer++;
-	switch ((int) iot_bt_relay[i].mode.cur_name)
+	switch ((int) iot_bt_relay[i].mode.current)
 	{
 	case NORMAL_MODE:
-		iot_bt_relay[i].mode.req_name = NORMAL_MODE;
+		iot_bt_relay[i].mode.requested = NORMAL_MODE;
 		iot_bt_relay[i].bt_handler = bt_handler_normal_mode;
 		iot_bt_relay[i].mqtt = true;
 		pin_write(iot_bt_relay[i].pin.out, !pin_read(iot_bt_relay[i].pin.out));
 		break;
 	case SOS_MODE:
-		iot_bt_relay[i].mode.req_name = NORMAL_MODE;
+		iot_bt_relay[i].mode.requested = NORMAL_MODE;
 		iot_bt_relay[i].bt_handler = NULL;
 		iot_bt_relay[i].mqtt = true;
 		break;
@@ -141,7 +141,7 @@ void iot_button_relay_on_callback_handler(int i)
 	case PANIC_MODE:
 		if (iot_bt_relay[i].mode.timer > ALARM_PANIC_MODE_DELAY)
 		{
-			iot_bt_relay[i].mode.req_name = NORMAL_MODE;
+			iot_bt_relay[i].mode.requested = NORMAL_MODE;
 			iot_bt_relay[i].bt_handler = NULL;
 			iot_bt_relay[i].mode.long_press = true;
 			iot_bt_relay[i].mqtt = true;
@@ -157,11 +157,11 @@ void iot_button_relay_off_callback(int i)
 
 	if (iot_bt_relay[i].mode.long_press == false)
 	{
-		switch ((int) iot_bt_relay[i].mode.cur_name)
+		switch ((int) iot_bt_relay[i].mode.current)
 		{
 		case ALARM_MODE:
 		case PANIC_MODE:
-			iot_bt_relay[i].mode.req_name = iot_bt_relay[i].mode.cur_name;
+			iot_bt_relay[i].mode.requested = iot_bt_relay[i].mode.current;
 			iot_bt_relay[i].mqtt = true;
 			break;
 		}
