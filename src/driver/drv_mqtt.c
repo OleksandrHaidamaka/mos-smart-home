@@ -26,7 +26,7 @@
  ******************************************************************************/
 drv_mqtt_t drv_mqtt =
 { .handler = NULL, .time = 0, .iot_mode =
-{ "normal", "disco", "sos", "alarm", "panic" } };
+{ "normal", "sos", "alarm", "panic" } };
 
 //------------------------------------------------------------------------------
 static void drv_mqtt_sub()
