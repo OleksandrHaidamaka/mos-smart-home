@@ -25,8 +25,9 @@
  *** VARIABLES
  ******************************************************************************/
 drv_mqtt_t drv_mqtt =
-{ .handler = NULL, .time = 0, .iot_mode =
-{ "normal", "sos", "alarm", "panic" } };
+{
+	.handler = NULL, .time = 0, .iot_mode = { "normal", "sos", "alarm", "panic" }
+};
 
 //------------------------------------------------------------------------------
 static void drv_mqtt_sub()
@@ -51,8 +52,7 @@ void drv_mqtt_pub(const char *cmd, ...)
 	va_start(ap, cmd);
 	n = json_vprintf(&jmo, cmd, ap);
 	va_end(ap);
-	mg_mqtt_publish(c, PUB_TOPIC(), mgos_mqtt_get_packet_id(), MG_MQTT_QOS(0),
-			msg, n);
+	mg_mqtt_publish(c, PUB_TOPIC(), mgos_mqtt_get_packet_id(), MG_MQTT_QOS(0), msg, n);
 	drv_led_blink_mode(BL_MQTT_PUB_MSG);
 	printf("%s(%s msg: %s)\n", __func__, PUB_TOPIC(), msg);
 }
@@ -141,33 +141,27 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 		{
 		case NORMAL_MODE:
 			if (iot_bt_relay[i].mode.current == ALARM_MODE)
-				iot_button_relay_mode_task_handler(i,
-						iot_button_relay_task_off_alarm);
+				iot_button_relay_mode_task_handler(i, iot_button_relay_task_off_on_alarm);
 			else
 			{
-				pin_write(iot_bt_relay[i].pin.out,
-						iot_bt_relay[i].mode.pin_state);
-				iot_bt_relay[i].mqtt = true;
+				pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
 				iot_button_relay_mode_task_handler(i, NULL);
+				iot_bt_relay[i].mqtt = true;
 			}
 			break;
 
 		case SOS_MODE:
 			if (iot_bt_relay[i].mode.current == NORMAL_MODE)
-				iot_bt_relay[i].mode.pin_state = pin_read(
-						iot_bt_relay[i].pin.out);
+				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
 			iot_button_relay_mode_task_handler(i, iot_button_relay_task_sos);
 			break;
 
 		case ALARM_MODE:
 			if (iot_bt_relay[i].mode.current == NORMAL_MODE)
-				iot_bt_relay[i].mode.pin_state = pin_read(
-						iot_bt_relay[i].pin.out);
+				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
 			else
-				pin_write(iot_bt_relay[i].pin.out,
-						iot_bt_relay[i].mode.pin_state);
-			iot_button_relay_mode_task_handler(i,
-					iot_button_relay_task_on_alarm);
+				pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
+			iot_button_relay_mode_task_handler(i, iot_button_relay_task_off_on_alarm);
 			break;
 
 		case PANIC_MODE:
@@ -175,8 +169,7 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 			break;
 		}
 
-		iot_bt_relay[i].mode.current = iot_bt_relay[i].mode.requested =
-				mode_name_new;
+		iot_bt_relay[i].mode.current = iot_bt_relay[i].mode.requested = mode_name_new;
 	}
 }
 
@@ -310,18 +303,15 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	{
 		mqtt_relay_state(i, state_to_bool(arg));
 	}
-	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &arg)
-			== 2)
+	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &arg) == 2)
 	{
 		mqtt_sw_relay_state(i, state_to_bool(arg));
 	}
-	else if (json_scanf(s->p, s->len, "{bt_relay: %d, state: %Q}", &i, &arg)
-			== 2)
+	else if (json_scanf(s->p, s->len, "{bt_relay: %d, state: %Q}", &i, &arg) == 2)
 	{
 		mqtt_bt_relay_state(i, state_to_bool(arg));
 	}
-	else if (json_scanf(s->p, s->len, "{bt_relay: %d, mode: %Q}", &i, &arg)
-			== 2)
+	else if (json_scanf(s->p, s->len, "{bt_relay: %d, mode: %Q}", &i, &arg) == 2)
 	{
 		mqtt_bt_relay_mode(i, mode_to_ind(arg));
 	}
@@ -341,8 +331,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	if (err == false)
 	{
 		drv_led_blink_mode(BL_MQTT_SUB_MSG_OK);
-		if (MQTT_ACK() == true)
-			drv_mqtt_pub("%.*s\n", (int) s->len, s->p);
+		if (MQTT_ACK() == true) drv_mqtt_pub("%.*s\n", (int) s->len, s->p);
 	}
 	else
 	{
@@ -351,8 +340,7 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 }
 
 //------------------------------------------------------------------------------
-void drv_mqtt_callback(struct mg_connection *c, int ev, void *p,
-		void* user_data)
+void drv_mqtt_callback(struct mg_connection *c, int ev, void *p, void* user_data)
 {
 	(void) c;
 	(void) user_data;
