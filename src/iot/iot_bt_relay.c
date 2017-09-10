@@ -146,6 +146,10 @@ void iot_button_relay_off_callback(int i)
 		switch ((int) iot_bt_relay[i].mode.current)
 		{
 		case ALARM_MODE:
+			pin_write(iot_bt_relay[i].pin.out, !pin_read(iot_bt_relay[i].pin.out));
+			iot_bt_relay[i].mode.requested = iot_bt_relay[i].mode.current;
+			iot_bt_relay[i].mqtt = true;
+			break;
 		case PANIC_MODE:
 			iot_bt_relay[i].mode.requested = iot_bt_relay[i].mode.current;
 			iot_bt_relay[i].mqtt = true;
