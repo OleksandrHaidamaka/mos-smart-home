@@ -13,24 +13,26 @@
  *** VARIABLES
  ******************************************************************************/
 drv_led_t drv_led =
-{ .mode =
 {
-//      time short, time long, number of short blinks, repeat flag
-		{ 250 / SYS_TICK, 500 / SYS_TICK, 1, true }, // BL_WIFI_DISCONNECTED
-		{ 250 / SYS_TICK, 500 / SYS_TICK, 2, true }, // BL_WIFI_IP_ACQUIRED
-		{ 250 / SYS_TICK, 500 / SYS_TICK, 3, true }, // BL_MQTT_CONNECTED
-		{ 50 / SYS_TICK, 100 / SYS_TICK, 1, false }, // BL_MQTT_SUB_MSG_ERR
-		{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }, // BL_MQTT_SUB_MSG
-		{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }  // BL_MQTT_PUB_MSG
-} };
+	.mode =
+	{
+	//      time short, time long, number of short blinks, repeat flag
+			{ 250 / SYS_TICK, 500 / SYS_TICK, 1, true }, // BL_WIFI_DISCONNECTED
+			{ 250 / SYS_TICK, 500 / SYS_TICK, 2, true }, // BL_WIFI_IP_ACQUIRED
+			{ 250 / SYS_TICK, 500 / SYS_TICK, 3, true }, // BL_MQTT_CONNECTED
+			{ 50 / SYS_TICK, 100 / SYS_TICK, 1, false }, // BL_MQTT_SUB_MSG_ERR
+			{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }, // BL_MQTT_SUB_MSG
+			{ 50 / SYS_TICK, 100 / SYS_TICK, 3, false }  // BL_MQTT_PUB_MSG
+	}
+};
 
 //------------------------------------------------------------------------------
 void drv_led_init()
 {
-	led_out()
+	led_out();
 	led_off_on(true);
 	drv_led.handler = drv_led_handler;
-	drv_led.mqtt = true;
+	drv_led.mqtt = POLL;
 	drv_led.mode_current = BL_WIFI_DISCONNECTED;
 	drv_led.mode_new = BL_WIFI_DISCONNECTED;
 	drv_led_blink_mode(BL_WIFI_DISCONNECTED);

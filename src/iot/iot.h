@@ -6,7 +6,11 @@
  ******************************************************************************/
 typedef enum
 {
-	NORMAL_MODE, SOS_MODE, ALARM_MODE, PANIC_MODE, SIZE_IOT_MODE,
+	NORMAL_MODE,
+	SOS_MODE,
+	ALARM_MODE,
+	PANIC_MODE,
+	NUM_IOT_MODES,
 } iot_mode_e;
 
 /*******************************************************************************
