@@ -132,8 +132,7 @@ static void mqtt_bt_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_BT_RELAY)
 	{
-		if (iot_bt_relay[i].mode.current == NORMAL_MODE
-				|| iot_bt_relay[i].mode.current == ALARM_MODE)
+		if (iot_bt_relay[i].mode.current == NORMAL_MODE || iot_bt_relay[i].mode.current == ALARM_MODE)
 			pin_write(iot_bt_relay[i].pin.out, !state);
 	}
 }
@@ -143,7 +142,7 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 {
 	if (i < NUM_IOT_BT_RELAY)
 	{
-		iot_bt_relay[i].mqtt = NONE;
+		iot_bt_relay[i].mqtt = POLL;
 
 		switch ((int) mode_name_new)
 		{
@@ -154,7 +153,6 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 			{
 				pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
 				iot_button_relay_mode_task_handler(i, NULL);
-				iot_bt_relay[i].mqtt = POLL;
 			}
 			break;
 
