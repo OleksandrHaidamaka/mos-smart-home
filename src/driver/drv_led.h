@@ -2,11 +2,16 @@
 #define __DRV_LED_H__
 
 /*******************************************************************************
+ *** INCLUDES
+ ******************************************************************************/
+#include "drv.h"
+
+/*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
 #define LED_PIN            (D4)
-#define led_in()           pin_input(LED_PIN, MGOS_GPIO_PULL_UP);
-#define led_out()          pin_output(LED_PIN);
+#define led_in()           pin_input(LED_PIN, MGOS_GPIO_PULL_UP)
+#define led_out()          pin_output(LED_PIN)
 #define led_off_on(state)  pin_write(LED_PIN, !state)
 
 /*******************************************************************************
@@ -36,7 +41,7 @@ typedef struct
 typedef struct
 {
 	void (*handler)(void);
-	bool mqtt;
+	drv_mqtt_reason_e mqtt;
 	enum drv_led_blink_mode_t mode_current;
 	enum drv_led_blink_mode_t mode_new;
 	drv_blink_mode_t mode[];

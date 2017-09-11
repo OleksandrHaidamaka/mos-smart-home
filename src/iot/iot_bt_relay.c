@@ -62,7 +62,7 @@ void iot_button_relay_task_off_on_alarm(int i)
 	{
 		iot_button_relay_mode_task_handler(i, NULL);
 		pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
-		iot_bt_relay[i].mqtt = true;
+		iot_bt_relay[i].mqtt = POLL;
 	}
 }
 
@@ -103,7 +103,7 @@ void bt_handler_normal_mode(int i)
 		iot_bt_relay[i].mode.requested = ALARM_MODE;
 		iot_bt_relay[i].mode.long_press = true;
 		iot_bt_relay[i].bt_handler = NULL;
-		iot_bt_relay[i].mqtt = true;
+		iot_bt_relay[i].mqtt = EVENT;
 	}
 }
 
@@ -116,12 +116,12 @@ void iot_button_relay_on_callback_handler(int i)
 	case NORMAL_MODE:
 		pin_write(iot_bt_relay[i].pin.out, !pin_read(iot_bt_relay[i].pin.out));
 		iot_bt_relay[i].bt_handler = bt_handler_normal_mode;
-		iot_bt_relay[i].mqtt = true;
+		iot_bt_relay[i].mqtt = EVENT;
 		break;
 	case SOS_MODE:
 		iot_bt_relay[i].mode.requested = NORMAL_MODE;
 		iot_bt_relay[i].bt_handler = NULL;
-		iot_bt_relay[i].mqtt = true;
+		iot_bt_relay[i].mqtt = EVENT;
 		break;
 	case ALARM_MODE:
 	case PANIC_MODE:
@@ -130,7 +130,7 @@ void iot_button_relay_on_callback_handler(int i)
 			iot_bt_relay[i].mode.requested = NORMAL_MODE;
 			iot_bt_relay[i].mode.long_press = true;
 			iot_bt_relay[i].bt_handler = NULL;
-			iot_bt_relay[i].mqtt = true;
+			iot_bt_relay[i].mqtt = EVENT;
 		}
 		break;
 	}
@@ -148,11 +148,11 @@ void iot_button_relay_off_callback(int i)
 		case ALARM_MODE:
 			pin_write(iot_bt_relay[i].pin.out, !pin_read(iot_bt_relay[i].pin.out));
 			iot_bt_relay[i].mode.requested = iot_bt_relay[i].mode.current;
-			iot_bt_relay[i].mqtt = true;
+			iot_bt_relay[i].mqtt = EVENT;
 			break;
 		case PANIC_MODE:
 			iot_bt_relay[i].mode.requested = iot_bt_relay[i].mode.current;
-			iot_bt_relay[i].mqtt = true;
+			iot_bt_relay[i].mqtt = EVENT;
 			break;
 		}
 	}
