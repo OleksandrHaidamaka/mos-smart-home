@@ -119,6 +119,16 @@ static void mqtt_relay_state(int i, bool state)
 }
 
 //------------------------------------------------------------------------------
+static void mqtt_sw_mode(int i, iot_mode_e mode_name_new)
+{
+	if (i < NUM_IOT_SW)
+	{
+		iot_sw[i].mqtt = POLL;
+		iot_bt_relay[i].mode.current = mode_name_new;
+	}
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_sw_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_SW_RELAY)
@@ -237,11 +247,11 @@ void drv_mqtt_handler(void)
 	{
 		if (iot_sw[i].mqtt != NONE)
 		{
-			iot_sw[i].mqtt = NONE;
-			drv_mqtt_pub(
-					"{sw: %d, state: %Q, mode_current: %Q, mode_requested: %Q}",
+			drv_mqtt_pub("{sw: %d, state: %Q, mode_current: %Q, mqtt_reason: %Q}",
 					i, bool_to_state_str(!pin_read(iot_sw[i].in)),
-					enum_to_iot_mode_str(NORMAL_MODE), enum_to_iot_mode_str(NORMAL_MODE));
+					enum_to_iot_mode_str(iot_sw[i].mode.current),
+					enum_to_mqtt_reason_str(iot_sw[i].mqtt));
+			iot_sw[i].mqtt = NONE;
 			return;
 		}
 	}
@@ -308,6 +318,10 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	if (json_scanf(s->p, s->len, "{relay: %d, state: %Q}", &i, &arg) == 2)
 	{
 		mqtt_relay_state(i, state_str_to_bool(arg));
+	}
+	else if (json_scanf(s->p, s->len, "{sw: %d, mode: %Q}", &i, &arg) == 2)
+	{
+		mqtt_sw_mode(i, iot_mode_str_to_enum(arg));
 	}
 	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &arg) == 2)
 	{
