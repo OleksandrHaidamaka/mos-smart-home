@@ -16,5 +16,6 @@ void iot_relay_init(void)
 	{
 		pin_output(iot_relay[i].out);
 		pin_write(iot_relay[i].out, true);
+		iot_relay[i].mode.current = NORMAL_MODE;
 	}
 }
