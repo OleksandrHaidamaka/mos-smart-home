@@ -2,6 +2,12 @@
 #define __IOT_H__
 
 /*******************************************************************************
+ *** INCLUDES
+ ******************************************************************************/
+#include <stdbool.h>
+#include "drv.h"
+
+/*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
 #define SHORT_TASK_DELAY         (100 / SYS_TICK)
@@ -51,14 +57,10 @@ typedef struct
 } iot_x_relay_t;
 
 /*******************************************************************************
- *** COMMON FUNCTIONS
+ *** PROTOTYPE
  ******************************************************************************/
-//void iot_x_relay_mode_task_handler(void* iot, void (*handler)(int))
-//{
-//	((iot_x_relay_t *) iot)->mode.task.handler = handler;
-//	((iot_x_relay_t *) iot)->mode.task.count = 0;
-//	((iot_x_relay_t *) iot)->mode.task.state = 0;
-//	((iot_x_relay_t *) iot)->mode.task.time = 0;
-//}
+void iot_x_relay_mode_task_handler(iot_x_relay_t*, void (*handler)(int));
+void iot_x_relay_task_sos(iot_x_relay_t* iot);
+void iot_x_relay_task_off_on_alarm(iot_x_relay_t* iot);
 
 #endif  // __IOT_H__
