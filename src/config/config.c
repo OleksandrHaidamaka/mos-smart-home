@@ -14,8 +14,8 @@
  ******************************************************************************/
 iot_relay_t iot_relay[NUM_IOT_RELAY] = 					// relay object
 {
-	{ .out = D5, .mqtt = NONE },
-//	{ .out = D6, .mqtt = NONE },
+	{{ .out = D5 }, .mqtt = NONE },
+//	{{ .out = D6 }, .mqtt = NONE },
 };
 
 iot_sw_t iot_sw[NUM_IOT_SW] = 							// switch object

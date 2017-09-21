@@ -114,7 +114,7 @@ static void mqtt_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_RELAY)
 	{
-		pin_write(iot_relay[i].out, !state);
+		pin_write(iot_relay[i].pin.out, !state);
 	}
 }
 
@@ -236,7 +236,7 @@ void drv_mqtt_handler(void)
 		{
 			drv_mqtt_pub(
 					"{relay: %d, state: %Q, mode_current: %Q, mqtt_reason: %Q}",
-					i, bool_to_state_str(!pin_read(iot_relay[i].out)),
+					i, bool_to_state_str(!pin_read(iot_relay[i].pin.out)),
 					enum_to_iot_mode_str(iot_relay[i].mode.current),
 					enum_to_mqtt_reason_str(iot_relay[i].mqtt));
 			iot_relay[i].mqtt = NONE;
