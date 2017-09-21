@@ -9,14 +9,6 @@
  ******************************************************************************/
 #include "../main.h"
 
-/*******************************************************************************
- *** DEFENITIONS
- ******************************************************************************/
-#define SHORT_TASK_DELAY         (100 / SYS_TICK)
-#define SOS_TASK_DELAY           (350 / SYS_TICK)
-#define ALARM_PANIC_MODE_DELAY   (6000 / SYS_TICK)
-#define PANIC_TASK_DELAY         (200 / SYS_TICK)
-
 //------------------------------------------------------------------------------
 void iot_button_relay_mode_task_handler(int i, void (*handler)(int))
 {
