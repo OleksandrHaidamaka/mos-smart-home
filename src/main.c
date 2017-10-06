@@ -27,14 +27,11 @@ static void sys_tick()
 	/* Driver handlers */
 	drv_switch_handler();
 	drv_button_handler();
-
-	if (drv_led.handler != NULL)
-		drv_led.handler();
-
-	if (drv_mqtt.handler != NULL)
-		drv_mqtt.handler();
+	drv_LED_handler();
+	drv_MQTT_handler();
 
 	/* IoT handlers */
+	iot_relay_handler();
 	iot_button_relay_handler();
 }
 

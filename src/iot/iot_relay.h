@@ -15,5 +15,6 @@ extern iot_x_relay_t iot_relay[NUM_IOT_RELAY];
  *** PROTOTYPES
  ******************************************************************************/
 void iot_relay_init(void);
+void iot_relay_handler(void);
 
 #endif  //__IOT_RELAY_H__

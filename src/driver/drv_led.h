@@ -57,6 +57,7 @@ extern drv_led_t drv_led;
  ******************************************************************************/
 void drv_led_init(void);
 void drv_led_blink_mode(enum drv_led_blink_mode_t mode);
-void drv_led_handler();
+void drv_led_handler(void);
+void drv_LED_handler(void);
 
 #endif  //__DRV_LED_H__
