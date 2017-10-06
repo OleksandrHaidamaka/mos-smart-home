@@ -32,7 +32,7 @@ typedef enum
  ******************************************************************************/
 typedef struct
 {
-	void (*handler)(int);
+	void (*handler)(void*); // [relay] handler
 	int count;
 	int state;
 	int time;
@@ -48,19 +48,21 @@ typedef struct
 	bool pin_state;
 } iot_mode_t;
 
+// x - could be switch or button
 typedef struct
 {
 	drv_in_out_t pin;
 	drv_mqtt_reason_e mqtt;
 	iot_mode_t mode;
-	void (*bt_handler)(int);
+	void (*handler)(int); // [x] handler
 } iot_x_relay_t;
 
 /*******************************************************************************
  *** PROTOTYPE
  ******************************************************************************/
-void iot_x_relay_mode_task_handler(iot_x_relay_t*, void (*handler)(int));
-void iot_x_relay_task_sos(iot_x_relay_t* iot);
-void iot_x_relay_task_off_on_alarm(iot_x_relay_t* iot);
+void iot_x_relay_mode_task_handler(iot_x_relay_t* iot, void (*handler)(void*));
+void iot_x_relay_task_sos(void* iot);
+void iot_x_relay_task_off_on_alarm(void* iot);
+void iot_x_relay_task_panic(void* iot);
 
 #endif  // __IOT_H__

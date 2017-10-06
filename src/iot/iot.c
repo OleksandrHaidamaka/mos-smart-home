@@ -10,7 +10,7 @@
 #include "main.h"
 
 //------------------------------------------------------------------------------
-void iot_x_relay_mode_task_handler(iot_x_relay_t* iot, void (*handler)(int))
+void iot_x_relay_mode_task_handler(iot_x_relay_t* iot, void (*handler)(void*))
 {
 	iot->mode.task.handler = handler;
 	iot->mode.task.count = 0;
@@ -44,28 +44,31 @@ static int iot_x_relay_task_blink(iot_x_relay_t* iot, int delay)
 }
 
 //------------------------------------------------------------------------------
-void iot_x_relay_task_sos(iot_x_relay_t* iot)
+void iot_x_relay_task_sos(void* iot)
 {
-	iot_x_relay_task_blink(iot, SOS_TASK_DELAY);
+	iot_x_relay_t* iot_p = (iot_x_relay_t*) iot;
+	iot_x_relay_task_blink(iot_p, SOS_TASK_DELAY);
 }
 
 //------------------------------------------------------------------------------
-void iot_x_relay_task_off_on_alarm(iot_x_relay_t* iot)
+void iot_x_relay_task_off_on_alarm(void* iot)
 {
-	if (iot_x_relay_task_blink(iot, SHORT_TASK_DELAY) == 0)
+	iot_x_relay_t* iot_p = (iot_x_relay_t*) iot;
+	if (iot_x_relay_task_blink(iot_p, SHORT_TASK_DELAY) == 0)
 		return;
 
-	if (iot->mode.task.count++ > 10)
+	if (iot_p->mode.task.count++ > 10)
 	{
-		iot_x_relay_mode_task_handler(iot, NULL);
-		pin_write(iot->pin.out, iot->mode.pin_state);
-		iot->mqtt = POLL;
+		iot_x_relay_mode_task_handler(iot_p, NULL);
+		pin_write(iot_p->pin.out, iot_p->mode.pin_state);
+		iot_p->mqtt = POLL;
 	}
 }
 
 //------------------------------------------------------------------------------
-//void iot_button_relay_task_panic(int i)
-//{
-//	iot_button_task_blink(i, PANIC_TASK_DELAY);
-//}
+void iot_x_relay_task_panic(void* iot)
+{
+	iot_x_relay_t* iot_p = (iot_x_relay_t*) iot;
+	iot_x_relay_task_blink(iot_p, PANIC_TASK_DELAY);
+}
 
