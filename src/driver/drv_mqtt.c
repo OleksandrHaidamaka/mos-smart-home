@@ -124,12 +124,49 @@ static void mqtt_relay_state(int i, bool state)
 }
 
 //------------------------------------------------------------------------------
+static void mqtt_relay_mode(int i, iot_mode_e mode_name_new)
+{
+	if (i < NUM_IOT_RELAY)
+	{
+		iot_relay[i].mqtt = POLL;
+
+		switch ((int) mode_name_new)
+		{
+		case NORMAL_MODE:
+			pin_write(iot_relay[i].pin.out, iot_relay[i].mode.pin_state);
+			iot_x_relay_mode_task_handler(&iot_relay[i], NULL);
+			break;
+
+		case SOS_MODE:
+			if (iot_relay[i].mode.current == NORMAL_MODE)
+				iot_relay[i].mode.pin_state = pin_read(iot_relay[i].pin.out);
+			iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_sos);
+			break;
+
+		case ALARM_MODE:
+			if (iot_relay[i].mode.current == NORMAL_MODE)
+				iot_relay[i].mode.pin_state = pin_read(iot_relay[i].pin.out);
+			else
+				pin_write(iot_relay[i].pin.out, iot_relay[i].mode.pin_state);
+			iot_x_relay_mode_task_handler(&iot_relay[i], NULL);
+			break;
+
+		case PANIC_MODE:
+			iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_panic);
+			break;
+		}
+
+		iot_relay[i].mode.current = mode_name_new;
+	}
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_sw_mode(int i, iot_mode_e mode_name_new)
 {
 	if (i < NUM_IOT_SW)
 	{
 		iot_sw[i].mqtt = POLL;
-		iot_bt_relay[i].mode.current = mode_name_new;
+		iot_sw[i].mode.current = mode_name_new;
 	}
 }
 
@@ -326,6 +363,10 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	if (json_scanf(s->p, s->len, "{relay: %d, state: %Q}", &i, &arg) == 2)
 	{
 		mqtt_relay_state(i, state_str_to_bool(arg));
+	}
+	else if (json_scanf(s->p, s->len, "{relay: %d, mode: %Q}", &i, &arg) == 2)
+	{
+		mqtt_relay_mode(i, iot_mode_str_to_enum(arg));
 	}
 	else if (json_scanf(s->p, s->len, "{sw: %d, mode: %Q}", &i, &arg) == 2)
 	{
