@@ -17,7 +17,7 @@ void iot_relay_init(void)
 		pin_output(iot_relay[i].pin.out);
 		pin_write(iot_relay[i].pin.out, true);
 		iot_relay[i].mode.current = NORMAL_MODE;
-		iot_bt_relay[i].mode.task.handler = NULL;
+		iot_relay[i].mode.task.handler = NULL;
 	}
 }
 
