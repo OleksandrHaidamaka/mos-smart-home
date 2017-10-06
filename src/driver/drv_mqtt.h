@@ -21,8 +21,7 @@ typedef struct
 /*******************************************************************************
  *** PROTOTYPES
  ******************************************************************************/
-void drv_mqtt_pub(const char *cmd, ...);
-void drv_mqtt_handler(void);
+void drv_MQTT_handler(void);
 void drv_mqtt_callback(struct mg_connection *c, int ev, void *p,
 		void* user_data);
 

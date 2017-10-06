@@ -22,6 +22,11 @@
 #define  MQTT_ACK()     get_cfg()->mqtt.ack
 
 /*******************************************************************************
+ *** PROTOTYPES
+ ******************************************************************************/
+void drv_mqtt_handler(void);
+
+/*******************************************************************************
  *** VARIABLES
  ******************************************************************************/
 drv_mqtt_t drv_mqtt =
@@ -389,4 +394,11 @@ void drv_mqtt_callback(struct mg_connection *c, int ev, void *p, void* user_data
 		mqtt_parcer_msg(msg);
 		break;
 	}
+}
+
+//------------------------------------------------------------------------------
+void drv_MQTT_handler(void)
+{
+	if (drv_mqtt.handler != NULL)
+		drv_mqtt.handler();
 }

@@ -32,7 +32,6 @@ void drv_led_init()
 	led_out();
 	led_off_on(true);
 	drv_led.handler = drv_led_handler;
-	drv_led.mqtt = POLL;
 	drv_led.mode_current = BL_WIFI_DISCONNECTED;
 	drv_led.mode_new = BL_WIFI_DISCONNECTED;
 	drv_led_blink_mode(BL_WIFI_DISCONNECTED);
@@ -48,7 +47,7 @@ void drv_led_blink_mode(enum drv_led_blink_mode_t mode)
 }
 
 //------------------------------------------------------------------------------
-void drv_led_handler()
+void drv_led_handler(void)
 {
 	static enum drv_led_blink_mode_t mode = BL_WIFI_DISCONNECTED;
 	static int time = 0;
@@ -103,4 +102,11 @@ void drv_led_handler()
 		}
 		break;
 	}
+}
+
+//------------------------------------------------------------------------------
+void drv_LED_handler(void)
+{
+	if (drv_led.handler != NULL)
+		drv_led.handler();
 }
