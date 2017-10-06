@@ -7,20 +7,9 @@
 #include "iot.h"
 
 /*******************************************************************************
- *** TYPEDEF
- ******************************************************************************/
-typedef struct
-{
-	drv_in_out_t pin;
-	drv_mqtt_reason_e mqtt;
-	iot_mode_t mode;
-	void (*bt_handler)(int);
-} iot_bt_relay_t;
-
-/*******************************************************************************
  *** EXTERN VARIABLES
  ******************************************************************************/
-extern iot_bt_relay_t iot_bt_relay[NUM_IOT_BT_RELAY];
+extern iot_x_relay_t iot_bt_relay[NUM_IOT_BT_RELAY];
 
 /*******************************************************************************
  *** PROTOTYPES
@@ -29,9 +18,5 @@ void iot_button_relay_init(void);
 void iot_button_relay_off_callback(int i);
 void iot_button_relay_on_callback(int i);
 void iot_button_relay_handler(void);
-void iot_button_relay_mode_task_handler(int i, void (*handler)(int));
-void iot_button_relay_task_off_on_alarm(int i);
-void iot_button_relay_task_sos(int i);
-void iot_button_relay_task_panic(int i);
 
 #endif  //__IOT_BT_RELAY_H__
