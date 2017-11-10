@@ -17,9 +17,9 @@
 /*******************************************************************************
  *** MACROSES
  ******************************************************************************/
-#define  PUB_TOPIC()    get_cfg()->mqtt.pub
-#define  SUB_TOPIC()    get_cfg()->mqtt.sub
-#define  MQTT_ACK()     get_cfg()->mqtt.ack
+#define  PUB_TOPIC()    mgos_sys_config_get_mqtt_pub()
+#define  SUB_TOPIC()    mgos_sys_config_get_mqtt_sub()
+#define  MQTT_ACK()     mgos_sys_config_get_mqtt_ack()
 
 /*******************************************************************************
  *** PROTOTYPES

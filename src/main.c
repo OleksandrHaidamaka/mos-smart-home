@@ -38,8 +38,8 @@ static void sys_tick()
 //------------------------------------------------------------------------------
 static void wifi_sta_start()
 {
-	get_cfg()->wifi.sta.enable = true;
-	mgos_wifi_setup_sta(&get_cfg()->wifi.sta);
+	mgos_sys_config_set_wifi_sta_enable(true);
+	mgos_wifi_setup_sta(mgos_sys_config_get_wifi_sta());
 }
 
 //------------------------------------------------------------------------------
@@ -59,7 +59,7 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 	switch ((int) event)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
-		get_cfg()->mqtt.enable = true;
+		mgos_sys_config_set_mqtt_enable(true);
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		drv_led_blink_mode(BL_WIFI_IP_ACQUIRED);
@@ -73,7 +73,7 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 		}
 		break;
 	case MGOS_WIFI_DISCONNECTED:
-		get_cfg()->mqtt.enable = false;
+		mgos_sys_config_set_mqtt_enable(false);
 		drv_mqtt.handler = NULL;
 		if (timer_id == 0)
 			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
