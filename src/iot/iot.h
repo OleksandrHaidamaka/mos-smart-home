@@ -24,6 +24,7 @@ typedef enum
 	SOS_MODE,
 	ALARM_MODE,
 	PANIC_MODE,
+	SENSOR_MODE,
 	NUM_IOT_MODES,
 } iot_mode_e;
 
@@ -62,7 +63,7 @@ typedef struct
  ******************************************************************************/
 void iot_x_relay_mode_task_handler(iot_x_relay_t* iot, void (*handler)(void*));
 void iot_x_relay_task_sos(void* iot);
-void iot_x_relay_task_off_on_alarm(void* iot);
+void iot_x_relay_task_off_on_blink(void* iot);
 void iot_x_relay_task_panic(void* iot);
 
 #endif  // __IOT_H__
