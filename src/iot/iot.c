@@ -51,7 +51,7 @@ void iot_x_relay_task_sos(void* iot)
 }
 
 //------------------------------------------------------------------------------
-void iot_x_relay_task_off_on_alarm(void* iot)
+void iot_x_relay_task_off_on_blink(void* iot)
 {
 	iot_x_relay_t* iot_p = (iot_x_relay_t*) iot;
 	if (iot_x_relay_task_blink(iot_p, SHORT_TASK_DELAY) == 0)

@@ -12,7 +12,7 @@
 /*******************************************************************************
  *** DEFENITIONS
  ******************************************************************************/
-#define  MQTT_SEND_TIMEOUT  (350/SYS_TICK)  // time [ms]
+#define  MQTT_SEND_TIMEOUT  (400/SYS_TICK)  // time [ms]
 
 /*******************************************************************************
  *** MACROSES
@@ -33,7 +33,7 @@ drv_mqtt_t drv_mqtt =
 {
 	.handler = NULL, .time = 0,
 	.mqtt_reason = { "none", "poll", "event" },
-	.iot_mode = { "normal", "sos", "alarm", "panic" }
+	.iot_mode = { "normal", "sos", "alarm", "panic", "sensor" }
 };
 
 //------------------------------------------------------------------------------
@@ -133,22 +133,38 @@ static void mqtt_relay_mode(int i, iot_mode_e mode_name_new)
 		switch ((int) mode_name_new)
 		{
 		case NORMAL_MODE:
-			pin_write(iot_relay[i].pin.out, iot_relay[i].mode.pin_state);
-			iot_x_relay_mode_task_handler(&iot_relay[i], NULL);
+			switch ((int) iot_relay[i].mode.current)
+			{
+			case SOS_MODE:
+				pin_write(iot_relay[i].pin.out, iot_relay[i].mode.pin_state);
+				iot_x_relay_mode_task_handler(&iot_relay[i], NULL);
+				break;
+
+			case ALARM_MODE:
+				iot_relay[i].mode.pin_state = false;
+				iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_off_on_blink);
+				break;
+
+			case PANIC_MODE:
+				pin_write(iot_relay[i].pin.out, false);
+				iot_x_relay_mode_task_handler(&iot_relay[i], NULL);
+				break;
+
+			case SENSOR_MODE:
+				iot_relay[i].mode.pin_state = true;
+				iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_off_on_blink);
+				break;
+			}
 			break;
 
 		case SOS_MODE:
-			if (iot_relay[i].mode.current == NORMAL_MODE)
-				iot_relay[i].mode.pin_state = pin_read(iot_relay[i].pin.out);
+			iot_relay[i].mode.pin_state = pin_read(iot_relay[i].pin.out);
 			iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_sos);
 			break;
 
-		case ALARM_MODE:
-			if (iot_relay[i].mode.current == NORMAL_MODE)
-				iot_relay[i].mode.pin_state = pin_read(iot_relay[i].pin.out);
-			else
-				pin_write(iot_relay[i].pin.out, iot_relay[i].mode.pin_state);
-			iot_x_relay_mode_task_handler(&iot_relay[i], NULL);
+		case ALARM_MODE: case SENSOR_MODE:
+			iot_relay[i].mode.pin_state = true;
+			iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_off_on_blink);
 			break;
 
 		case PANIC_MODE:
@@ -199,27 +215,38 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 		switch ((int) mode_name_new)
 		{
 		case NORMAL_MODE:
-			if (iot_bt_relay[i].mode.current == ALARM_MODE)
-				iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_off_on_alarm);
-			else
+			switch ((int) iot_bt_relay[i].mode.current)
 			{
+			case SOS_MODE:
 				pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
 				iot_x_relay_mode_task_handler(&iot_bt_relay[i], NULL);
+				break;
+
+			case ALARM_MODE:
+				iot_bt_relay[i].mode.pin_state = false;
+				iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_off_on_blink);
+				break;
+
+			case PANIC_MODE:
+				pin_write(iot_bt_relay[i].pin.out, false);
+				iot_x_relay_mode_task_handler(&iot_bt_relay[i], NULL);
+				break;
+
+			case SENSOR_MODE:
+				iot_bt_relay[i].mode.pin_state = true;
+				iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_off_on_blink);
+				break;
 			}
 			break;
 
 		case SOS_MODE:
-			if (iot_bt_relay[i].mode.current == NORMAL_MODE)
-				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
+			iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
 			iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_sos);
 			break;
 
-		case ALARM_MODE:
-			if (iot_bt_relay[i].mode.current == NORMAL_MODE)
-				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
-			else
-				pin_write(iot_bt_relay[i].pin.out, iot_bt_relay[i].mode.pin_state);
-			iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_off_on_alarm);
+		case ALARM_MODE: case SENSOR_MODE:
+			iot_bt_relay[i].mode.pin_state = true;
+			iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_off_on_blink);
 			break;
 
 		case PANIC_MODE:
