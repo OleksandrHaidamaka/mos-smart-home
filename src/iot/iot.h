@@ -21,10 +21,10 @@
 typedef enum
 {
 	NORMAL_MODE,
+	MOTION_MODE,
 	SOS_MODE,
 	ALARM_MODE,
 	PANIC_MODE,
-	SENSOR_MODE,
 	NUM_IOT_MODES,
 } iot_mode_e;
 
