@@ -259,25 +259,14 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_status()
+static void mqtt_iot_x_init()
 {
-	int i;
-
-	for (i = 0; i < NUM_IOT_RELAY; i++)
-		iot_relay[i].mqtt = POLL;
-
-	for (i = 0; i < NUM_IOT_SW; i++)
-		iot_sw[i].mqtt = POLL;
-
-	for (i = 0; i < NUM_IOT_SW_RELAY; i++)
-		iot_sw_relay[i].mqtt = POLL;
-
-	for (i = 0; i < NUM_IOT_BT; i++)
-		iot_bt[i].mqtt = POLL;
-
-	for (i = 0; i < NUM_IOT_BT_RELAY; i++)
-		iot_bt_relay[i].mqtt = POLL;
-
+	drv_mqtt.mqtt_reason_e = INIT;
+	iot_relay_init();
+	iot_switch_init();
+	iot_switch_relay_init();
+	iot_button_init();
+	iot_button_relay_init();
 	drv_led.mqtt = POLL;
 }
 
@@ -298,6 +287,12 @@ void drv_mqtt_handler(void)
 
 	int i;
 	drv_mqtt.time = 0;
+
+	if(drv_mqtt.mqtt_reason_e == INIT)
+	{
+		drv_mqtt_pub("init");
+		drv_mqtt.mqtt_reason_e = NONE;
+	}
 
 	for (i = 0; i < NUM_IOT_RELAY; i++)
 	{
@@ -415,9 +410,9 @@ static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 	{
 		mqtt_led_state(state_str_to_bool(arg));
 	}
-	else if (strncmp(s->p, "status", sizeof("status") - 1) == 0)
+	else if (strncmp(s->p, "init", sizeof("init") - 1) == 0)
 	{
-		mqtt_status();
+		mqtt_iot_x_init();
 	}
 	else
 	{
@@ -451,7 +446,7 @@ void drv_mqtt_callback(struct mg_connection *c, int ev, void *p, void* user_data
 			{
 				drv_mqtt.handler = drv_mqtt_handler;
 				drv_mqtt_sub();
-				mqtt_status();
+				mqtt_iot_x_init();
 				drv_led_blink_mode(BL_MQTT_CONNECTED);
 			}
 			else

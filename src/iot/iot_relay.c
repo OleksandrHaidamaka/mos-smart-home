@@ -19,6 +19,7 @@ void iot_relay_init(void)
 		iot_relay[i].mode.pin_state = true;
 		iot_relay[i].mode.current = NORMAL_MODE;
 		iot_relay[i].mode.task.handler = NULL;
+		iot_relay[i].mqtt = POLL;
 	}
 }
 

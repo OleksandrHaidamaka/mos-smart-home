@@ -21,6 +21,7 @@ void iot_button_relay_init(void)
 		iot_bt_relay[i].mode.pin_state = true;
 		iot_bt_relay[i].mode.current = iot_bt_relay[i].mode.requested = NORMAL_MODE;
 		iot_bt_relay[i].mode.task.handler = NULL;
+		iot_bt_relay[i].mqtt = POLL;
 	}
 }
 

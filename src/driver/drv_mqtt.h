@@ -12,6 +12,7 @@
  ******************************************************************************/
 typedef struct
 {
+	drv_mqtt_reason_e mqtt_reason_e;
 	void (*handler)(void);
 	int time;
 	const char* const mqtt_reason[NUM_MQTT_REASONS];
