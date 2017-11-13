@@ -49,7 +49,7 @@ void iot_button_relay_on_callback_handler(int i)
 		iot_bt_relay[i].handler = bt_handler_normal_mode;
 		iot_bt_relay[i].mqtt = EVENT;
 		break;
-	case SOS_MODE: case SENSOR_MODE:
+	case SOS_MODE: case MOTION_MODE:
 		iot_bt_relay[i].mode.requested = NORMAL_MODE;
 		iot_bt_relay[i].handler = NULL;
 		iot_bt_relay[i].mqtt = EVENT;

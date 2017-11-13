@@ -33,7 +33,7 @@ drv_mqtt_t drv_mqtt =
 {
 	.handler = NULL, .time = 0,
 	.mqtt_reason = { "none", "poll", "event" },
-	.iot_mode = { "normal", "sos", "alarm", "panic", "sensor" }
+	.iot_mode = { "normal", "motion", "sos", "alarm", "panic" }
 };
 
 //------------------------------------------------------------------------------
@@ -150,7 +150,7 @@ static void mqtt_relay_mode(int i, iot_mode_e mode_name_new)
 				iot_x_relay_mode_task_handler(&iot_relay[i], NULL);
 				break;
 
-			case SENSOR_MODE:
+			case MOTION_MODE:
 				iot_relay[i].mode.pin_state = true;
 				iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_off_on_blink);
 				break;
@@ -162,7 +162,7 @@ static void mqtt_relay_mode(int i, iot_mode_e mode_name_new)
 			iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_sos);
 			break;
 
-		case ALARM_MODE: case SENSOR_MODE:
+		case ALARM_MODE: case MOTION_MODE:
 			iot_relay[i].mode.pin_state = true;
 			iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_off_on_blink);
 			break;
@@ -232,7 +232,7 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 				iot_x_relay_mode_task_handler(&iot_bt_relay[i], NULL);
 				break;
 
-			case SENSOR_MODE:
+			case MOTION_MODE:
 				iot_bt_relay[i].mode.pin_state = true;
 				iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_off_on_blink);
 				break;
@@ -244,7 +244,7 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 			iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_sos);
 			break;
 
-		case ALARM_MODE: case SENSOR_MODE:
+		case ALARM_MODE: case MOTION_MODE:
 			iot_bt_relay[i].mode.pin_state = true;
 			iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_off_on_blink);
 			break;
