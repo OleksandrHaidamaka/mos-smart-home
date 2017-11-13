@@ -200,8 +200,12 @@ static void mqtt_bt_relay_state(int i, bool state)
 {
 	if (i < NUM_IOT_BT_RELAY)
 	{
-		if (iot_bt_relay[i].mode.current == NORMAL_MODE || iot_bt_relay[i].mode.current == ALARM_MODE)
+		switch((int) iot_bt_relay[i].mode.current)
+		{
+		case NORMAL_MODE: case MOTION_MODE: case ALARM_MODE:
 			pin_write(iot_bt_relay[i].pin.out, !state);
+			break;
+		}
 	}
 }
 
