@@ -16,6 +16,7 @@ void iot_switch_init(void)
 	{
 		pin_input(iot_sw[i].in, MGOS_GPIO_PULL_UP);
 		iot_sw[i].mode.current = NORMAL_MODE;
+		iot_sw[i].mqtt = POLL;
 	}
 }
 

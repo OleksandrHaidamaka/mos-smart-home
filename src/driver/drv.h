@@ -9,6 +9,7 @@ typedef enum
 	NONE,
 	POLL,
 	EVENT,
+	INIT,
 	NUM_MQTT_REASONS
 } drv_mqtt_reason_e;
 

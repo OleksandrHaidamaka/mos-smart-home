@@ -14,6 +14,7 @@
  ******************************************************************************/
 drv_led_t drv_led =
 {
+	.mqtt = POLL,
 	.mode =
 	{
 	//      time short, time long, number of short blinks, repeat flag
