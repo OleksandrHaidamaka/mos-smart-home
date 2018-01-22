@@ -47,19 +47,25 @@ void drv_button_handler()
 
 		if (state != drv_bt[i].state)
 		{
-			drv_bt[i].state = state;
-
-			switch (state)
+			if(drv_bt[i].debounsing)
 			{
-			case false: // button push-up
-				if (drv_bt[i].on_callback != NULL)
-					drv_bt[i].on_callback(drv_bt[i].iot_ind);
-				break;
-			case true: // button push-down
-				if (drv_bt[i].off_callback != NULL)
-					drv_bt[i].off_callback(drv_bt[i].iot_ind);
-				break;
+				drv_bt[i].debounsing = 0;
+				drv_bt[i].state = state;
+
+				switch (state)
+				{
+				case false: // button push-up
+					if (drv_bt[i].on_callback != NULL)
+						drv_bt[i].on_callback(drv_bt[i].iot_ind);
+					break;
+				case true: // button push-down
+					if (drv_bt[i].off_callback != NULL)
+						drv_bt[i].off_callback(drv_bt[i].iot_ind);
+					break;
+				}
 			}
+			else drv_bt[i].debounsing++;
 		}
+		else drv_bt[i].debounsing = 0;
 	}
 }
