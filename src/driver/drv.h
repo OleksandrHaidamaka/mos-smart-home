@@ -23,6 +23,7 @@ typedef struct
 	int pin;
 	int iot_ind;
 	bool state;
+	int debounsing;
 } drv_input_t;
 
 typedef struct
