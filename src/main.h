@@ -4,18 +4,7 @@
 /*******************************************************************************
  *** INCLUDES
  ******************************************************************************/
-#include <stdio.h>
-#include <user_interface.h>
-
-#include "common/platform.h"
-#include "common/platforms/esp8266/esp_missing_includes.h"
-#include "fw/platforms/esp8266/src/esp_periph.h"
-#include "mgos_sys_config.h"
-#include "mgos_hal.h"
-#include "mgos_app.h"
-#include "mgos_gpio.h"
-#include "fw/src/mgos_timers.h"
-#include "mgos_wifi.h"
+#include "mgos.h"
 #include "mgos_mqtt.h"
 #include "config/config.h"
 #include "driver/drv.h"
