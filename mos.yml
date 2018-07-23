@@ -24,19 +24,24 @@ config_schema:
 ################################################################################
 
 ### WIFI settings ##############################################################
-  - ["wifi.ap.enable", false]
+  - ["wifi.ap.enable",  false]
   - ["wifi.sta.enable", true]
-  - ["wifi.sta.ssid", "TP-LINK-Landgraf"]
-  - ["wifi.sta.pass", "07031987"]
+  - ["wifi.sta.ssid",   "TP-LINK-Landgraf"]
+  - ["wifi.sta.pass",   "07031987"]
 ################################################################################
 
 ### MQTT settings ##############################################################
-  - ["mqtt.enable", true]
-# - ["mqtt.server", "broker.mqttdashboard.com:1883"]
-  - ["mqtt.server", "192.168.0.100:1883"]
-  - ["mqtt.pub", "s", "from/esp0",   {title: "Publish topic"}]
-  - ["mqtt.sub", "s", "to/esp0",     {title: "Subscribe topic"}]
-  - ["mqtt.ack", "b", false,         {title: "Acknowledge on mqtt request"}]
+  - ["mqtt.enable",   true]
+# - ["mqtt.server",   "broker.mqttdashboard.com:1883"]
+# - ["mqtt.server",   "192.168.0.100:1883"]
+  - ["mqtt.server",   "io.adafruit.com:1883"]
+  - ["mqtt.user",     "landgraf"]
+  - ["mqtt.pass",     "c00794040e08443c8bab85b48e627b5e"]
+  - ["mqtt.pub", "s", "landgraf/f/light",   {title: "Publish topic"}]
+  - ["mqtt.sub", "s", "landgraf/f/light",   {title: "Subscribe topic"}]
+# - ["mqtt.pub", "s", "from/esp0",          {title: "Publish topic"}]
+# - ["mqtt.sub", "s", "to/esp0",            {title: "Subscribe topic"}]
+  - ["mqtt.ack", "b", false,                {title: "Acknowledge on mqtt request"}]
   - ["debug.stdout_topic", "debug/esp0"]
 ################################################################################
 
