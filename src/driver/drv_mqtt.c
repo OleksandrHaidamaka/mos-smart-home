@@ -13,6 +13,7 @@
  *** DEFENITIONS
  ******************************************************************************/
 #define  MQTT_SEND_TIMEOUT  (400/SYS_TICK)  // time [ms]
+#define  NO_INDEX           (-1)            // индекс объекта отсутствует в сообщении
 
 /*******************************************************************************
  *** MACROSES
@@ -20,6 +21,7 @@
 #define  PUB_TOPIC()    mgos_sys_config_get_mqtt_pub()
 #define  SUB_TOPIC()    mgos_sys_config_get_mqtt_sub()
 #define  MQTT_ACK()     mgos_sys_config_get_mqtt_ack()
+#define  INDEX_OK(i, num)  ((i) >= 0 && (i) < (num))
 
 /*******************************************************************************
  *** PROTOTYPES
@@ -32,7 +34,7 @@ void drv_mqtt_handler(void);
 drv_mqtt_t drv_mqtt =
 {
 	.handler = NULL, .time = 0,
-	.mqtt_reason = { "none", "poll", "event" },
+	.mqtt_reason = { "none", "poll", "event", "init" },
 	.iot_mode = { "normal", "motion", "sos", "alarm", "panic" }
 };
 
@@ -48,10 +50,18 @@ static void drv_mqtt_sub()
 }
 
 //------------------------------------------------------------------------------
-void drv_mqtt_pub(const char *cmd, ...)
+static void drv_mqtt_publish(const char *msg, int len)
 {
 	struct mg_connection *c = mgos_mqtt_get_global_conn();
 
+	mg_mqtt_publish(c, PUB_TOPIC(), mgos_mqtt_get_packet_id(), MG_MQTT_QOS(0), msg, len);
+	drv_led_blink_mode(BL_MQTT_PUB_MSG);
+	printf("%s(%s msg: %.*s)\n", __func__, PUB_TOPIC(), len, msg);
+}
+
+//------------------------------------------------------------------------------
+void drv_mqtt_pub(const char *cmd, ...)
+{
 	char msg[128];
 	struct json_out jmo = JSON_OUT_BUF(msg, sizeof(msg));
 	va_list ap;
@@ -59,9 +69,14 @@ void drv_mqtt_pub(const char *cmd, ...)
 	va_start(ap, cmd);
 	n = json_vprintf(&jmo, cmd, ap);
 	va_end(ap);
-	mg_mqtt_publish(c, PUB_TOPIC(), mgos_mqtt_get_packet_id(), MG_MQTT_QOS(0), msg, n);
-	drv_led_blink_mode(BL_MQTT_PUB_MSG);
-	printf("%s(%s msg: %s)\n", __func__, PUB_TOPIC(), msg);
+
+	/* json_vprintf возвращает полную длину, даже если она не влезла в буфер */
+	if (n >= (int) sizeof(msg))
+	{
+		printf("%s: message is too long (%d bytes)\n", __func__, n);
+		return;
+	}
+	drv_mqtt_publish(msg, n);
 }
 
 //------------------------------------------------------------------------------
@@ -96,7 +111,7 @@ static iot_mode_e iot_mode_str_to_enum(char* mode)
 		{
 			return (iot_mode_e) i;
 		}
-	return NORMAL_MODE;
+	return NUM_IOT_MODES; // неизвестный режим
 }
 
 //------------------------------------------------------------------------------
@@ -112,21 +127,25 @@ static void mqtt_led_state(bool state)
 		drv_led.handler = NULL;
 		led_in();
 	}
+	drv_led.mqtt = POLL;
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_relay_state(int i, bool state)
+static bool mqtt_relay_state(int i, bool state)
 {
-	if (i < NUM_IOT_RELAY)
+	if (INDEX_OK(i, NUM_IOT_RELAY))
 	{
 		pin_write(iot_relay[i].pin.out, !state);
+		iot_relay[i].mqtt = POLL;
+		return true;
 	}
+	return false;
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_relay_mode(int i, iot_mode_e mode_name_new)
+static bool mqtt_relay_mode(int i, iot_mode_e mode_name_new)
 {
-	if (i < NUM_IOT_RELAY)
+	if (INDEX_OK(i, NUM_IOT_RELAY) && mode_name_new < NUM_IOT_MODES)
 	{
 		iot_relay[i].mqtt = POLL;
 
@@ -158,7 +177,9 @@ static void mqtt_relay_mode(int i, iot_mode_e mode_name_new)
 			break;
 
 		case SOS_MODE:
-			iot_relay[i].mode.pin_state = pin_read(iot_relay[i].pin.out);
+			// сохраняем состояние только если реле не мигает (иначе оно случайное)
+			if (iot_relay[i].mode.task.handler == NULL)
+				iot_relay[i].mode.pin_state = pin_read(iot_relay[i].pin.out);
 			iot_x_relay_mode_task_handler(&iot_relay[i], iot_x_relay_task_sos);
 			break;
 
@@ -173,32 +194,39 @@ static void mqtt_relay_mode(int i, iot_mode_e mode_name_new)
 		}
 
 		iot_relay[i].mode.current = mode_name_new;
+		return true;
 	}
+	return false;
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_sw_mode(int i, iot_mode_e mode_name_new)
+static bool mqtt_sw_mode(int i, iot_mode_e mode_name_new)
 {
-	if (i < NUM_IOT_SW)
+	if (INDEX_OK(i, NUM_IOT_SW) && mode_name_new < NUM_IOT_MODES)
 	{
 		iot_sw[i].mqtt = POLL;
 		iot_sw[i].mode.current = mode_name_new;
+		return true;
 	}
+	return false;
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_sw_relay_state(int i, bool state)
+static bool mqtt_sw_relay_state(int i, bool state)
 {
-	if (i < NUM_IOT_SW_RELAY)
+	if (INDEX_OK(i, NUM_IOT_SW_RELAY))
 	{
 		pin_write(iot_sw_relay[i].pin.out, !state);
+		iot_sw_relay[i].mqtt = true;
+		return true;
 	}
+	return false;
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_bt_relay_state(int i, bool state)
+static bool mqtt_bt_relay_state(int i, bool state)
 {
-	if (i < NUM_IOT_BT_RELAY)
+	if (INDEX_OK(i, NUM_IOT_BT_RELAY))
 	{
 		switch((int) iot_bt_relay[i].mode.current)
 		{
@@ -206,13 +234,16 @@ static void mqtt_bt_relay_state(int i, bool state)
 			pin_write(iot_bt_relay[i].pin.out, !state);
 			break;
 		}
+		iot_bt_relay[i].mqtt = POLL;
+		return true;
 	}
+	return false;
 }
 
 //------------------------------------------------------------------------------
-static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
+static bool mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 {
-	if (i < NUM_IOT_BT_RELAY)
+	if (INDEX_OK(i, NUM_IOT_BT_RELAY) && mode_name_new < NUM_IOT_MODES)
 	{
 		iot_bt_relay[i].mqtt = POLL;
 
@@ -244,7 +275,9 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 			break;
 
 		case SOS_MODE:
-			iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
+			// сохраняем состояние только если реле не мигает (иначе оно случайное)
+			if (iot_bt_relay[i].mode.task.handler == NULL)
+				iot_bt_relay[i].mode.pin_state = pin_read(iot_bt_relay[i].pin.out);
 			iot_x_relay_mode_task_handler(&iot_bt_relay[i], iot_x_relay_task_sos);
 			break;
 
@@ -259,19 +292,39 @@ static void mqtt_bt_relay_mode(int i, iot_mode_e mode_name_new)
 		}
 
 		iot_bt_relay[i].mode.current = iot_bt_relay[i].mode.requested = mode_name_new;
+		return true;
 	}
+	return false;
+}
+
+//------------------------------------------------------------------------------
+static void mqtt_iot_x_poll()
+{
+	int i;
+
+	drv_mqtt.mqtt_reason_e = INIT;
+	for (i = 0; i < NUM_IOT_RELAY; i++)
+		iot_relay[i].mqtt = POLL;
+	for (i = 0; i < NUM_IOT_SW; i++)
+		iot_sw[i].mqtt = POLL;
+	for (i = 0; i < NUM_IOT_SW_RELAY; i++)
+		iot_sw_relay[i].mqtt = true;
+	for (i = 0; i < NUM_IOT_BT; i++)
+		iot_bt[i].mqtt = true;
+	for (i = 0; i < NUM_IOT_BT_RELAY; i++)
+		iot_bt_relay[i].mqtt = POLL;
+	drv_led.mqtt = POLL;
 }
 
 //------------------------------------------------------------------------------
 static void mqtt_iot_x_init()
 {
-	drv_mqtt.mqtt_reason_e = INIT;
 	iot_relay_init();
 	iot_switch_init();
 	iot_switch_relay_init();
 	iot_button_init();
 	iot_button_relay_init();
-	drv_led.mqtt = POLL;
+	mqtt_iot_x_poll();
 }
 
 //------------------------------------------------------------------------------
@@ -331,7 +384,7 @@ void drv_mqtt_handler(void)
 		{
 			drv_mqtt_pub(
 					"{sw_relay: %d, state: %Q, mode_current: %Q, mode_requested: %Q}",
-					i, bool_to_state_str(!pin_read(iot_sw_relay[i].pin.in)),
+					i, bool_to_state_str(!pin_read(iot_sw_relay[i].pin.out)),
 					enum_to_iot_mode_str(NORMAL_MODE),
 					enum_to_iot_mode_str(NORMAL_MODE));
 			iot_sw_relay[i].mqtt = NONE;
@@ -376,57 +429,70 @@ void drv_mqtt_handler(void)
 }
 
 //------------------------------------------------------------------------------
+static bool mqtt_is_init_cmd(const struct mg_str *s)
+{
+	size_t len = s->len;
+
+	/* допускаем завершающие пробелы и перевод строки */
+	while (len > 0 && (s->p[len - 1] == ' ' || s->p[len - 1] == '\r'
+			|| s->p[len - 1] == '\n'))
+		len--;
+
+	return (len == sizeof("init") - 1 && strncmp(s->p, "init", len) == 0);
+}
+
+//------------------------------------------------------------------------------
 static void mqtt_parcer_msg(struct mg_mqtt_message* msg)
 {
 	struct mg_str *s = &msg->payload;
-	int i;
-	bool err = false;
-	char* arg;
+	int relay = NO_INDEX, sw = NO_INDEX, sw_relay = NO_INDEX, bt_relay = NO_INDEX;
+	char *state = NULL, *mode = NULL, *led = NULL;
+	bool ok;
 
 	printf("%s(%s msg: %.*s)\n", __func__, SUB_TOPIC(), (int) s->len, s->p);
 
+	/* все ключи разбираются за один проход;
+	 строки %Q выделяются через malloc и освобождаются ниже */
+	json_scanf(s->p, s->len,
+			"{relay: %d, sw: %d, sw_relay: %d, bt_relay: %d, state: %Q, mode: %Q, led: %Q}",
+			&relay, &sw, &sw_relay, &bt_relay, &state, &mode, &led);
+
 	/* parsing commands */
-	if (json_scanf(s->p, s->len, "{relay: %d, state: %Q}", &i, &arg) == 2)
+	if (relay != NO_INDEX && state != NULL)
+		ok = mqtt_relay_state(relay, state_str_to_bool(state));
+	else if (relay != NO_INDEX && mode != NULL)
+		ok = mqtt_relay_mode(relay, iot_mode_str_to_enum(mode));
+	else if (sw != NO_INDEX && mode != NULL)
+		ok = mqtt_sw_mode(sw, iot_mode_str_to_enum(mode));
+	else if (sw_relay != NO_INDEX && state != NULL)
+		ok = mqtt_sw_relay_state(sw_relay, state_str_to_bool(state));
+	else if (bt_relay != NO_INDEX && state != NULL)
+		ok = mqtt_bt_relay_state(bt_relay, state_str_to_bool(state));
+	else if (bt_relay != NO_INDEX && mode != NULL)
+		ok = mqtt_bt_relay_mode(bt_relay, iot_mode_str_to_enum(mode));
+	else if (led != NULL)
 	{
-		mqtt_relay_state(i, state_str_to_bool(arg));
+		mqtt_led_state(state_str_to_bool(led));
+		ok = true;
 	}
-	else if (json_scanf(s->p, s->len, "{relay: %d, mode: %Q}", &i, &arg) == 2)
-	{
-		mqtt_relay_mode(i, iot_mode_str_to_enum(arg));
-	}
-	else if (json_scanf(s->p, s->len, "{sw: %d, mode: %Q}", &i, &arg) == 2)
-	{
-		mqtt_sw_mode(i, iot_mode_str_to_enum(arg));
-	}
-	else if (json_scanf(s->p, s->len, "{sw_relay: %d, state: %Q}", &i, &arg) == 2)
-	{
-		mqtt_sw_relay_state(i, state_str_to_bool(arg));
-	}
-	else if (json_scanf(s->p, s->len, "{bt_relay: %d, state: %Q}", &i, &arg) == 2)
-	{
-		mqtt_bt_relay_state(i, state_str_to_bool(arg));
-	}
-	else if (json_scanf(s->p, s->len, "{bt_relay: %d, mode: %Q}", &i, &arg) == 2)
-	{
-		mqtt_bt_relay_mode(i, iot_mode_str_to_enum(arg));
-	}
-	else if (json_scanf(s->p, s->len, "{led: %Q}", &arg) == 1)
-	{
-		mqtt_led_state(state_str_to_bool(arg));
-	}
-	else if (strncmp(s->p, "init", sizeof("init") - 1) == 0)
+	else if (mqtt_is_init_cmd(s))
 	{
 		mqtt_iot_x_init();
+		ok = true;
 	}
 	else
 	{
-		err = true;
+		ok = false;
 	}
 
-	if (err == false)
+	free(state);
+	free(mode);
+	free(led);
+
+	if (ok == true)
 	{
 		drv_led_blink_mode(BL_MQTT_SUB_MSG_OK);
-		if (MQTT_ACK() == true) drv_mqtt_pub("%.*s\n", (int) s->len, s->p);
+		if (MQTT_ACK() == true) drv_mqtt_publish(s->p, (int) s->len);
 	}
 	else
 	{
@@ -450,7 +516,7 @@ void drv_mqtt_callback(struct mg_connection *c, int ev, void *p, void* user_data
 			{
 				drv_mqtt.handler = drv_mqtt_handler;
 				drv_mqtt_sub();
-				mqtt_iot_x_init();
+				mqtt_iot_x_poll();
 				drv_led_blink_mode(BL_MQTT_CONNECTED);
 			}
 			else

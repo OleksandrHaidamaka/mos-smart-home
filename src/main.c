@@ -9,11 +9,6 @@
  ******************************************************************************/
 #include "main.h"
 
-/*******************************************************************************
- *** VARIABLES
- ******************************************************************************/
-mgos_timer_id timer_id;
-
 //------------------------------------------------------------------------------
 static void welcome_str()
 {
@@ -46,10 +41,7 @@ static void wifi_sta_start()
 void delay(int ms)
 {
 	if (ms)
-	{
-		mgos_ints_disable();
 		mgos_msleep(ms);
-	}
 }
 
 //------------------------------------------------------------------------------
@@ -60,23 +52,14 @@ static void drv_wifi_callback(enum mgos_wifi_status event, void *data)
 	{
 	case MGOS_WIFI_IP_ACQUIRED:
 		mgos_sys_config_set_mqtt_enable(true);
-		if (timer_id == 0)
-			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		drv_led_blink_mode(BL_WIFI_IP_ACQUIRED);
 		break;
 	case MGOS_WIFI_CONNECTED:
-		if (timer_id)
-		{
-			mgos_clear_timer(timer_id);
-			timer_id = 0;
-			drv_led_init();
-		}
+		drv_led_init();
 		break;
 	case MGOS_WIFI_DISCONNECTED:
 		mgos_sys_config_set_mqtt_enable(false);
 		drv_mqtt.handler = NULL;
-		if (timer_id == 0)
-			timer_id = mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 		drv_led_blink_mode(BL_WIFI_DISCONNECTED);
 		break;
 	}
@@ -87,8 +70,6 @@ static void __low_level_init()
 {
 	/* Driver init */
 	drv_led_init();
-	drv_switch_init();
-	drv_button_init();
 
 	/* IoT init */
 	iot_relay_init();
@@ -97,11 +78,15 @@ static void __low_level_init()
 	iot_button_init();
 	iot_button_relay_init();
 
+	/* Driver init (после IoT: входы уже настроены с подтяжкой) */
+	drv_switch_init();
+	drv_button_init();
+
 	/* регистрация wifi & mqtt callback's */
 	mgos_wifi_add_on_change_cb(drv_wifi_callback, NULL);
 	mgos_mqtt_add_global_handler(drv_mqtt_callback, NULL);
 
-	/* старт sys_tick таймера */
+	/* старт sys_tick таймера (единственный, работает всегда) */
 	mgos_set_timer(SYS_TICK, true, sys_tick, NULL);
 
 	/* oтложенный старт wifi модуля */

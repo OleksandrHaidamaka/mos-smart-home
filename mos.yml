@@ -31,13 +31,15 @@ config_schema:
 ################################################################################
 
 ### MQTT settings ##############################################################
+# Топики pub и sub должны различаться: иначе устройство получает
+# свои же статусы обратно и принимает их за команды.
   - ["mqtt.enable",   true]
 # - ["mqtt.server",   "broker.mqttdashboard.com:1883"]
 # - ["mqtt.server",   "192.168.0.100:1883"]
   - ["mqtt.server",   "io.adafruit.com:1883"]
   - ["mqtt.user",     "landgraf"]
   - ["mqtt.pass",     "c00794040e08443c8bab85b48e627b5e"]
-  - ["mqtt.pub", "s", "landgraf/f/light",   {title: "Publish topic"}]
+  - ["mqtt.pub", "s", "landgraf/f/light-state", {title: "Publish topic"}]
   - ["mqtt.sub", "s", "landgraf/f/light",   {title: "Subscribe topic"}]
 # - ["mqtt.pub", "s", "from/esp0",          {title: "Publish topic"}]
 # - ["mqtt.sub", "s", "to/esp0",            {title: "Subscribe topic"}]
